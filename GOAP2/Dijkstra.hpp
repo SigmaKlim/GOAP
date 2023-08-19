@@ -53,7 +53,7 @@ public:
 		return distFromStart < right->distFromStart;
 	};
 private:
-	Node(ull id_, T_NodeDesc data_, Node* prevNodePtr = nullptr, T_ArcDesc prevArc_ = T_ArcDesc()) : id(id_), data(data_), prevNode (prevNodePtr), prevArc(prevArc_) {};
+	Node(ull id_, T_NodeDesc data_, Node* prevNodePtr = nullptr, T_ArcDesc prevArc_ = T_ArcDesc(), int distFromStart_ = 0) : id(id_), data(data_), prevNode (prevNodePtr), prevArc(prevArc_), distFromStart(distFromStart_) {};
 	virtual ~Node() {};
 	//bool operator>(const Node& right) const
 	//{
@@ -88,7 +88,7 @@ public:
 		Path<T_ArcDesc>* path = new Path<T_ArcDesc>();
 		struct NodePtr
 		{
-			Node<T_NodeDesc, T_ArcDesc>* nodePtr;
+			Node<T_NodeDesc, T_ArcDesc>* nodePtr = nullptr;
 			bool operator>(const NodePtr& right) const
 			{
 				return nodePtr->operator>(right.nodePtr);
@@ -122,31 +122,30 @@ public:
 			std::vector <std::pair<T_NodeDesc, T_ArcDesc>> neighborDescList = GetNeighborDescList(currentNode->data);
 			for (int i = 0; i < neighborDescList.size(); i++)
 			{
-				NodePtr neighbor = { new Node<T_NodeDesc, T_ArcDesc>(GenerateId(neighborDescList[i].first), neighborDescList[i].first, currentNode.nodePtr, neighborDescList[i].second) };
-				auto tempIt = discMap.find(neighbor->id);
+				ull neighborId = GenerateId(neighborDescList[i].first);
+				int dist = GetDist(neighborDescList[i].second);
+				auto tempIt = discMap.find(neighborId);
 				bool wasDiscovered = (tempIt != discMap.end());
 				Element<NodePtr>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
-				bool wasExpanded = expanded.find(neighbor->id) != expanded.end();
-				int dist = GetDist(neighborDescList[i].second);
+				NodePtr neighbor = { new Node<T_NodeDesc, T_ArcDesc>(neighborId, neighborDescList[i].first, currentNode.nodePtr, neighborDescList[i].second, currentNode->distFromStart + dist) };;
+				bool wasExpanded = expanded.find(neighborId) != expanded.end();
 				if (wasDiscovered == false && wasExpanded == false)
 				{
-					neighbor->distFromStart = currentNode->distFromStart + dist;
-					neighbor->prevNode = currentNode.nodePtr;
 					currentElement = discovered.insert(neighbor);
 					discMap.insert({ neighbor->id, currentElement });
 				}
-				else if (wasDiscovered == true && neighbor->distFromStart > currentNode->distFromStart + dist)
+				else if (wasDiscovered == true && neighborElement->getKey()->distFromStart > neighbor->distFromStart)
 				{
-					neighbor->distFromStart = currentNode->distFromStart + dist;
-					neighbor->prevNode = currentNode.nodePtr;
-					//auto toDelete = neighborElement.getKey();
+					auto toDelete = neighborElement->getKey().nodePtr;
 					discovered.decreaseKey(neighborElement, neighbor);
-					//delete toDelete;
+					delete toDelete;
 				}
+				else
+					delete neighbor.nodePtr;
 			}
 		}
 		path->cost = currentNode->distFromStart;
-		for (auto prevNode = currentNode.nodePtr; prevNode != nullptr; prevNode = prevNode->prevNode)
+		for (auto prevNode = currentNode.nodePtr; prevNode->prevNode != nullptr; prevNode = prevNode->prevNode)
 			path->arcs.push_back(prevNode->prevArc);
 		path->Reverse();
 		for (auto& it : discMap)
@@ -186,7 +185,7 @@ public:
 	};
 	int GetDist(const std::string& arc) const
 	{
-		int dashPos = arc.find('-', 0);
+		auto dashPos = arc.find('-', 0);
 		if (dashPos != 1 && dashPos != 2)
 			return -1;
 		auto from = std::stoi(arc.substr(0, dashPos));
