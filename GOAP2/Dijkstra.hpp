@@ -53,7 +53,7 @@ public:
 		return distFromStart < right->distFromStart;
 	};
 private:
-	Node(ull id_, T_NodeDesc data_, Node* prevNode_ = nullptr, T_ArcDesc prevArc_ = T_ArcDesc()) : id(id_), data(data_), prevNode (prevNode_), prevArc(prevArc_) {};
+	Node(ull id_, T_NodeDesc data_, Node* prevNodePtr = nullptr, T_ArcDesc prevArc_ = T_ArcDesc()) : id(id_), data(data_), prevNode (prevNodePtr), prevArc(prevArc_) {};
 	virtual ~Node() {};
 	//bool operator>(const Node& right) const
 	//{
@@ -86,14 +86,14 @@ public:
 	Path<T_ArcDesc>* Pathfind(T_NodeDesc* start, T_NodeDesc* finish)
 	{
 		Path<T_ArcDesc>* path = new Path<T_ArcDesc>();
-		struct Node_
+		struct NodePtr
 		{
 			Node<T_NodeDesc, T_ArcDesc>* nodePtr;
-			bool operator>(const Node_& right) const
+			bool operator>(const NodePtr& right) const
 			{
 				return nodePtr->operator>(right.nodePtr);
 			}; 
-			bool operator<(const Node_& right) const
+			bool operator<(const NodePtr& right) const
 			{
 				return nodePtr->operator<(right.nodePtr);
 			};
@@ -102,12 +102,12 @@ public:
 				return nodePtr;
 			}
 		};
-		FibonacciHeap<Node<T_NodeDesc, T_ArcDesc>*> discovered; //a queue of discovered but not expanded nodes
-		std::map<ull, Element<Node<T_NodeDesc, T_ArcDesc>*>*> discMap; //used to access elements of heap and check if a node had been discovered (by id)
-		std::map<ull, Node<T_NodeDesc, T_ArcDesc>*> expanded; //a set of expanded nodes, used to check if a node had been expanded (by id)
+		FibonacciHeap<NodePtr> discovered; //a queue of discovered but not expanded nodes
+		std::map<ull, Element<NodePtr>*> discMap; //used to access elements of heap and check if a node had been discovered (by id)
+		std::map<ull, NodePtr> expanded; //a set of expanded nodes, used to check if a node had been expanded (by id)
 				
-		Node<T_NodeDesc, T_ArcDesc>* currentNode = new Node<T_NodeDesc, T_ArcDesc>(GenerateId(*start), *start);
-		Node<T_NodeDesc, T_ArcDesc>* finishNode = new Node<T_NodeDesc, T_ArcDesc>(666, *finish);//!
+		NodePtr currentNode = { new Node<T_NodeDesc, T_ArcDesc>(GenerateId(*start), *start) };
+		NodePtr finishNode = { new Node<T_NodeDesc, T_ArcDesc>(666, *finish) };//!
 		auto currentElement = discovered.insert(currentNode);
 		discMap.insert({ currentNode->id, currentElement });
 		while (true)
@@ -116,43 +116,44 @@ public:
 				return nullptr;
 			currentNode = discovered.extractMin();
 			discMap.erase(currentNode->id);
-			if (Satisfies(currentNode, finishNode) == true)
+			if (Satisfies(currentNode.nodePtr, finishNode.nodePtr) == true)
 				break;
 			expanded.insert({ currentNode->id, currentNode });
 			std::vector <std::pair<T_NodeDesc, T_ArcDesc>> neighborDescList = GetNeighborDescList(currentNode->data);
 			for (int i = 0; i < neighborDescList.size(); i++)
 			{
-				Node<T_NodeDesc, T_ArcDesc>* neighbor = new Node<T_NodeDesc, T_ArcDesc>(GenerateId(neighborDescList[i].first), neighborDescList[i].first, currentNode, neighborDescList[i].second);
+				NodePtr neighbor = { new Node<T_NodeDesc, T_ArcDesc>(GenerateId(neighborDescList[i].first), neighborDescList[i].first, currentNode.nodePtr, neighborDescList[i].second) };
 				auto tempIt = discMap.find(neighbor->id);
 				bool wasDiscovered = (tempIt != discMap.end());
-				Element<Node<T_NodeDesc, T_ArcDesc>*>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
+				Element<NodePtr>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
 				bool wasExpanded = expanded.find(neighbor->id) != expanded.end();
 				int dist = GetDist(neighborDescList[i].second);
 				if (wasDiscovered == false && wasExpanded == false)
 				{
 					neighbor->distFromStart = currentNode->distFromStart + dist;
-					neighbor->prevNode = currentNode;
+					neighbor->prevNode = currentNode.nodePtr;
 					currentElement = discovered.insert(neighbor);
 					discMap.insert({ neighbor->id, currentElement });
 				}
 				else if (wasDiscovered == true && neighbor->distFromStart > currentNode->distFromStart + dist)
 				{
 					neighbor->distFromStart = currentNode->distFromStart + dist;
-					neighbor->prevNode = currentNode;
+					neighbor->prevNode = currentNode.nodePtr;
+					//auto toDelete = neighborElement.getKey();
 					discovered.decreaseKey(neighborElement, neighbor);
+					//delete toDelete;
 				}
-				//else delete neighbor;
 			}
 		}
 		path->cost = currentNode->distFromStart;
-		for (auto prevNode = currentNode; prevNode != nullptr; prevNode = prevNode->prevNode)
+		for (auto prevNode = currentNode.nodePtr; prevNode != nullptr; prevNode = prevNode->prevNode)
 			path->arcs.push_back(prevNode->prevArc);
 		path->Reverse();
 		for (auto& it : discMap)
-			delete it.second->getKey();
+			delete it.second->getKey().nodePtr;
 		for (auto& it : expanded)
-			delete it.second;
-		delete finishNode;
+			delete it.second.nodePtr;
+		delete finishNode.nodePtr;
 		return path;
 	}
 
