@@ -27,6 +27,16 @@ class Path
 		for (int i = 0; i < arcs.size() / 2; i++)
 			std::swap(arcs[i], arcs[arcs.size() - 1 - i]);
 	}; //swaps elements of path so that 1st element becomes last etc.
+
+public:
+	const std::vector<T_ArcDesc>& GetArcList() const
+	{
+		return arcs;
+	}
+	int GetCost() const
+	{
+		return cost;
+	}
 };
 
 template <class T_NodeDesc, class T_ArcDesc>
@@ -55,15 +65,6 @@ public:
 private:
 	Node(ull id_, T_NodeDesc data_, Node* prevNodePtr = nullptr, T_ArcDesc prevArc_ = T_ArcDesc(), int distFromStart_ = 0) : id(id_), data(data_), prevNode (prevNodePtr), prevArc(prevArc_), distFromStart(distFromStart_) {};
 	virtual ~Node() {};
-	//bool operator>(const Node& right) const
-	//{
-	//	return distFromStart > right.distFromStart;
-	//}; //for ordering
-	//bool operator<(const Node& right) const
-	//{
-	//	return distFromStart < right.distFromStart;
-	//}; //for ordering
-
 	ull id = 0;
 	T_NodeDesc data;
 	Node* prevNode = nullptr;
@@ -124,10 +125,12 @@ public:
 			{
 				ull neighborId = GenerateId(neighborDescList[i].first);
 				int dist = GetDist(neighborDescList[i].second);
+				if (currentNode->distFromStart + dist < 0)
+					std::cout << "";
 				auto tempIt = discMap.find(neighborId);
 				bool wasDiscovered = (tempIt != discMap.end());
 				Element<NodePtr>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
-				NodePtr neighbor = { new Node<T_NodeDesc, T_ArcDesc>(neighborId, neighborDescList[i].first, currentNode.nodePtr, neighborDescList[i].second, currentNode->distFromStart + dist) };;
+				NodePtr neighbor = { new Node<T_NodeDesc, T_ArcDesc>(neighborId, neighborDescList[i].first, currentNode.nodePtr, neighborDescList[i].second, currentNode->distFromStart + dist) };
 				bool wasExpanded = expanded.find(neighborId) != expanded.end();
 				if (wasDiscovered == false && wasExpanded == false)
 				{
@@ -160,16 +163,15 @@ public:
 
 class TestPathfinder : public BasePathfinder<int, std::string>
 {
-	const int N = 5;
-	const float DISC_CHANCE = 0.67f;
+	int dim = 5;
 	mtrx matrix;
 
 public:
-	TestPathfinder()
+	TestPathfinder(std::ifstream& fin, int dim_)
 	{
-		std::ifstream fin("test_data.txt");
-		MathHelper::MakeEmptyMatrix(matrix, N);
-		MathHelper::ReadMtrxFromFile(matrix, fin, 0, ',');
+		dim = dim_;
+		MathHelper::MakeEmptyMatrix(matrix, dim);
+		MathHelper::ReadMtrxFromFile(matrix, fin,/* 0,*/ ',');
 	}
 	int GenerateId(const int& data)
 	{
@@ -178,7 +180,7 @@ public:
 	std::vector <std::pair<int, std::string>> GetNeighborDescList(const int nodeDesc) const
 	{
 		std::vector <std::pair<int, std::string>> neighbors;
-		for (int i = 0; i < N; i++)
+		for (int i = 0; i < dim; i++)
 			if (matrix[nodeDesc][i] != INFTY)
 				neighbors.push_back({ i, std::to_string(nodeDesc) + "-" + std::to_string(i) });
 		return neighbors;
@@ -186,11 +188,9 @@ public:
 	int GetDist(const std::string& arc) const
 	{
 		auto dashPos = arc.find('-', 0);
-		if (dashPos != 1 && dashPos != 2)
-			return -1;
 		auto from = std::stoi(arc.substr(0, dashPos));
 		auto to = std::stoi(arc.substr(dashPos + 1, arc.length() - dashPos - 1));
-		if (from < 0 || from > N || to < 0 || to > N)
+		if (from < 0 || from > dim || to < 0 || to > dim)
 			return -1;
 		return matrix[from][to];
 	}
