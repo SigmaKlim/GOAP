@@ -44,11 +44,11 @@ int MathHelper::PrintMtrxToFile(const mtrx& toPrint,  std::ofstream& fout, unsig
 	return 0;
 }
 
-int MathHelper::ReadMtrxFromFile(mtrx& result, std::ifstream& fin, int startingPos, unsigned char separator)
+int MathHelper::ReadMtrxFromFile(mtrx& result, std::ifstream& fin, /*int startingPos,*/ unsigned char separator)
 {
 	if (fin.is_open() == false)
 		return -1;
-	fin.seekg(startingPos, std::ios_base::beg);
+	/*fin.seekg(startingPos, std::ios_base::beg);*/
 	std::string str;
 	std::string nextStr = "x";
 	for (fin >> nextStr; fin.eof() != true; fin >> nextStr)
@@ -66,5 +66,14 @@ int MathHelper::ReadMtrxFromFile(mtrx& result, std::ifstream& fin, int startingP
 		ctr++;
 	}
 	return 0;
+}
+
+void MathHelper::ToAdjacencyList(mtrx& incidence, mtrx& result)
+{
+	auto dim = incidence.size();
+	result = mtrx(dim*dim, std::vector<int>(3)); //from, to, dist
+	for (auto i = 0; i < dim; i++)
+		for (auto j = 0; j < dim; j++)
+			result[i * dim + j] = { i, j, incidence[i][j] };		
 }
 
