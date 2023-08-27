@@ -10,7 +10,7 @@
 int main()
 {
 	srand(time(0));
-	const std::vector<size_t> DIMS = { 500 };
+	const std::vector<size_t> DIMS = { 5 };
 	const int K = 1;
 	const float DISC_CHANCE = 0.67f;
 	for (const auto& dim : DIMS)

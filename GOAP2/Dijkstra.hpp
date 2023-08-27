@@ -22,12 +22,6 @@ class Path
 	std::vector<T_ArcDesc> arcs;
 	int cost = 0;
 
-	void Reverse()
-	{
-		for (int i = 0; i < arcs.size() / 2; i++)
-			std::swap(arcs[i], arcs[arcs.size() - 1 - i]);
-	}; //swaps elements of path so that 1st element becomes last etc.
-
 public:
 	const std::vector<T_ArcDesc>& GetArcList() const
 	{
@@ -56,21 +50,32 @@ public:
 	};
 	bool operator>(const Node* right) const
 	{
-		return distFromStart > right->distFromStart;
+		return distFromStart + heuristic > right->distFromStart + right->heuristic;
 	};
 	bool operator<(const Node* right) const
 	{
-		return distFromStart < right->distFromStart;
+		return distFromStart + heuristic < right->distFromStart + right->heuristic;
 	};
 private:
-	Node(ull id_, T_NodeDesc data_, Node* prevNodePtr = nullptr, T_ArcDesc prevArc_ = T_ArcDesc(), int distFromStart_ = 0) : id(id_), data(data_), prevNode (prevNodePtr), prevArc(prevArc_), distFromStart(distFromStart_) {};
+	Node(ull id_, 
+		T_NodeDesc data_, 
+		Node* prevNodePtr = nullptr, 
+		T_ArcDesc prevArc_ = T_ArcDesc(), 
+		int distFromStart_ = 0,
+		int heuristics_ = 0) : 
+		id(id_), data(data_), prevNode (prevNodePtr), prevArc(prevArc_), distFromStart(distFromStart_), heuristic(heuristics_) 
+	{
+		f = distFromStart + heuristic;
+	};
 	virtual ~Node() {};
+	
 	ull id = 0;
 	T_NodeDesc data;
 	Node* prevNode = nullptr;
 	T_ArcDesc prevArc = T_ArcDesc();
 	int distFromStart = 0;
-		
+	int heuristic = 0;
+	int f = 0;
 };
 
 template <class T_NodeDesc, class T_ArcDesc>
@@ -78,6 +83,10 @@ class BasePathfinder
 {
 protected:
 	virtual int GetDist(const T_ArcDesc& arc) const = 0; //returns the length of arc
+	virtual int GetHeuristic(const T_NodeDesc& node) const
+	{
+		return 0;
+	};
 	virtual std::vector <std::pair<T_NodeDesc, T_ArcDesc>> GetNeighborDescList(const T_NodeDesc nodeDesc) const = 0; //returns the vector pairs of neighbor descriptor and arc node->neighbor
 	virtual int GenerateId(const T_NodeDesc& data) = 0; //must make unique ID for each Node according to data
 	virtual bool Satisfies(const Node<T_NodeDesc, T_ArcDesc>* node, const Node<T_NodeDesc, T_ArcDesc>* target) const = 0; //checks whether this node satisfies conditions of the target node; target is a shell for Node(T* cond), i.e. for any node with set cond field
@@ -107,8 +116,13 @@ public:
 		std::map<ull, Element<NodePtr>*> discMap; //used to access elements of heap and check if a node had been discovered (by id)
 		std::map<ull, NodePtr> expanded; //a set of expanded nodes, used to check if a node had been expanded (by id)
 				
-		NodePtr currentNode = { new Node<T_NodeDesc, T_ArcDesc>(GenerateId(*start), *start) };
-		NodePtr finishNode = { new Node<T_NodeDesc, T_ArcDesc>(666, *finish) };//!
+		NodePtr currentNode = { new Node<T_NodeDesc, T_ArcDesc>(GenerateId(*start), 
+																*start,
+																nullptr,
+																T_ArcDesc(),
+																0,
+																GetHeuristic(*start)) };
+		NodePtr finishNode = { new Node<T_NodeDesc, T_ArcDesc>(GenerateId(*finish), *finish) };
 		auto currentElement = discovered.insert(currentNode);
 		discMap.insert({ currentNode->id, currentElement });
 		while (true)
@@ -125,12 +139,16 @@ public:
 			{
 				ull neighborId = GenerateId(neighborDescList[i].first);
 				int dist = GetDist(neighborDescList[i].second);
-				if (currentNode->distFromStart + dist < 0)
-					std::cout << "";
+				int heuristic = GetHeuristic(neighborDescList[i].first);
 				auto tempIt = discMap.find(neighborId);
 				bool wasDiscovered = (tempIt != discMap.end());
 				Element<NodePtr>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
-				NodePtr neighbor = { new Node<T_NodeDesc, T_ArcDesc>(neighborId, neighborDescList[i].first, currentNode.nodePtr, neighborDescList[i].second, currentNode->distFromStart + dist) };
+				NodePtr neighbor = { new Node<T_NodeDesc, T_ArcDesc>(neighborId, 
+																	neighborDescList[i].first, 
+																	currentNode.nodePtr, 
+																	neighborDescList[i].second, 
+																	currentNode->distFromStart + dist, 
+																	heuristic)};
 				bool wasExpanded = expanded.find(neighborId) != expanded.end();
 				if (wasDiscovered == false && wasExpanded == false)
 				{
@@ -150,7 +168,8 @@ public:
 		path->cost = currentNode->distFromStart;
 		for (auto prevNode = currentNode.nodePtr; prevNode->prevNode != nullptr; prevNode = prevNode->prevNode)
 			path->arcs.push_back(prevNode->prevArc);
-		path->Reverse();
+		for (int i = 0; i < path->arcs.size() / 2; i++)
+			std::swap(path->arcs[i], path->arcs[path->arcs.size() - 1 - i]);
 		for (auto& it : discMap)
 			delete it.second->getKey().nodePtr;
 		for (auto& it : expanded)
