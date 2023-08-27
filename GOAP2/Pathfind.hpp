@@ -63,10 +63,7 @@ private:
 		T_ArcDesc prevArc_ = T_ArcDesc(), 
 		int distFromStart_ = 0,
 		int heuristics_ = 0) : 
-		id(id_), data(data_), prevNode (prevNodePtr), prevArc(prevArc_), distFromStart(distFromStart_), heuristic(heuristics_) 
-	{
-		f = distFromStart + heuristic;
-	};
+		id(id_), data(data_), prevNode (prevNodePtr), prevArc(prevArc_), distFromStart(distFromStart_), heuristic(heuristics_) {};
 	virtual ~Node() {};
 	
 	ull id = 0;
@@ -75,7 +72,6 @@ private:
 	T_ArcDesc prevArc = T_ArcDesc();
 	int distFromStart = 0;
 	int heuristic = 0;
-	int f = 0;
 };
 
 template <class T_NodeDesc, class T_ArcDesc>

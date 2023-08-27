@@ -1,39 +1,39 @@
 #include <random>
 #include <ctime>
 #include <string>
-#include <iostream>
+#include <iostream> 
 #include <fstream>
 #include "MathHelper.h"
-#include "Dijkstra.hpp"
+#include "Pathfind.hpp"
 #pragma optimize( "", off )
 
 int main()
 {
 	srand(time(0));
-	const std::vector<size_t> DIMS = { 5 };
+	const std::vector<size_t> DIMS = { 500 };
 	const int K = 1;
 	const float DISC_CHANCE = 0.67f;
-	for (const auto& dim : DIMS)
-	{
-		for (auto k = 0; k < K; k++)
-		{
-			std::ofstream fout("test_data/test_matrix_set_" + std::to_string(dim) + "_" + std::to_string(k) + ".txt");
-			if (fout.is_open() == false)
-				return -1;
-			std::ofstream fout_("test_data/test_adjacency_list_" + std::to_string(dim) + "_" + std::to_string(k) + ".txt");
-			if (fout.is_open() == false)
-				return -1;
-			mtrx m;
-			mtrx aList;
-			MathHelper::MakeRndIncidenceMatrx(m, dim, DISC_CHANCE);
-			MathHelper::ToAdjacencyList(m, aList);
-			MathHelper::PrintMtrxToFile(m, fout, ',');
-			MathHelper::PrintMtrxToFile(aList, fout_, ' ');
-			fout.close();
-			fout_.close();
-		}
-	}
-	
+	//for (const auto& dim : DIMS)
+	//{
+	//	for (auto k = 0; k < K; k++)
+	//	{
+	//		std::ofstream fout("test_data/test_matrix_set_" + std::to_string(dim) + "_" + std::to_string(k) + ".txt");
+	//		if (fout.is_open() == false)
+	//			return -1;
+	//		std::ofstream fout_("test_data/test_adjacency_list_" + std::to_string(dim) + "_" + std::to_string(k) + ".txt");
+	//		if (fout.is_open() == false)
+	//			return -1;
+	//		mtrx m;
+	//		mtrx aList;
+	//		MathHelper::MakeRndIncidenceMatrx(m, dim, DISC_CHANCE);
+	//		MathHelper::ToAdjacencyList(m, aList);
+	//		MathHelper::PrintMtrxToFile(m, fout, ',');
+	//		MathHelper::PrintMtrxToFile(aList, fout_, ' ');
+	//		fout.close();
+	//		fout_.close();
+	//	}
+	//}
+	//
 	std::ofstream fout("test_data/results.txt"); 
 	for (const auto& dim : DIMS)
 	{

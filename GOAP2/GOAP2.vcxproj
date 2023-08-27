@@ -136,7 +136,7 @@
   <ItemGroup>
     <ClInclude Include="Action.h" />
     <ClInclude Include="FibonacciHeap.hpp" />
-    <ClInclude Include="Dijkstra.hpp" />
+    <ClInclude Include="Pathfind.hpp" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Plan.h" />
     <ClInclude Include="Search.h" />

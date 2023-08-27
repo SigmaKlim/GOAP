@@ -1,5 +1,5 @@
-dim = 5	 k = 0
-start = 0	 finish = 4
-path: 0-4 
-cost = 31
+dim = 500	 k = 0
+start = 236	 finish = 87
+path: 236-110 110-366 366-380 380-36 36-225 225-87 
+cost = 8
 

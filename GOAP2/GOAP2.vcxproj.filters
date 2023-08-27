@@ -47,7 +47,7 @@
     <ClInclude Include="FibonacciHeap.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Dijkstra.hpp">
+    <ClInclude Include="Pathfind.hpp">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="MathHelper.h">
