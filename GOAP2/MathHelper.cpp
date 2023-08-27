@@ -2,6 +2,7 @@
 #include <random>
 #include <string>
 #include <iostream>
+#include <cmath>
 #pragma optimize( "", off )
 void MathHelper::MakeEmptyMatrix(mtrx& result, int dim)
 {
@@ -75,5 +76,18 @@ void MathHelper::ToAdjacencyList(mtrx& incidence, mtrx& result)
 	for (auto i = 0; i < dim; i++)
 		for (auto j = 0; j < dim; j++)
 			result[i * dim + j] = { i, j, incidence[i][j] };		
+}
+
+unsigned MathHelper::NumDigits(int number)
+{
+	unsigned digits = 1;
+	unsigned bound = 10;
+	number = abs(number);
+	while (bound <= number)
+	{
+		digits++;
+		bound *= 10;
+	}
+	return digits;
 }
 

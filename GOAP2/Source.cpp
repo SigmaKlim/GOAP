@@ -33,7 +33,7 @@ int main()
 	//		fout_.close();
 	//	}
 	//}
-	//
+	
 	std::ofstream fout("test_data/results.txt"); 
 	for (const auto& dim : DIMS)
 	{
@@ -52,7 +52,7 @@ int main()
 				finish = rand() % dim;
 			} while (finish == start);
 			fin.close();
-			auto path = tpf.Pathfind(&start, &finish);
+			auto path = tpf.Pathfind(start, finish);
 			std::cout << "dim = " + std::to_string(dim) + "\t k = " + std::to_string(k) + "\n";
 			std::cout << "start = " + std::to_string(start) + "\t finish = " + std::to_string(finish) + "\n";
 			std::cout << "path: ";
