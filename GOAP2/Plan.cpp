@@ -134,5 +134,20 @@ bool Planner::AddGoal(const std::string& name, const std::map<std::string, bool>
     return true;
 }
 
+GoapPathfinder::GoapPathfinder()
+{
+}
 
+std::vector <std::pair<node_id, arc_id>> GoapPathfinder::GetTransitions(const node_id id) const
+{
+    return std::vector <std::pair<node_id, arc_id>>();
+}
+int GoapPathfinder::GetDist(const arc_id& arcId) const
+{
+    return 0;
+}
+bool GoapPathfinder::Satisfies(const Node<Vertex>* node, const Node<Vertex>* target) const
+{
+    return false;
+}
 

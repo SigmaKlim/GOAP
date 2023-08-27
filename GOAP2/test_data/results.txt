@@ -1,5 +1,5 @@
 dim = 500	 k = 0
-start = 340	 finish = 285
-path: 340199 199352 352407 407285 
+start = 126	 finish = 65
+path: 126265 265065 
 cost = 7
 

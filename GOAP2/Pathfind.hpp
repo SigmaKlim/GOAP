@@ -17,6 +17,7 @@ typedef int arc_id;
 
 class Path
 {
+	template <typename t_node_data>
 	friend class BasePathfinder;
 
 	std::vector<arc_id> arcs;
@@ -33,9 +34,10 @@ public:
 	}
 };
 
-
+template <typename t_node_data>
 class Node
 {
+	template <typename t_node_data>
 	friend class BasePathfinder;
 
 public:
@@ -59,15 +61,21 @@ private:
 		int distFromStart_ = 0,
 		int heuristics_ = 0) : 
 		id(id_), prevNode (prevNodePtr), prevArcId(prevArc_), distFromStart(distFromStart_), heuristic(heuristics_) {};
-	virtual ~Node() {};
+	virtual ~Node() 
+	{
+		delete data;
+	};
 	
 	node_id id = 0;
 	Node* prevNode = nullptr;
 	arc_id prevArcId = arc_id();
 	int distFromStart = 0;
 	int heuristic = 0;
+
+	t_node_data* data = nullptr;
 };
 
+template <typename t_node_data>
 class BasePathfinder
 {
 protected:
@@ -77,16 +85,16 @@ protected:
 		return 0;
 	};
 	virtual std::vector <std::pair<node_id, arc_id>> GetTransitions(const node_id id) const = 0; //returns the vector pairs of neighbor id and arc node->neighbor id
-	virtual bool Satisfies(const Node* node, const Node* target) const = 0; //checks whether this node satisfies conditions of the target node; target is a shell for Node(T* cond), i.e. for any node with set cond field
+	virtual bool Satisfies(const Node<t_node_data>* node, const Node<t_node_data>* target) const = 0; //checks whether this node satisfies conditions of the target node; target is a shell for Node(T* cond), i.e. for any node with set cond field
 public:
 	BasePathfinder() {};
 	virtual ~BasePathfinder() {};
-	Path* Pathfind(node_id start, node_id finish)
+	Path* Pathfind(node_id startId, t_node_data* startData, node_id finishId)
 	{
 		Path* path = new Path();
 		struct NodePtr
 		{
-			Node/*<T_NodeDesc, T_ArcDesc>*/* nodePtr = nullptr;
+			Node<t_node_data>* nodePtr = nullptr;
 			bool operator>(const NodePtr& right) const
 			{
 				return nodePtr->operator>(right.nodePtr);
@@ -95,7 +103,7 @@ public:
 			{
 				return nodePtr->operator<(right.nodePtr);
 			};
-			Node/*<T_NodeDesc, T_ArcDesc>*/* operator-> () const
+			Node<t_node_data>* operator-> () const
 			{
 				return nodePtr;
 			}
@@ -104,8 +112,8 @@ public:
 		std::map<node_id, Element<NodePtr>*> discMap; //used to access elements of heap and check if a node had been discovered (by id)
 		std::map<node_id, NodePtr> expanded; //a set of expanded nodes, used to check if a node had been expanded (by id)
 				
-		NodePtr currentNode = { new Node(start, nullptr, arc_id(), 0, GetHeuristic(start)) };
-		NodePtr finishNode = { new Node(finish) };
+		NodePtr currentNode = { new Node<t_node_data>(startId, nullptr, arc_id(), 0, GetHeuristic(startId)) };
+		NodePtr finishNode = { new Node<t_node_data>(finishId) };
 		auto currentElement = discovered.insert(currentNode);
 		discMap.insert({ currentNode->id, currentElement });
 		while (true)
@@ -126,7 +134,7 @@ public:
 				auto tempIt = discMap.find(neighborId);
 				bool wasDiscovered = (tempIt != discMap.end());
 				Element<NodePtr>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
-				NodePtr neighbor = { new Node(	neighborId, 
+				NodePtr neighbor = { new Node<t_node_data>(	neighborId, 
 												currentNode.nodePtr, 
 												neighborDescList[i].second, 
 												currentNode->distFromStart + dist, 
@@ -162,7 +170,7 @@ public:
 
 };
 
-class TestPathfinder : public BasePathfinder
+class TestPathfinder : public BasePathfinder<int>
 {
 	int dim;
 	mtrx matrix;
@@ -174,10 +182,6 @@ public:
 		MathHelper::MakeEmptyMatrix(matrix, dim);
 		MathHelper::ReadMtrxFromFile(matrix, fin, ',');
 	}
-	int GenerateId(const int& data)
-	{
-		return data;
-	};
 	std::vector <std::pair<node_id, arc_id>> GetTransitions(const node_id id) const
 	{
 		static const unsigned BOUND = pow(10, MathHelper::NumDigits(dim));
@@ -194,7 +198,7 @@ public:
 		unsigned from = arcId / BOUND;
 		return matrix[from][to];
 	}
-	bool Satisfies(const Node* node, const Node* target) const
+	bool Satisfies(const Node<int>* node, const Node<int>* target) const
 	{
 		return node->GetId() == target->GetId();
 	};

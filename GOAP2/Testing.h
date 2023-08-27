@@ -53,7 +53,7 @@ int test()
 				finish = rand() % dim;
 			} while (finish == start);
 			fin.close();
-			auto path = tpf.Pathfind(start, finish);
+			auto path = tpf.Pathfind(start, nullptr, finish);
 			std::cout << "dim = " + std::to_string(dim) + "\t k = " + std::to_string(k) + "\n";
 			std::cout << "start = " + std::to_string(start) + "\t finish = " + std::to_string(finish) + "\n";
 			std::cout << "path: ";

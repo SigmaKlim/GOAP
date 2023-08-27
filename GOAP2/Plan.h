@@ -24,7 +24,10 @@ class Planner
 {
 	std::map<std::string, WsMask> goalCatalogue;
 	std::map<std::string, Action> actionCatalogue;
+	std::vector<std::string*> idToAction;
 	std::vector<std::string> attributeNamesCatalogue;
+	
+
 	const int ATTRIBUTES_MAX_NUM = 20;
 
 public:
@@ -45,7 +48,17 @@ public:
 struct Vertex
 {
 	std::vector<const std::string*> availableActions;
-	std::vector<const std::string*> path;
+	//std::vector<const std::string*> path;
 	WsMask cnd;
 	WsMask state;
+};
+
+class GoapPathfinder : public BasePathfinder <Vertex>
+{
+
+public:
+	GoapPathfinder();
+	std::vector <std::pair<node_id, arc_id>> GetTransitions(const node_id id) const;
+	int GetDist(const arc_id& arcId) const;
+	bool Satisfies(const Node<Vertex>* node, const Node<Vertex>* target) const;
 };

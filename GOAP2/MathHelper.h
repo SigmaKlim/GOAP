@@ -17,5 +17,6 @@ public:
 	static int ReadMtrxFromFile(mtrx& result, std::ifstream& fin,/* int startingPos,*/ unsigned char separator = ' ');
 	static void ToAdjacencyList(mtrx& incidence, mtrx& result);
 	static unsigned NumDigits(int number);
+	
 };
 
