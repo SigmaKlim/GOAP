@@ -1,0 +1,5 @@
+dim = 100	 k = 0
+start = 0	 finish = 99
+path: 36 36052 52031 31099 
+cost = 15
+

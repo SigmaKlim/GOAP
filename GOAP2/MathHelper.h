@@ -20,3 +20,10 @@ public:
 	
 };
 
+template<class T> struct PtrLess
+{
+	bool operator()(T* lhs, T* rhs)
+	{
+		return *lhs < *rhs;
+	}
+};

@@ -112,35 +112,37 @@ public:
 				return nodePtr;
 			}
 		};
-		struct NodeIdPtr
-		{
-			t_node_id* nodeIdPtr = nullptr;
-			bool operator>(const NodeIdPtr& right) const
-			{
-				return *nodeIdPtr > *(right.nodeIdPtr);
-			};
-			bool operator <(const NodeIdPtr& right) const
-			{
-				return *(nodeIdPtr) < *(right.nodeIdPtr);
-			};
-		};
+		//struct NodeIdPtr
+		//{
+		//	t_node_id* nodeIdPtr = nullptr;
+		//	//bool operator>(const NodeIdPtr& right) const
+		//	//{
+		//	//	bool b = *nodeIdPtr > *right.nodeIdPtr;
+		//	//	return b;
+		//	//};
+		//	bool operator <(const NodeIdPtr& right) const
+		//	{
+		//		bool b = *nodeIdPtr < *right.nodeIdPtr;
+		//		return b;
+		//	};
+		//};
 		FibonacciHeap<NodePtr> discovered; //a queue of discovered but not expanded nodes
-		std::map<NodeIdPtr, Element<NodePtr>*> discMap; //used to access elements of heap and check if a node had been discovered (by id)
-		std::map<NodeIdPtr, NodePtr> expanded; //a set of expanded nodes, used to check if a node had been expanded (by id)
+		std::map<t_node_id, Element<NodePtr>*> discMap; //used to access elements of heap and check if a node had been discovered (by id)
+		std::map<t_node_id, NodePtr> expanded; //a set of expanded nodes, used to check if a node had been expanded (by id)
 				
 		NodePtr currentNode = { new Node<t_node_id>(start, nullptr, arc_id(), 0, GetHeuristic(start)) };
 		NodePtr finishNode = { new Node<t_node_id>(finish) };
 		Element<NodePtr>* currentElement = discovered.insert(currentNode);
-		discMap.insert({ {&currentNode->id}, currentElement });
+		discMap.insert({currentNode->id, currentElement });
 		while (true)
 		{
 			if (discovered.isEmpty() == true)
 				return nullptr;
 			currentNode = discovered.extractMin();
-			discMap.erase({ &currentNode->id });
+			discMap.erase(currentNode->id);
 			if (Satisfies(currentNode.nodePtr, finishNode.nodePtr) == true)
 				break;
-			expanded.insert({ {&currentNode->id}, currentNode });
+			expanded.insert({currentNode->id, currentNode });
 			std::vector <Node<t_node_id>*> neighborList = GetNeighbors(currentNode.nodePtr);
 			for (int i = 0; i < neighborList.size(); i++)
 			{
@@ -148,14 +150,14 @@ public:
 				//t_node_id neighborId = neighborDescList[i].first;
 				//int dist = GetDist(neighborDescList[i].second);
 				//int heuristic = GetHeuristic(neighborDescList[i].first);
-				auto tempIt = discMap.find({ &neighborList[i]->id });
+				auto tempIt = discMap.find(neighborList[i]->id);
 				bool wasDiscovered = (tempIt != discMap.end());
 				Element<NodePtr>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
-				bool wasExpanded = expanded.find({ &neighborList[i]->id }) != expanded.end();
+				bool wasExpanded = expanded.find(neighborList[i]->id) != expanded.end();
 				if (wasDiscovered == false && wasExpanded == false)
 				{
-					currentElement = discovered.insert({ neighborList[i] });
-					discMap.insert({ { &neighborList[i]->id }, currentElement });
+					neighborElement = discovered.insert({ neighborList[i] });
+					discMap.insert({neighborList[i]->id, neighborElement });
 				}
 				else if (wasDiscovered == true && neighborElement->getKey()->distFromStart > neighborList[i]->distFromStart)
 				{
@@ -172,8 +174,8 @@ public:
 			path->arcs.push_back(prevNodePtr->prevArcId);
 		for (int i = 0; i < path->arcs.size() / 2; i++)
 			std::swap(path->arcs[i], path->arcs[path->arcs.size() - 1 - i]);
-	/*	for (auto& it : discMap)
-			delete it.second->getKey().nodePtr;*/
+		for (auto& it : discMap)
+			delete it.second->getKey().nodePtr;
 		for (auto& it : expanded)
 			delete it.second.nodePtr;
 		delete finishNode.nodePtr;
