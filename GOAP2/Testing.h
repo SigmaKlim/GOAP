@@ -11,7 +11,7 @@
 int test()
 {
 	srand(time(0));
-	const std::vector<size_t> DIMS = { 500 };
+	const std::vector<size_t> DIMS = { 100 };
 	const int K = 1;
 	const float DISC_CHANCE = 0.67f;
 	//for (const auto& dim : DIMS)
@@ -46,14 +46,10 @@ int test()
 			if (fin.is_open() == false)
 				return -1;
 			TestPathfinder tpf(fin, dim);
-			int start = rand() % dim;
-			int finish = 0;
-			do
-			{
-				finish = rand() % dim;
-			} while (finish == start);
+			int start = 0;
+			int finish = dim - 1;
 			fin.close();
-			auto path = tpf.Pathfind(start, nullptr, finish);
+			auto path = tpf.Pathfind(start, finish);
 			std::cout << "dim = " + std::to_string(dim) + "\t k = " + std::to_string(k) + "\n";
 			std::cout << "start = " + std::to_string(start) + "\t finish = " + std::to_string(finish) + "\n";
 			std::cout << "path: ";

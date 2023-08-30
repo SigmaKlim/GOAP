@@ -1,5 +1,0 @@
-dim = 500	 k = 0
-start = 126	 finish = 65
-path: 126265 265065 
-cost = 7
-

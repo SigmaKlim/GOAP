@@ -138,7 +138,7 @@ GoapPathfinder::GoapPathfinder()
 {
 }
 
-std::vector <std::pair<node_id, arc_id>> GoapPathfinder::GetTransitions(const node_id id) const
+std::vector <std::pair<node_id, arc_id>> GoapPathfinder::GetNeighbors(const node_id id) const
 {
     return std::vector <std::pair<node_id, arc_id>>();
 }

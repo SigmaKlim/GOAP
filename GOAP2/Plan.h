@@ -58,7 +58,7 @@ class GoapPathfinder : public BasePathfinder <Vertex>
 
 public:
 	GoapPathfinder();
-	std::vector <std::pair<node_id, arc_id>> GetTransitions(const node_id id) const;
+	std::vector <std::pair<node_id, arc_id>> GetNeighbors(const node_id id) const;
 	int GetDist(const arc_id& arcId) const;
 	bool Satisfies(const Node<Vertex>* node, const Node<Vertex>* target) const;
 };
