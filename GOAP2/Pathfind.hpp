@@ -7,7 +7,7 @@
 #include <ctime>
 #include <string>
 #include <iostream>
-#include <memory>
+//#include <memory>
 #include "MathHelper.h"
 #include "FibonacciHeap.hpp"
 
@@ -96,6 +96,7 @@ public:
 	virtual ~BasePathfinder() {};
 	Path* Pathfind(t_node_id start, t_node_id finish)
 	{
+
 		Path* path = new Path();
 		struct NodePtr
 		{
@@ -130,7 +131,8 @@ public:
 		FibonacciHeap<NodePtr> discovered; //a queue of discovered but not expanded nodes
 		std::map<t_node_id*, Element<NodePtr>*, PtrLess<t_node_id>> discMap; //used to access elements of heap and check if a node had been discovered (by id)
 		std::map<t_node_id*, NodePtr, PtrLess<t_node_id>> expanded; //a set of expanded nodes, used to check if a node had been expanded (by id)
-				
+
+
 		NodePtr currentNode = { new Node<t_node_id>(start, nullptr, arc_id(), 0, GetHeuristic(start)) };
 		NodePtr finishNode = { new Node<t_node_id>(finish) };
 		Element<NodePtr>* currentElement = discovered.insert(currentNode);
@@ -151,6 +153,8 @@ public:
 				bool wasDiscovered = (tempIt != discMap.end());
 				Element<NodePtr>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
 				bool wasExpanded = expanded.find(&neighborList[i]->id) != expanded.end();
+				if (wasDiscovered && neighborElement->getKey().nodePtr == nullptr)
+					std::cout << "!";
 				if (wasDiscovered == false && wasExpanded == false)
 				{
 					neighborElement = discovered.insert({ neighborList[i] });
@@ -158,9 +162,9 @@ public:
 				}
 				else if (wasDiscovered == true && neighborElement->getKey()->distFromStart > neighborList[i]->distFromStart)
 				{
-					auto toDelete = neighborElement->getKey().nodePtr;
+					Node<t_node_id>* toDelete = neighborElement->getKey().nodePtr;
 					discovered.decreaseKey(neighborElement, { neighborList[i] });
-					//delete toDelete;
+					delete toDelete;
 				}
 				else
 					delete neighborList[i];

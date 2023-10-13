@@ -11,7 +11,7 @@
 int test()
 {
 	srand(time(0));
-	const std::vector<size_t> DIMS = { 100 };
+	const std::vector<size_t> DIMS = { 500 };
 	const int K = 1;
 	const float DISC_CHANCE = 0.67f;
 	//for (const auto& dim : DIMS)

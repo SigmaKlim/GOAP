@@ -22,8 +22,10 @@ public:
 
 template<class T> struct PtrLess
 {
-	bool operator()(const T* lhs, const T* rhs) const
+	static int a;
+	bool operator()(T* lhs, T* rhs) const
 	{
+
 		return *lhs < *rhs;
 	}
 };
