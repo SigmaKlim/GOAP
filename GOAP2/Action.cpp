@@ -1,6 +1,6 @@
 #include "Action.h"
 
-Action::Action(const WsMask& cnd_, const WsMask& eff_, const int cost_) : cnd(cnd_), eff(eff_), cost(cost_)
+Action::Action(const WorldState& cnd_, const WorldState& eff_, const int cost_) : cnd(cnd_), eff(eff_), cost(cost_)
 {
 	
 }
@@ -9,12 +9,12 @@ Action::~Action()
 {
 }
 
-const WsMask& Action::GetCnd() const
+const WorldState& Action::GetCnd() const
 {
 	return cnd;
 }
 
-const WsMask& Action::GetEff() const
+const WorldState& Action::GetEff() const
 {
 	return eff;
 }

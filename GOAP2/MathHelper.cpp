@@ -4,13 +4,13 @@
 #include <iostream>
 #include <cmath>
 #pragma optimize( "", off )
-void MathHelper::MakeEmptyMatrix(mtrx& result, int dim)
+void MathHelper::MakeEmptyMatrix(mtrx& result, u_int dim)
 {
 	result = mtrx(dim);
 	for (size_t i = 0; i < dim; i++)
-		result[i] = std::vector<int>(dim);
+		result[i] = std::vector<u_int>(dim);
 }
-void MathHelper::MakeRndMtrx(mtrx& result, int dim, int lower, int upper)
+void MathHelper::MakeRndMtrx(mtrx& result, u_int dim, u_int lower, u_int upper)
 {
 	MakeEmptyMatrix(result, dim);
 	for (size_t i = 0; i < dim; i++)
@@ -20,7 +20,7 @@ void MathHelper::MakeRndMtrx(mtrx& result, int dim, int lower, int upper)
 	}
 }
 
-void MathHelper::MakeRndIncidenceMatrx(mtrx& result, int dim, float discChance)
+void MathHelper::MakeRndIncidenceMatrx(mtrx& result, u_int dim, float discChance)
 {
 	MakeEmptyMatrix(result, dim);
 	int discValue = discChance * 100.0f;
@@ -72,9 +72,9 @@ int MathHelper::ReadMtrxFromFile(mtrx& result, std::ifstream& fin, /*int startin
 void MathHelper::ToAdjacencyList(mtrx& incidence, mtrx& result)
 {
 	auto dim = incidence.size();
-	result = mtrx(dim*dim, std::vector<int>(3)); //from, to, dist
-	for (auto i = 0; i < dim; i++)
-		for (auto j = 0; j < dim; j++)
+	result = mtrx(dim*dim, std::vector<u_int>(3)); //from, to, dist
+	for (u_int i = 0; i < dim; i++)
+		for (u_int j = 0; j < dim; j++)
 			result[i * dim + j] = { i, j, incidence[i][j] };		
 }
 

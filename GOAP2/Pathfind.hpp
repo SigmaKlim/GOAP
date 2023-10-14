@@ -10,216 +10,133 @@
 //#include <memory>
 #include "MathHelper.h"
 #include "FibonacciHeap.hpp"
+#include <unordered_set>
+#include <unordered_map>
 
 extern const int INFTY;
 typedef unsigned long long ull;
-typedef ull node_id;
+typedef unsigned t_node_id;
 typedef int arc_id;
+const t_node_id NO_ID = UINT_MAX;
 
-class Path
+template <typename t_vertex>
+struct Path
 {
-	template <typename t_node_id>
-	friend class BasePathfinder;
-
-	std::vector<arc_id> arcs;
+	std::vector<t_vertex> vertices;
 	int cost = 0;
-
-public:
-	const std::vector<arc_id>& GetArcList() const
-	{
-		return arcs;
-	}
-	int GetCost() const
-	{
-		return cost;
-	}
 };
 
-template <typename t_node_id>
-class Node
+struct Node
 {
-	template <typename t_node_id>
-	friend class BasePathfinder;
-
-public:
-
-	const t_node_id& GetId() const
+	Node(t_node_id id_,
+		 t_node_id prevNodeId_,
+		 unsigned distFromStart_,
+		 unsigned heuristic_)
+		 : id(id_), prevNodeId(prevNodeId_), distFromStart(distFromStart_), heuristic(heuristic_) {};
+	bool operator<(const Node& right) const
 	{
-		return id;
+		return distFromStart + heuristic < right.distFromStart + right.heuristic;
 	};
-	const 
-	bool operator>(const Node* right) const
+	bool operator>(const Node& right) const
 	{
-		return distFromStart + heuristic > right->distFromStart + right->heuristic;
+		return distFromStart + heuristic > right.distFromStart + right.heuristic;
 	};
-	bool operator<(const Node* right) const
-	{
-		return distFromStart + heuristic < right->distFromStart + right->heuristic;
-	};
-
-	Node(t_node_id id_, 
-		const Node* prevNodePtr_ = nullptr,
-		arc_id prevArcId_ = arc_id(),
-		unsigned distFromPrev_ = 0,
-		unsigned heuristics_ = 0)
-	{
-		id = id_;
-		prevNodePtr = prevNodePtr_;
-		prevArcId = prevArcId_;
-		distFromStart = (prevNodePtr_ == nullptr) ? 0 : prevNodePtr->distFromStart + distFromPrev_;
-		heuristic = heuristics_;
-	}
-	virtual ~Node() 
-	{
-	};
-private:	
 	t_node_id id = 0;
-	const Node* prevNodePtr = nullptr;
-	arc_id prevArcId = arc_id();
+	t_node_id prevNodeId = 0;
+	//arc_id prevArcId = arc_id();
 	unsigned distFromStart = 0;
 	unsigned heuristic = 0;
+
+
 };
 
-template <typename t_node_id>
+template <typename t_vertex>
 class BasePathfinder
 {
+	;
 protected:
-	//virtual int GetDist(const arc_id& arc) const = 0; //returns the length of arc
-	virtual int GetHeuristic(const node_id& node) const
+	virtual int			GetHeuristic(const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const
 	{
 		return 0;
 	};
-	virtual std::vector <Node<t_node_id>*> GetNeighbors(const Node<t_node_id>* node) const = 0; //returns array of newly created node's neighbors
-	virtual bool Satisfies(const Node<t_node_id>* node, const Node<t_node_id>* target) const = 0; //checks whether this node satisfies conditions of the target node; target is a shell for Node(T* cond), i.e. for any node with set cond field
+	virtual void		GetNeighbors(std::vector<t_vertex>&	neighbors_, const t_vertex& vertex_) const = 0; //returns array of newly created node's neighbors
+	virtual bool		Satisfies(const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const { return vertex_ == finish_; }; //checks whether this node satisfies conditions of the target node; target is a shell for Node(T* cond), i.e. for any node with set cond field
+	virtual t_node_id	GetId(const t_vertex& vertex_) const = 0;
+	virtual unsigned	GetDist(const t_vertex& from_, const t_vertex& to_) const = 0;
 public:
 	BasePathfinder() {};
 	virtual ~BasePathfinder() {};
-	Path* Pathfind(t_node_id start, t_node_id finish)
+	void Pathfind(Path<t_vertex>& path_, t_vertex start_, t_vertex finish_ = t_vertex())
 	{
 
-		Path* path = new Path();
-		struct NodePtr
-		{
-			Node<t_node_id>* nodePtr = nullptr;
-			bool operator>(const NodePtr& right) const
-			{
-				return nodePtr->operator>(right.nodePtr);
-			}; 
-			bool operator<(const NodePtr& right) const
-			{
-				return nodePtr->operator<(right.nodePtr);
-			};
-			Node<t_node_id>* operator-> () const
-			{
-				return nodePtr;
-			}
-		};
-		//struct NodeIdPtr
-		//{
-		//	t_node_id* nodeIdPtr = nullptr;
-		//	//bool operator>(const NodeIdPtr& right) const
-		//	//{
-		//	//	bool b = *nodeIdPtr > *right.nodeIdPtr;
-		//	//	return b;
-		//	//};
-		//	bool operator <(const NodeIdPtr& right) const
-		//	{
-		//		bool b = *nodeIdPtr < *right.nodeIdPtr;
-		//		return b;
-		//	};
-		//};
-		FibonacciHeap<NodePtr> discovered; //a queue of discovered but not expanded nodes
-		std::map<t_node_id*, Element<NodePtr>*, PtrLess<t_node_id>> discMap; //used to access elements of heap and check if a node had been discovered (by id)
-		std::map<t_node_id*, NodePtr, PtrLess<t_node_id>> expanded; //a set of expanded nodes, used to check if a node had been expanded (by id)
-
-
-		NodePtr currentNode = { new Node<t_node_id>(start, nullptr, arc_id(), 0, GetHeuristic(start)) };
-		NodePtr finishNode = { new Node<t_node_id>(finish) };
-		Element<NodePtr>* currentElement = discovered.insert(currentNode);
-		discMap.insert({ &currentNode->id, currentElement });
+		FibonacciHeap<Node> discovered; //a queue of discovered but not expanded nodes
+		std::unordered_map<t_node_id, Element<Node>*> discMap; //used to access elements of heap and check if a node had been discovered (by id)
+		std::unordered_set<t_node_id> expanded; //a set of expanded nodes, used to check if a node had been expanded
+		std::unordered_map<t_node_id, t_vertex> vertices;
+		std::map <t_node_id, t_node_id> cameFrom; // <nodeId, prevNodeId>
+		
+		Node currentNode(0, NO_ID, 0, GetHeuristic(start_, finish_));
+		vertices.insert({ 0, start_ });
+		cameFrom.insert({ 0, NO_ID });
+		Element<Node>* currentElement = discovered.insert(currentNode);
+		discMap.insert({ currentNode.id, currentElement });
+		
+		std::vector <t_vertex> neighborVertices;
 		while (true)
 		{
 			if (discovered.isEmpty() == true)
-				return nullptr;
-			currentNode = discovered.extractMin();
-			discMap.erase(&currentNode->id);
-			if (Satisfies(currentNode.nodePtr, finishNode.nodePtr) == true)
-				break;
-			expanded.insert({ &currentNode->id, currentNode });
-			std::vector <Node<t_node_id>*> neighborList = GetNeighbors(currentNode.nodePtr);
-			for (int i = 0; i < neighborList.size(); i++)
 			{
-				auto tempIt = discMap.find(&neighborList[i]->id);
+				path_.vertices.clear();
+				return;
+			}
+			currentNode = discovered.extractMin();
+			discMap.erase(currentNode.id);
+			t_vertex currentVertex = vertices.at(currentNode.id);
+			if (Satisfies(currentVertex, finish_) == true)
+				break;
+			expanded.insert({ currentNode.id });
+			GetNeighbors(neighborVertices, currentVertex);
+			for (int i = 0; i < neighborVertices.size(); i++)
+			{
+				auto neighborId = GetId(neighborVertices[i]);
+				auto tempIt = discMap.find(neighborId);
 				bool wasDiscovered = (tempIt != discMap.end());
-				Element<NodePtr>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
-				bool wasExpanded = expanded.find(&neighborList[i]->id) != expanded.end();
-				if (wasDiscovered && neighborElement->getKey().nodePtr == nullptr)
-					std::cout << "!";
+				Element<Node>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
+				bool wasExpanded = expanded.find(neighborId) != expanded.end();
+				Node neighborNode(	neighborId, 
+									currentNode.id, 
+									currentNode.distFromStart + GetDist(currentVertex, neighborVertices[i]), 
+									GetHeuristic(neighborVertices[i], finish_));
 				if (wasDiscovered == false && wasExpanded == false)
 				{
-					neighborElement = discovered.insert({ neighborList[i] });
-					discMap.insert({ &neighborList[i]->id, neighborElement });
+					neighborElement = discovered.insert({ neighborNode });
+					discMap.insert({ neighborId, neighborElement });
+					vertices.insert({neighborId, neighborVertices[i]});
+					if (cameFrom.insert({neighborId, currentNode.id}).second != true)
+						std::cout << "!";
 				}
-				else if (wasDiscovered == true && neighborElement->getKey()->distFromStart > neighborList[i]->distFromStart)
+				else if (	wasDiscovered == true && 
+							neighborElement->getKey().distFromStart > neighborNode.distFromStart)
 				{
-					Node<t_node_id>* toDelete = neighborElement->getKey().nodePtr;
-					discovered.decreaseKey(neighborElement, { neighborList[i] });
-					delete toDelete;
+					discovered.decreaseKey(neighborElement, neighborNode);
+					if (cameFrom.insert_or_assign(neighborId, currentNode.id).second != false)
+						std::cout << "!";
 				}
-				else
-					delete neighborList[i];
 			}
+			neighborVertices.clear();
 		}
-		path->cost = currentNode->distFromStart;
-		for (const Node<t_node_id>* prevNodePtr = currentNode.nodePtr; prevNodePtr->prevNodePtr != nullptr; prevNodePtr = prevNodePtr->prevNodePtr)
-			path->arcs.push_back(prevNodePtr->prevArcId);
-		for (int i = 0; i < path->arcs.size() / 2; i++)
-			std::swap(path->arcs[i], path->arcs[path->arcs.size() - 1 - i]);
-	/*	for (auto& it : discMap)
-			delete it.second->getKey().nodePtr;*/
-		for (auto& it : expanded)
-			delete it.second.nodePtr;
-		delete finishNode.nodePtr;
-		return path;
+		path_.cost = currentNode.distFromStart;
+		t_node_id anotherId = currentNode.id;
+		while (anotherId != NO_ID)
+		{
+			t_vertex anotherVertex = vertices.at(anotherId);
+			path_.vertices.push_back(anotherVertex);
+			anotherId = cameFrom.at(anotherId);
+		}
+		//path_.vertices.push_back(finish_);
+		for (u_int i = 0; i < path_.vertices.size() / 2; i++)
+			std::swap(path_.vertices[i], path_.vertices[path_.vertices.size() - 1 - i]);
 	}
 
 };
 
-class TestPathfinder : public BasePathfinder<int>
-{
-	int dim;
-	mtrx matrix;
-
-public:
-	TestPathfinder(std::ifstream& fin, int dim_)
-	{
-		dim = dim_;
-		MathHelper::MakeEmptyMatrix(matrix, dim);
-		MathHelper::ReadMtrxFromFile(matrix, fin, ',');
-	}
-	std::vector <Node<int>*> GetNeighbors(const Node<int>* node) const
-	{
-		static const unsigned BOUND = pow(10, MathHelper::NumDigits(dim));
-		std::vector <Node<int>*> neighbors;
-		for (int i = 0; i < dim; i++)
-			if (matrix[node->GetId()][i] != INFTY)
-			{
-				neighbors.push_back(new Node<int>(i, node, BOUND * node->GetId() + i, matrix[node->GetId()][i], 0));
-			}
-			
-		return neighbors;
-	};
-	int GetDist(const arc_id& arcId) const
-	{
-		static const unsigned BOUND = pow(10, MathHelper::NumDigits(dim));
-		unsigned to = arcId % BOUND;
-		unsigned from = arcId / BOUND;
-		return matrix[from][to];
-	}
-	bool Satisfies(const Node<int>* node, const Node<int>* target) const
-	{
-		int id1 = node->GetId();
-		int id2 = target->GetId();
-		return (node->GetId()) == (target->GetId());
-	};
-};

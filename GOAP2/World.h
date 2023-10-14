@@ -1,36 +1,30 @@
 #pragma once
 #include <vector>
+#include <set>
 #include <string>
+#include "Attribute.h"
 
-
-class Attribute
+typedef /*unsigned*/ std::vector <u_char> t_mask;
+struct WorldState
 {
-	bool value;
-public:
-	Attribute(bool value_);
-	~Attribute();
-	const bool GetValue() const;
+	void	InitializeAttributes(const std::set<Attribute>& attribytes_);
+			WorldState(const std::map<std::string, u_char>& affectedAttributes );
+			WorldState(const WorldState& other_);
+			~WorldState();
+	bool	SetAttributeValue(const std::string& name, u_char value_);
+	bool	SetAttributeValue(const unsigned index_, u_char value_);
+	//void	SetMask(const t_mask& mask_);
 
-	friend class WsMask;
-};
+	u_char	GetAttributeValue(const unsigned index_) const;
+	u_char	GetAttributeValue(const std::string& name_) const;
+	t_mask	GetMask() const;
 
-class WsMask
-{
-	std::vector <Attribute> attributes;
-	int mask;
-	int affectedAttributesNum;
-
-	bool SetAttributeByIndex(const int i, bool value);
-	bool SetMask(const std::vector <int>& affectedAttributes);
-	void SetMask(int mask_);
-
-public:
-	WsMask(const int attNum);
-	~WsMask();
-	Attribute const& GetAttributeByIndex(const int i) const;
-	int GetMask() const;
-	std::vector <int> GetAffectedAttributes() const;
-	int GetAffectedAttributesNum() const;
+private:
+	
+	static unsigned										attributesNum;
+	static std::map < const std::string&, Attribute>	attributes;
+	static bool											wasInitialized;
+	t_mask												mask;
 
 	friend class Action;
 	friend class Planner;

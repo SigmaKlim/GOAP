@@ -135,7 +135,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.h" />
+    <ClInclude Include="Attribute.h" />
     <ClInclude Include="FibonacciHeap.hpp" />
+    <ClInclude Include="NumPathfinder.h" />
     <ClInclude Include="Pathfind.hpp" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Plan.h" />

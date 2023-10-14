@@ -3,17 +3,17 @@
 
 class Action
 {
-	WsMask cnd;
-	WsMask eff;
+	WorldState cnd;
+	WorldState eff;
 	int cost;
 
 
 public:
-	Action(const WsMask& cnd_, const WsMask& eff_, const int cost_);
+	Action(const WorldState& cnd_, const WorldState& eff_, const int cost_);
 	~Action();
 
-	const WsMask& GetCnd() const;
-	const WsMask& GetEff() const;
+	const WorldState& GetCnd() const;
+	const WorldState& GetEff() const;
 	int GetCost() const;
 	void SetCost(const int cost_);
 

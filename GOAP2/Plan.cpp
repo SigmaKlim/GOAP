@@ -2,12 +2,12 @@
 #include <algorithm>
 #include <iostream>
 #include <algorithm>
-Plan::Plan(const WsMask& startingWs_, const std::string& goalName_, const std::vector<std::string*>& actionNames_) : startingWs(startingWs_), goalName(goalName_), actionNames(actionNames_)
+Plan::Plan(const WorldState& startingWs_, const std::string& goalName_, const std::vector<std::string*>& actionNames_) : startingWs(startingWs_), goalName(goalName_), actionNames(actionNames_)
 {
 
 }
 
-const WsMask& Plan::GetStartingWs() const
+const WorldState& Plan::GetStartingWs() const
 {
     return startingWs;
 }
@@ -22,32 +22,6 @@ const std::vector<std::string*>& Plan::GetActionNames() const
     return actionNames;
 }
 
-WsMask Planner::MakeWs() const
-{
-    return WsMask(ATTRIBUTES_MAX_NUM);
-}
-
-bool Planner::FillInWs(WsMask& newWs, const std::map<std::string, bool> attrs) const
-{
-    std::vector <int> affectedAttributes;
-    for (auto const &i : attrs)
-    {
-        int index = std::find(attributeNamesCatalogue.begin(), attributeNamesCatalogue.end(), i.first) - attributeNamesCatalogue.begin();
-        if (index < attributeNamesCatalogue.size())
-        {
-            newWs.SetAttributeByIndex(index, i.second);
-            affectedAttributes.push_back(index);
-        }
-        else
-        {
-            std::cout << "Could not find attribute \"" + i.first + "\" in catalogue.\n";
-            return false;
-        }
-    }
-    newWs.SetMask(affectedAttributes);
-    newWs.affectedAttributesNum = affectedAttributes.size();
-    return true;
-}
 
 Action Planner::MakeAction() const
 {
@@ -64,7 +38,7 @@ std::vector<const std::string*> Planner::GetActionNamesVector() const
 
 Planner::Planner()
 {
-    goalCatalogue = std::map<std::string, WsMask>();
+    goalCatalogue = std::map<std::string, WorldState>();
     actionCatalogue = std::map<std::string, Action>();
     attributeNamesCatalogue = std::vector<std::string>();
 }
@@ -85,7 +59,7 @@ bool Planner::AddAttribute(const std::string& name)
     return true;
 }
 
-bool Planner::GetGoalByName(WsMask* result, const std::string& name) const
+bool Planner::GetGoalByName(WorldState* result, const std::string& name) const
 {
     auto it = goalCatalogue.find(name);
     if (it == goalCatalogue.end())
@@ -105,10 +79,10 @@ bool Planner::GetActionByName(Action* result, const std::string& name) const
 
 bool Planner::AddAction(const std::string& name, const std::map <std::string, bool> cnd, const std::map <std::string, bool> eff, const int cost)
 {
-    WsMask cndWs = MakeWs();
+    WorldState cndWs = MakeWs();
     if (FillInWs(cndWs, cnd) == false)
         return false;
-    WsMask effWs = MakeWs();
+    WorldState effWs = MakeWs();
     if (FillInWs(effWs, eff) == false)
         return false;
     auto status = actionCatalogue.insert({ name, Action(cndWs, effWs, cost) });
@@ -122,7 +96,7 @@ bool Planner::AddAction(const std::string& name, const std::map <std::string, bo
 
 bool Planner::AddGoal(const std::string& name, const std::map<std::string, bool> attrs)
 {
-    WsMask goalWs = MakeWs();
+    WorldState goalWs = MakeWs();
     if (FillInWs(goalWs, attrs) == false)
         return false;
     auto status = goalCatalogue.insert({ name, goalWs });
@@ -134,20 +108,5 @@ bool Planner::AddGoal(const std::string& name, const std::map<std::string, bool>
     return true;
 }
 
-GoapPathfinder::GoapPathfinder()
-{
-}
 
-std::vector <std::pair<node_id, arc_id>> GoapPathfinder::GetNeighbors(const node_id id) const
-{
-    return std::vector <std::pair<node_id, arc_id>>();
-}
-int GoapPathfinder::GetDist(const arc_id& arcId) const
-{
-    return 0;
-}
-bool GoapPathfinder::Satisfies(const Node<Vertex>* node, const Node<Vertex>* target) const
-{
-    return false;
-}
 

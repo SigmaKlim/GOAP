@@ -1,77 +1,90 @@
 #include "World.h"
+bool WorldState::wasInitialized = false;
+std::map< const std::string&, Attribute> WorldState::attributes;
 
-
-Attribute::Attribute(bool value_)
+void WorldState::InitializeAttributes(const std::set<Attribute>& attributes_)
 {
-	value = value_;
+	for (auto& attribute : attributes_)
+		attributes.insert(std::move(
+			std::pair<const std::string&, Attribute>(attribute.GetName(), attribute)));
+	attributesNum = attributes_.size();
+	wasInitialized = true;
 }
 
-Attribute::~Attribute()
+WorldState::WorldState(const std::map<std::string, u_char>& affectedAttributes)
+{
+	if (wasInitialized == false)
+	{
+		std::cout << "You have to initialize attributes before you create a WorldState object! \n";
+		exit(-1);
+	}
+	for (auto& atValPair : affectedAttributes)
+	{
+		const std::string& attributeName = atValPair.first;
+		auto it = attributes.find(attributeName);
+		if (it == attributes.end())
+		{
+			std::cout << "Incorrect attribute name: " + attributeName + "\n";
+			exit(-1);
+		}
+		size_t pos = std::distance(attributes.begin(), it);
+		mask[pos] = atValPair.second;
+	}
+}
+
+WorldState::WorldState(const WorldState& other_)
+{
+	mask = other_.mask;
+}
+
+WorldState::~WorldState()
 {
 }
 
-const bool Attribute::GetValue() const
+bool WorldState::SetAttributeValue(const std::string& name_, u_char value_)
 {
-	return value;
-}
-
-bool WsMask::SetAttributeByIndex(const int i, bool value)
-{
-	if (i >= attributes.size())
-		return false;
-	attributes[i].value = value;
+	auto it = attributes.find(name_);
+	if (it == attributes.end())
+	{
+		std::cout << "Incorrect attribute name: " + name_ + "\n";
+		exit(-1);
+	}
+	size_t pos = std::distance(attributes.begin(), it);
+	mask[pos] = value_;
 	return true;
 }
 
-bool WsMask::SetMask(const std::vector<int>& affectedAttributes)
+bool WorldState::SetAttributeValue(const unsigned index_, u_char value_)
 {
-	mask = 0;
-	for (auto a : affectedAttributes)
-		if (a >= attributes.size())
-			return false;
-		else
-			mask += 1 << a;
-	affectedAttributesNum = affectedAttributes.size();
+	if (index_ > attributesNum)
+	{
+		std::cout << "Index(" + std::to_string(index_) + ") exceeds attributeNum(" +
+			std::to_string(attributesNum) + ").\n";
+		exit(-1);
+	}
+	mask[index_] = value_;
 	return true;
 }
 
-void WsMask::SetMask(int mask_)
+u_char	WorldState::GetAttributeValue(const unsigned index_) const
 {
-	mask = mask_;
+	if (index_ > attributesNum)
+	{
+		std::cout << "Index(" + std::to_string(index_) + ") exceeds attributeNum(" +
+			std::to_string(attributesNum) + ").\n";
+		exit(-1);
+	}
+	return mask[index_];
 }
 
-WsMask::WsMask(const int attNum)
+u_char	WorldState::GetAttributeValue(const std::string& name_) const
 {
-	attributes = std::vector<Attribute>(attNum, true);
-	affectedAttributesNum = attNum;
-	mask = (1 << attNum) - 1;
+	auto it = attributes.find(name_);
+	if (it == attributes.end())
+	{
+		std::cout << "Incorrect attribute name: " + name_ + "\n";
+		exit(-1);
+	}
+	size_t pos = std::distance(attributes.begin(), it);
+	return mask[pos];
 }
-
-WsMask::~WsMask()
-{
-}
-
-Attribute const& WsMask::GetAttributeByIndex(const int i) const
-{
-	return attributes[i];
-}
-
-int WsMask::GetMask() const
-{
-	return mask;
-}
-
-std::vector<int> WsMask::GetAffectedAttributes() const
-{
-	std::vector<int> affectedAttributes;
-	for (auto i = 0; i < attributes.size(); i++)
-		if ((1 << i) & mask)
-			affectedAttributes.push_back(i);
-	return affectedAttributes;
-}
-
-int WsMask::GetAffectedAttributesNum() const
-{
-	return affectedAttributesNum;
-}
-

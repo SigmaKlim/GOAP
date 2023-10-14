@@ -5,14 +5,14 @@
 #include <iostream> 
 #include <fstream>
 #include "MathHelper.h"
-#include "Pathfind.hpp"
+#include "NumPathfinder.h"
 #pragma optimize( "", off )
 
 int test()
 {
 	srand(time(0));
-	const std::vector<size_t> DIMS = { 500 };
-	const int K = 1;
+	const std::vector<size_t> DIMS = { /*5, 15, 30, 100,*/ 500 };
+	const int K = 5;
 	const float DISC_CHANCE = 0.67f;
 	//for (const auto& dim : DIMS)
 	//{
@@ -45,37 +45,37 @@ int test()
 			std::ifstream fin("test_data/test_matrix_set_" + std::to_string(dim) + "_" + std::to_string(k) + ".txt");
 			if (fin.is_open() == false)
 				return -1;
-			TestPathfinder tpf(fin, dim);
+			NumPathfinder tpf(fin, dim);
 			int start = 0;
 			int finish = dim - 1;
 			fin.close();
-			auto path = tpf.Pathfind(start, finish);
+			Path<u_int> path;
+			tpf.Pathfind(path, start, finish);
 			std::cout << "dim = " + std::to_string(dim) + "\t k = " + std::to_string(k) + "\n";
 			std::cout << "start = " + std::to_string(start) + "\t finish = " + std::to_string(finish) + "\n";
 			std::cout << "path: ";
-			if (path == nullptr)
+			if (path.vertices.empty())
 				std::cout << "NONE\ncost = INFTY\n\n";
 			else
 			{
-				for (const auto& arc : path->GetArcList())
-					std::cout << arc << " ";
+				for (auto& vertex : path.vertices)
+					std::cout << vertex << " ";
 				std::cout << "\n";
-				std::cout << "cost = " << path->GetCost() << "\n\n";
+				std::cout << "cost = " << path.cost << "\n\n";
 			}
 
 			fout << "dim = " + std::to_string(dim) + "\t k = " + std::to_string(k) + "\n";
 			fout << "start = " + std::to_string(start) + "\t finish = " + std::to_string(finish) + "\n";
 			fout << "path: ";
-			if (path == nullptr)
+			if (path.vertices.empty())
 				fout << "NONE\ncost = INFTY\n\n";
 			else
 			{
-				for (const auto& arc : path->GetArcList())
-					fout << arc << " ";
+				for (auto& vertex : path.vertices)
+					fout << vertex << " ";
 				fout << "\n";
-				fout << "cost = " << path->GetCost() << "\n\n";
+				fout << "cost = " << path.cost << "\n\n";
 			}
-			delete path;
 		}
 	}
 }
