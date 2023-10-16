@@ -6,6 +6,7 @@
 #include <fstream>
 #include "MathHelper.h"
 #include "NumPathfinder.h"
+#include "Plan.h"
 #pragma optimize( "", off )
 
 int test()
@@ -82,6 +83,22 @@ int test()
 	//}
 #pragma endregion
 
+	Planner planner;
+	planner.RegisterAttribute("Pose",	{	"CROUCHING",
+																"STANDING"});
+	planner.RegisterAttribute("Location", {	"IN_COVER",
+																"NOT_IN_COVER"});
+	
+	planner.RegisterGoal("TakeCover",	{{"Pose", "CROUCHING"},
+																{"Location", "IN_COVER"}});
+	WorldState start(	t_attr_enum_map({{"Pose", "CROUCHING"},
+															{"Location", "NOT_IN_COVER"}}));
+	WorldState crouchCnd;
+	WorldState crouchEff(t_attr_enum_map({{"Pose","CROUCHING"}}));
+	planner.RegisterAction("Crouch", crouchCnd, crouchEff, 1);
+	WorldState goToCoverCnd(t_attr_enum_map({{"Pose", "STANDING"}}));
+	WorldState goToCoverEff(t_attr_enum_map({{"Location", "IN_COVER"}}));
+	planner.RegisterAction("Go to cover", goToCoverCnd, goToCoverEff, 3);
+	
 	return 0;
-
 }

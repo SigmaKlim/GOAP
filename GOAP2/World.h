@@ -6,6 +6,7 @@
 #include <limits>
 #include "Attribute.h"
 
+typedef std::unordered_map<std::string,std::string> t_attr_enum_map;
 class Action;
 typedef unsigned t_mask;
 struct WsMask
@@ -22,17 +23,20 @@ struct WsMask
 
 	
 	t_mask mask = 0;
-	const u_char CELL_BITS_NUM = std::log2(Attribute::MAX_VALUES);
-	const u_char NUM_CELLS = std::numeric_limits<t_mask>::digits / CELL_BITS_NUM;
+	const unsigned CELL_BITS_NUM = std::log2(Attribute::MAX_VALUES);
+	const unsigned NUM_CELLS = std::numeric_limits<t_mask>::digits / CELL_BITS_NUM;
 	//debug
 	std::vector<std::string> binaryCells; 
 };
 
 struct WorldState
 {
+	friend class Action;
+	friend class Planner;
+	
 	//Must be called prior to any WorldState object being created.
 	void		InitializeAttributes(const std::set<std::string>& attributeNames_);
-				WorldState			(const std::unordered_map<std::string,u_char>& nameValuePairs_);
+				WorldState			(const t_attr_enum_map& nameValuePairs_);
 				WorldState			();
 				WorldState			(const WorldState& other_);
 	WorldState& operator=			(const WorldState& other_);
@@ -49,13 +53,12 @@ struct WorldState
 	
 	unsigned	GetNumAttributes	() const;
 private:
-	
+
 	WsMask								mask;
 
 	static bool						wasInitialized;
 	static std::set<std::string>	attributeNames;
 	static unsigned					numAttributes;
+	static Planner* planner;
 
-	friend class Action;
-	friend class Planner;
 };

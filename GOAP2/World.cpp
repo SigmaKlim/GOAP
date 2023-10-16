@@ -1,10 +1,12 @@
 #include "World.h"
 #include "Action.h"
 #include <bitset>
+#include "Plan.h"
+
 bool WorldState::wasInitialized = false;
 std::set<std::string> WorldState::attributeNames;
 unsigned WorldState::numAttributes = 0;
-
+Planner* WorldState::planner = nullptr;
 
 WsMask::WsMask() 
 { 
@@ -77,6 +79,7 @@ void WsMask::SetMask(const t_mask& mask_)
 
 void WorldState::InitializeAttributes(const std::set<std::string>& attributeNames_)
 {
+
 	for (auto& attributeName : attributeNames_)
 	{
 		attributeNames.insert(attributeName);
@@ -84,40 +87,42 @@ void WorldState::InitializeAttributes(const std::set<std::string>& attributeName
 	numAttributes = attributeNames.size();
 	wasInitialized = true;
 }
-WorldState::WorldState(const std::unordered_map<std::string,u_char>& nameValuePairs_)
+WorldState::WorldState(const t_attr_enum_map& nameValuePairs_)
 {
-	if (wasInitialized == false)
-	{
-		std::cout << "You have to initialize attributes before you create a WorldState object! \n";
-		exit(-1);
-	}
+	// if (wasInitialized == false)
+	// {
+	// 	std::cout << "You have to initialize attributes before you create a WorldState object! \n";
+	// 	exit(-1);
+	// }
 	for (auto& nameValuePair : nameValuePairs_)
 	{
 		const std::string& attributeName = nameValuePair.first;
+		const auto& attribute = planner->GetAttribute(attributeName);
+		u_char value = attribute.GetEnumValue(nameValuePair.second);
 		auto pos = FindAttribute(attributeName);
 		if (pos == numAttributes)
 		{
 			std::cout << "Incorrect attribute name: " + attributeName + "\n";
 			exit(-1);
 		}
-		mask.SetValue(pos, nameValuePair.second);
+		mask.SetValue(pos, value);
 	}
 }
 WorldState::WorldState()
 {
-	if (wasInitialized == false)
-	{
-		std::cout << "You have to initialize attributes before you create a WorldState object! \n";
-		exit(-1);
-	}
+	// if (wasInitialized == false)
+	// {
+	// 	std::cout << "You have to initialize attributes before you create a WorldState object! \n";
+	// 	exit(-1);
+	// }
 }
 WorldState::WorldState(const WorldState& other_)
 {
-	if (wasInitialized == false)
-	{
-		std::cout << "You have to initialize attributes before you create a WorldState object! \n";
-		exit(-1);
-	};
+	// if (wasInitialized == false)
+	// {
+	// 	std::cout << "You have to initialize attributes before you create a WorldState object! \n";
+	// 	exit(-1);
+	// };
 	mask.SetMask(other_.mask.mask);
 }
 WorldState& WorldState::operator=(const WorldState& other_)

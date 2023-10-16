@@ -36,7 +36,7 @@ public:
 	bool				RegisterAction		(const std::string& name_, const Action& action_);
 	bool				RegisterAction		(const std::string& name_, const WorldState& cnd_, const WorldState& eff_, unsigned cost_);
 	bool				RegisterGoal		(const std::string& name_, const WorldState& goal_);
-	bool				RegisterGoal		(const std::string& name_, const std::unordered_map<std::string, u_char>& nameValuePairs_);
+	bool				RegisterGoal		(const std::string& name_, const std::unordered_map<std::string, std::string>& nameValuePairs_);
 	const Attribute&	GetAttribute		(const std::string& name_) const;
 	const Action&		GetAction			(const std::string& name_) const;
 	const WorldState&	GetGoal				(const std::string& name_) const;

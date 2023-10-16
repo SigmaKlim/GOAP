@@ -26,6 +26,7 @@ const std::vector<std::string>& Plan::GetActionNames() const
 
 Planner::Planner()
 {
+    WorldState::planner = this;
 }
 
 Planner::~Planner()
@@ -106,7 +107,7 @@ bool Planner::RegisterGoal(const std::string& name_, const WorldState& worldStat
     return true;
 }
 
-bool Planner::RegisterGoal(const std::string& name_, const std::unordered_map<std::string, u_char>& nameValuePairs_)
+bool Planner::RegisterGoal(const std::string& name_, const std::unordered_map<std::string, std::string>& nameValuePairs_)
 {
     bool contains = (goalCatalogue.find(name_) != goalCatalogue.end());
     if (contains == true)
