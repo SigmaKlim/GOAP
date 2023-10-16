@@ -5,16 +5,16 @@ class Action
 {
 	WorldState cnd;
 	WorldState eff;
-	int cost;
-
+	unsigned cost;
 
 public:
-	Action(const WorldState& cnd_, const WorldState& eff_, const int cost_);
+	Action() = default;
+	Action(const WorldState& cnd_, const WorldState& eff_, const unsigned cost_);
 	~Action();
 
 	const WorldState& GetCnd() const;
 	const WorldState& GetEff() const;
-	int GetCost() const;
+	unsigned GetCost() const;
 	void SetCost(const int cost_);
 
 	friend class Planner;

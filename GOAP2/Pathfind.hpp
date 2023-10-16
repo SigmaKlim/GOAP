@@ -7,7 +7,6 @@
 #include <ctime>
 #include <string>
 #include <iostream>
-//#include <memory>
 #include "MathHelper.h"
 #include "FibonacciHeap.hpp"
 #include <unordered_set>
@@ -53,14 +52,14 @@ struct Node
 template <typename t_vertex>
 class BasePathfinder
 {
-	;
+	
 protected:
 	virtual int			GetHeuristic(const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const
 	{
 		return 0;
 	};
-	virtual void		GetNeighbors(std::vector<t_vertex>&	neighbors_, const t_vertex& vertex_) const = 0; //returns array of newly created node's neighbors
-	virtual bool		Satisfies(const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const { return vertex_ == finish_; }; //checks whether this node satisfies conditions of the target node; target is a shell for Node(T* cond), i.e. for any node with set cond field
+	virtual void		GetNeighbors(std::vector<t_vertex>&	neighbors_, const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const = 0; //returns array of newly created node's neighbors
+	virtual bool		Satisfies(const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const = 0; //checks whether this node satisfies conditions of the target node; target is a shell for Node(T* cond), i.e. for any node with set cond field
 	virtual t_node_id	GetId(const t_vertex& vertex_) const = 0;
 	virtual unsigned	GetDist(const t_vertex& from_, const t_vertex& to_) const = 0;
 public:
@@ -95,7 +94,7 @@ public:
 			if (Satisfies(currentVertex, finish_) == true)
 				break;
 			expanded.insert({ currentNode.id });
-			GetNeighbors(neighborVertices, currentVertex);
+			GetNeighbors(neighborVertices, currentVertex, finish_);
 			for (int i = 0; i < neighborVertices.size(); i++)
 			{
 				auto neighborId = GetId(neighborVertices[i]);

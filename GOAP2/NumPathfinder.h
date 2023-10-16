@@ -12,7 +12,7 @@ public:
 		MathHelper::MakeEmptyMatrix(matrix, dim);
 		MathHelper::ReadMtrxFromFile(matrix, fin, ',');
 	}
-	void GetNeighbors(std::vector<u_int>& neighbors_, const u_int& vertex_) const
+	void GetNeighbors(std::vector<u_int>& neighbors_, const u_int& vertex_, const u_int& finish_ = 0) const
 	{
 		for (int i = 0; i < dim; i++)
 			if (matrix[vertex_][i] != INFTY)
