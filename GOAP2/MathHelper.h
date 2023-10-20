@@ -17,6 +17,9 @@ public:
 	static int ReadMtrxFromFile(mtrx& result, std::ifstream& fin,/* int startingPos,*/ unsigned char separator = ' ');
 	static void ToAdjacencyList(mtrx& incidence, mtrx& result);
 	static unsigned NumDigits(int number);
+	static bool SatisfiesMask(const unsigned& mask_, const unsigned& value_);
+	static bool SatisfiesMask(const unsigned long& mask_, const unsigned long& value_);
+	static bool SatisfiesMask(const unsigned long long& mask_, const unsigned long long& value_);
 	
 };
 

@@ -7,6 +7,8 @@
 #include <ctime>
 #include <string>
 #include <iostream>
+#include <stdbool.h>
+
 #include "MathHelper.h"
 #include "FibonacciHeap.hpp"
 #include <unordered_set>
@@ -65,7 +67,7 @@ protected:
 public:
 	BasePathfinder() {};
 	virtual ~BasePathfinder() {};
-	void Pathfind(Path<t_vertex>& path_, t_vertex start_, t_vertex finish_ = t_vertex())
+	bool Pathfind(Path<t_vertex>& path_, t_vertex start_, t_vertex finish_ = t_vertex()) const
 	{
 
 		FibonacciHeap<Node> discovered; //a queue of discovered but not expanded nodes
@@ -73,10 +75,11 @@ public:
 		std::unordered_set<t_node_id> expanded; //a set of expanded nodes, used to check if a node had been expanded
 		std::unordered_map<t_node_id, t_vertex> vertices;
 		std::map <t_node_id, t_node_id> cameFrom; // <nodeId, prevNodeId>
-		
-		Node currentNode(0, NO_ID, 0, GetHeuristic(start_, finish_));
-		vertices.insert({ 0, start_ });
-		cameFrom.insert({ 0, NO_ID });
+
+		auto startId = GetId(start_);
+		Node currentNode(startId, NO_ID, 0, GetHeuristic(start_, finish_));
+		vertices.insert({ startId, start_ });
+		cameFrom.insert({ startId, NO_ID });
 		Element<Node>* currentElement = discovered.insert(currentNode);
 		discMap.insert({ currentNode.id, currentElement });
 		
@@ -86,7 +89,7 @@ public:
 			if (discovered.isEmpty() == true)
 			{
 				path_.vertices.clear();
-				return;
+				return false;
 			}
 			currentNode = discovered.extractMin();
 			discMap.erase(currentNode.id);
@@ -135,7 +138,8 @@ public:
 		//path_.vertices.push_back(finish_);
 		for (u_int i = 0; i < path_.vertices.size() / 2; i++)
 			std::swap(path_.vertices[i], path_.vertices[path_.vertices.size() - 1 - i]);
+		return true;
 	}
-
+	
 };
 

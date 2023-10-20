@@ -3,7 +3,6 @@
 #include <bitset>
 #include "Plan.h"
 
-bool WorldState::wasInitialized = false;
 std::set<std::string> WorldState::attributeNames;
 unsigned WorldState::numAttributes = 0;
 Planner* WorldState::planner = nullptr;
@@ -13,12 +12,12 @@ WsMask::WsMask()
 	//debug
 	binaryCells.resize(NUM_CELLS); 
 };
-WsMask::WsMask(const t_mask& mask_)
+WsMask::WsMask(const t_mask& valueMask_)
 {
 	//debug
 	binaryCells.resize(NUM_CELLS);
 	//
-	SetMask(mask_);
+	SetMask(valueMask_);
 };
 WsMask::~WsMask() {};
 u_char WsMask::GetValue(u_char index_) const
@@ -36,6 +35,20 @@ u_char WsMask::GetValue(u_char index_) const
 	value >>= offset;
 	return value;
 }
+
+bool WsMask::GetSignificance(u_char index_) const
+{
+	if (index_ > NUM_CELLS - 1)
+	{
+		std::cout << "Index must be lower than NUM_CELLS("
+			+ std::to_string(NUM_CELLS) + "). \n";
+		exit(-1);
+	}
+	u_char offset = index_ * CELL_BITS_NUM;
+	t_mask value = mask & (1 << offset);
+	return value != 0;
+}
+
 void WsMask::SetValue(u_char index_, u_char value_)
 {
 	if (index_ > NUM_CELLS - 1)
@@ -56,15 +69,17 @@ void WsMask::SetValue(u_char index_, u_char value_)
 	t_mask valueWithOffset = value_ << offset;
 	mask += valueWithOffset;
 	//debug
-	binaryCells[index_] = std::bitset<4>(value_).to_string();
+	binaryCells[index_] = std::bitset<3>(value_).to_string();
 }
+
 t_mask WsMask::GetMask() const
 {
 	return mask;
 }
-void WsMask::SetMask(const t_mask& mask_)
+void WsMask::SetMask(const t_mask& valueMask_)
 {
-	mask = mask_;
+	mask = valueMask_;
+	
 	//debug
 	for (auto cellNum = 0; cellNum < NUM_CELLS; cellNum++)
 	{
@@ -77,23 +92,8 @@ void WsMask::SetMask(const t_mask& mask_)
 	}
 }
 
-void WorldState::InitializeAttributes(const std::set<std::string>& attributeNames_)
-{
-
-	for (auto& attributeName : attributeNames_)
-	{
-		attributeNames.insert(attributeName);
-	}
-	numAttributes = attributeNames.size();
-	wasInitialized = true;
-}
 WorldState::WorldState(const t_attr_enum_map& nameValuePairs_)
 {
-	// if (wasInitialized == false)
-	// {
-	// 	std::cout << "You have to initialize attributes before you create a WorldState object! \n";
-	// 	exit(-1);
-	// }
 	for (auto& nameValuePair : nameValuePairs_)
 	{
 		const std::string& attributeName = nameValuePair.first;
@@ -110,19 +110,9 @@ WorldState::WorldState(const t_attr_enum_map& nameValuePairs_)
 }
 WorldState::WorldState()
 {
-	// if (wasInitialized == false)
-	// {
-	// 	std::cout << "You have to initialize attributes before you create a WorldState object! \n";
-	// 	exit(-1);
-	// }
 }
 WorldState::WorldState(const WorldState& other_)
 {
-	// if (wasInitialized == false)
-	// {
-	// 	std::cout << "You have to initialize attributes before you create a WorldState object! \n";
-	// 	exit(-1);
-	// };
 	mask.SetMask(other_.mask.mask);
 }
 WorldState& WorldState::operator=(const WorldState& other_)
@@ -175,6 +165,7 @@ u_char WorldState::GetAttributeValue(const std::string& name_) const
 	}
 	return mask.GetValue(pos);
 }
+
 t_mask WorldState::GetMask() const
 {
 	return mask.GetMask();

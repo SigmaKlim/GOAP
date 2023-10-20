@@ -91,3 +91,18 @@ unsigned MathHelper::NumDigits(int number)
 	return digits;
 }
 
+bool MathHelper::SatisfiesMask(const unsigned& mask_, const unsigned& value_)
+{
+	return (mask_ & value_) == mask_;
+}
+
+bool MathHelper::SatisfiesMask(const unsigned long& mask_, const unsigned long& value_)
+{
+	return (mask_ & value_) == mask_;
+}
+
+bool MathHelper::SatisfiesMask(const unsigned long long& mask_, const unsigned long long& value_)
+{
+	return (mask_ & value_) == mask_;
+}
+

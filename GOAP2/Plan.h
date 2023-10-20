@@ -5,23 +5,32 @@
 #include <map>
 #include <unordered_map>
 #include "Pathfind.hpp"
+#include "Pathfind.hpp"
+struct Vertex
+{
+	Vertex					()  = default;
+	Vertex					(const WorldState& state_, const std::set <std::string>& availableActionNames_, const std::string& prevAction_) :
+								availableActionNames(availableActionNames_), state(state_), prevAction(prevAction_) {};
 
-class Plan
+	std::set<std::string> availableActionNames;
+	WorldState state;
+	std::string prevAction;
+};
+
+struct Plan
 {
 	WorldState startingWs;
 	std::string goalName;
+	const std::vector<std::string>& GetActionSequence() const;
+	unsigned GetCost() const;
+private:
 	std::vector <std::string> actionNames;
-
-public:
-	Plan(const WorldState& startingWs_, const std::string& goalName_, const std::vector<std::string>& actionNames_);
-	const WorldState& GetStartingWs() const;
-	const std::string& GetGoalName() const;
-	const std::vector<std::string>& GetActionNames() const;
+	unsigned cost;
 
 	friend class Planner;
 };
 
-class Planner
+class Planner : public BasePathfinder<Vertex>
 {
 	std::unordered_map<std::string, WorldState> goalCatalogue;
 	std::unordered_map<std::string, Action> actionCatalogue;
@@ -41,6 +50,12 @@ public:
 	const Action&		GetAction			(const std::string& name_) const;
 	const WorldState&	GetGoal				(const std::string& name_) const;
 
+	bool ConstructPlan(Plan& plan_) const;
+	
+	void		GetNeighbors(std::vector<Vertex>& neighbors_, const Vertex& vertex_, const Vertex& finish_ = Vertex()) const override;
+	bool		Satisfies	(const Vertex& vertex_, const Vertex& finish_ = Vertex()) const override;
+	t_node_id	GetId		(const Vertex& vertex_) const override;
+	unsigned	GetDist		(const Vertex& from_, const Vertex& to_) const override;
 	const unsigned MAX_ATTRIBUTES = 20;
 };
 
