@@ -182,9 +182,9 @@ void Planner::GetNeighbors(std::vector<Vertex>& neighbors_, const Vertex& vertex
 
 bool Planner::Satisfies(const Vertex& vertex_, const Vertex& targetVertex_) const
 {
-    const auto& targetState = targetVertex_.state;
+    const auto& initialState = targetVertex_.state;
     const auto& activeCndSet = vertex_.state;
-    return (targetState.GetMask()  & activeCndSet.GetMask()) == activeCndSet.GetMask();
+    return initialState.SatisfiesMask(activeCndSet);
 }
 
 t_node_id Planner::GetId(const Vertex& vertex_) const

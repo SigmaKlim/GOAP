@@ -91,38 +91,38 @@ int test()
 												 "NOT_IN_COVER"});
 	planner.RegisterAttribute("pose",			{"CROUCHING",
 												 "STANDING"});
-	// planner.RegisterAttribute("isWeaponDrawn",	{"FALSE",
-	// 											 "TRUE"});
-	// planner.RegisterAttribute("isWeaponLoaded", {"FALSE",
-	// 											 "TRUE"});
-	// planner.RegisterAttribute("isKnifeDrawn",	{"FALSE",
-	// 											 "TRUE"});
-	// planner.RegisterAttribute("isGrenadeDrawn",	{"FALSE",
-	// 											 "TRUE"});
-	// planner.RegisterAttribute("enemyStatus",	{"IN_CLOSE_COMBAT_RANGE",
-	// 											 "VISIBLE",
-	// 											 "NON_VISIBLE",
-	// 											 "DEAD"});
-	// planner.RegisterAttribute("hasAmmo",		{"FALSE",
-	// 											 "TRUE"});
-	// planner.RegisterAttribute("hasGrenades",	{"FALSE",
-	// 											 "TRUE"});
+	planner.RegisterAttribute("isWeaponDrawn",	{"FALSE",
+												 "TRUE"});
+	planner.RegisterAttribute("isWeaponLoaded", {"FALSE",
+												 "TRUE"});
+	planner.RegisterAttribute("isKnifeDrawn",	{"FALSE",
+												 "TRUE"});
+	planner.RegisterAttribute("isGrenadeDrawn",	{"FALSE",
+												 "TRUE"});
+	planner.RegisterAttribute("enemyStatus",	{"IN_CLOSE_COMBAT_RANGE",
+												 "VISIBLE",
+												 "NON_VISIBLE",
+												 "DEAD"});
+	planner.RegisterAttribute("hasAmmo",		{"FALSE",
+												 "TRUE"});
+	planner.RegisterAttribute("hasGrenades",	{"FALSE",
+												 "TRUE"});
 
 	//2. Register all goals
 	planner.RegisterGoal("GetToCover",t_attr_enum_map({	{"pose", "CROUCHING"},
 														{"location", "IN_COVER"}}));
-	//planner.RegisterGoal("KillEnemy", t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
+	planner.RegisterGoal("KillEnemy", t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
 	
 	//3. Define start state of the world
 	WorldState start(	t_attr_enum_map({	{"pose", "CROUCHING"},
-											{"location", "NOT_IN_COVER"}/*,
+											{"location", "NOT_IN_COVER"},
 											{"isWeaponDrawn", "FALSE"},
 											{"isWeaponLoaded", "FALSE"},
 											{"isKnifeDrawn", "FALSE"},
 											{"isGrenadeDrawn", "FALSE"},
-											{"enemyStatus", "NON_VISIBLE"},
+											{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
 											{"hasAmmo", "TRUE"},
-											{"hasGrenades", "TRUE"}*/}));
+											{"hasGrenades", "FALSE"}}));
 
 	//4. Register all available actions by defining their conditions and effects
 	WorldState crouchCnd;
@@ -140,57 +140,57 @@ int test()
 	WorldState standUpCnd;
 	WorldState standUpEff(t_attr_enum_map({{"pose", "STANDING"}}));
 	planner.RegisterAction("StandUp", standUpCnd, standUpEff, 2);
-	//
-	// WorldState drawWeaponCnd;
-	// WorldState drawWeaponEff(t_attr_enum_map({{"isWeaponDrawn", "TRUE"}}));
-	// planner.RegisterAction("DrawWeapon", drawWeaponCnd, drawWeaponEff, 3);
-	//
-	// WorldState drawKnifeCnd;
-	// WorldState drawKnifeEff(t_attr_enum_map({{"isKnifeDrawn", "TRUE"}}));
-	// planner.RegisterAction("DrawKnife", drawKnifeCnd, drawKnifeEff, 1);
-	//
-	// WorldState drawGrenadeCnd(t_attr_enum_map({{"hasGrenades", "TRUE"}}));
-	// WorldState drawGrenadeEff(t_attr_enum_map({{"isGrenadeDrawn", "TRUE"}}));
-	// planner.RegisterAction("DrawGrenade", drawGrenadeCnd, drawGrenadeEff, 2);
-	//
-	// WorldState reloadCnd(t_attr_enum_map({	{"hasAmmo", "TRUE"}}));
-	// WorldState reloadEff(t_attr_enum_map({	{"isWeaponLoaded", "TRUE"}}));
-	// planner.RegisterAction("Reload", reloadCnd, reloadEff, 3);
-	//
-	// WorldState searchCnd(t_attr_enum_map({	{"pose", "STANDING"},
-	// 										{"enemyStatus", "NON_VISIBLE"}}));
-	// WorldState searchEff(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
-	// 										{"location","NOT_IN_COVER"}}));
-	// planner.RegisterAction("SearchEnemy", searchCnd, searchEff, 10);
-	//
-	// WorldState approachCnd(t_attr_enum_map({{"enemyStatus", "VISIBLE"}}));
-	// WorldState approachEff(t_attr_enum_map({{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"}}));
-	// planner.RegisterAction("ApproachEnemy", approachCnd, approachEff, 7);
-	//
-	// WorldState moveAwayFromEnemyCnd(t_attr_enum_map({{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"}}));
-	// WorldState moveAwayFromEnemyEff(t_attr_enum_map({{"enemyStatus", "VISIBLE"}}));
-	// planner.RegisterAction("MoveAwayFromEnemy", moveAwayFromEnemyCnd, moveAwayFromEnemyEff, 7);
-	//
-	// WorldState attackGCnd(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
-	// 										{"isGrenadeDrawn","TRUE"}}));
-	// WorldState attackGEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
-	// planner.RegisterAction("AttackGrenade", attackGCnd, attackGEff, 4);
-	//
-	// WorldState attackWCnd(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
-	// 										{"isWeaponDrawn","TRUE"},
-	// 										{"isWeaponLoaded","TRUE"}}));
-	// WorldState attackWEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
-	// planner.RegisterAction("AttackWeapon", attackWCnd, attackWEff, 2);
-	//
-	// WorldState attackKCnd(t_attr_enum_map({	{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
-	// 										{"isKnifeDrawn","TRUE"}}));
-	// WorldState attackKEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
-	// planner.RegisterAction("AttackKnife", attackGCnd, attackGEff, 2);
+	
+	WorldState drawWeaponCnd;
+	WorldState drawWeaponEff(t_attr_enum_map({{"isWeaponDrawn", "TRUE"}}));
+	planner.RegisterAction("DrawWeapon", drawWeaponCnd, drawWeaponEff, 3);
+	
+	WorldState drawKnifeCnd;
+	WorldState drawKnifeEff(t_attr_enum_map({{"isKnifeDrawn", "TRUE"}}));
+	planner.RegisterAction("DrawKnife", drawKnifeCnd, drawKnifeEff, 1);
+	
+	WorldState drawGrenadeCnd(t_attr_enum_map({{"hasGrenades", "TRUE"}}));
+	WorldState drawGrenadeEff(t_attr_enum_map({{"isGrenadeDrawn", "TRUE"}}));
+	planner.RegisterAction("DrawGrenade", drawGrenadeCnd, drawGrenadeEff, 2);
+	
+	WorldState reloadCnd(t_attr_enum_map({	{"hasAmmo", "TRUE"}}));
+	WorldState reloadEff(t_attr_enum_map({	{"isWeaponLoaded", "TRUE"}}));
+	planner.RegisterAction("Reload", reloadCnd, reloadEff, 3);
+	
+	WorldState searchCnd(t_attr_enum_map({	{"pose", "STANDING"},
+											{"enemyStatus", "NON_VISIBLE"}}));
+	WorldState searchEff(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
+											{"location","NOT_IN_COVER"}}));
+	planner.RegisterAction("SearchEnemy", searchCnd, searchEff, 10);
+	
+	WorldState approachCnd(t_attr_enum_map({{"enemyStatus", "VISIBLE"}}));
+	WorldState approachEff(t_attr_enum_map({{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"}}));
+	planner.RegisterAction("ApproachEnemy", approachCnd, approachEff, 7);
+	
+	WorldState moveAwayFromEnemyCnd(t_attr_enum_map({{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"}}));
+	WorldState moveAwayFromEnemyEff(t_attr_enum_map({{"enemyStatus", "VISIBLE"}}));
+	planner.RegisterAction("MoveAwayFromEnemy", moveAwayFromEnemyCnd, moveAwayFromEnemyEff, 7);
+	
+	WorldState attackGCnd(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
+											{"isGrenadeDrawn","TRUE"}}));
+	WorldState attackGEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
+	planner.RegisterAction("AttackGrenade", attackGCnd, attackGEff, 4);
+	
+	WorldState attackWCnd(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
+											{"isWeaponDrawn","TRUE"},
+											{"isWeaponLoaded","TRUE"}}));
+	WorldState attackWEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
+	planner.RegisterAction("AttackWeapon", attackWCnd, attackWEff, 2);
+	
+	WorldState attackKCnd(t_attr_enum_map({	{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
+											{"isKnifeDrawn","TRUE"}}));
+	WorldState attackKEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
+	planner.RegisterAction("AttackKnife", attackKCnd, attackKEff, 2);
 	
 	//5. Pack the in-out structure 
 	Plan plan;
 	plan.startingWs = start;
-	plan.goalName = "GetToCover";
+	plan.goalName = "KillEnemy";
 
 	//6. Construct plan
 	bool builtPlan = planner.ConstructPlan(plan);
@@ -198,10 +198,18 @@ int test()
 	//6. Fetch results
 	if (builtPlan == true)
 	{
-		std::cout << "Started:\n";
+		std::cout << "Starting state:\n";
+		auto attributeNames = WorldState::GetAttributeNamesSet();
+		for (auto& attributeName : attributeNames)
+		{
+			std::cout << "\t" + attributeName + ": " + plan.startingWs.GetAttributeEnumerator(attributeName) + "\n";
+		}
+		std::cout << "Goal:\n";
+		std::cout << "\t" + plan.goalName + "\n";
+		std::cout << "Plan started:\n";
 		for (auto i = 0; i < plan.GetActionSequence().size(); i++)
 			std::cout << "\t" << std::to_string(i) << ". " << plan.GetActionSequence()[i] << "\n";
-		std::cout << "Finished\n";
+		std::cout << "Plan completed\n";
 		std::cout << "Cost: " << std::to_string(plan.GetCost());
 	}
 	else
