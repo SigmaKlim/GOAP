@@ -5,12 +5,12 @@
 
 const std::vector<std::string>& Plan::GetActionSequence() const
 {
-    return actionNames;
+    return _actionNames;
 }
 
 unsigned Plan::GetCost() const
 {
-    return cost;
+    return _cost;
 }
 
 Planner::Planner()
@@ -22,124 +22,124 @@ Planner::~Planner()
 {
 }
 
-bool Planner::RegisterAttribute(const std::string& name_, const Attribute& attribute_)
+bool Planner::RegisterAttribute(const std::string& name, const Attribute& attribute)
 {
-    bool contains =  (attributeCatalogue.find(name_) != attributeCatalogue.end());
+    bool contains =  (_attributeCatalogue.find(name) != _attributeCatalogue.end());
     if (contains)
     {
-        std::cout << "The Planner already contains attribute \"" + name_ + "\".\n";
+        std::cout << "The Planner already contains attribute \"" + name + "\".\n";
         return false;
     }
-    bool isOutOfRange = (attributeCatalogue.size() == MAX_ATTRIBUTES);
+    bool isOutOfRange = (_attributeCatalogue.size() == MAX_ATTRIBUTES);
     if (isOutOfRange == true)
     {
-        std::cout << "Can't register attribute \"" + name_ + 
+        std::cout << "Can't register attribute \"" + name + 
             "\": number of attributes reached MAX_ATTRIBUTES(" + std::to_string(MAX_ATTRIBUTES) + ").\n";
         return false;
     }
-    attributeCatalogue.insert(std::make_pair(std::string(name_), attribute_));
-    WorldState::attributeNames.emplace(std::string(name_));
+    _attributeCatalogue.insert(std::make_pair(std::string(name), attribute));
+    WorldState::attributeNames.emplace(std::string(name));
     WorldState::numAttributes++;
     return true;
 }
 
-bool Planner::RegisterAttribute(const std::string& name_, const std::vector<std::string>& enumerators_)
+bool Planner::RegisterAttribute(const std::string& name, const std::vector<std::string>& enumerators)
 {
-    bool contains = (attributeCatalogue.find(name_) != attributeCatalogue.end());
+    bool contains = (_attributeCatalogue.find(name) != _attributeCatalogue.end());
     if (contains)
     {
-        std::cout << "The Planner already contains attribute \"" + name_ + "\".\n";
+        std::cout << "The Planner already contains attribute \"" + name + "\".\n";
         return false;
     }
-    bool isOutOfRange = attributeCatalogue.size() == MAX_ATTRIBUTES;
+    bool isOutOfRange = _attributeCatalogue.size() == MAX_ATTRIBUTES;
     if (isOutOfRange == true)
     {
-        std::cout << "Can't register attribute \"" + name_ +
+        std::cout << "Can't register attribute \"" + name +
             "\": number of attributes reached MAX_ATTRIBUTES(" + std::to_string(MAX_ATTRIBUTES) + ").\n";
         return false;
     }
-    attributeCatalogue.emplace(std::make_pair(std::string(name_), Attribute(enumerators_)));
-    WorldState::attributeNames.emplace(std::string(name_));
+    _attributeCatalogue.emplace(std::make_pair(std::string(name), Attribute(enumerators)));
+    WorldState::attributeNames.emplace(std::string(name));
     WorldState::numAttributes++;
     return true;
 }
 
-bool Planner::RegisterAction(const std::string& name_, const Action& action_)
+bool Planner::RegisterAction(const std::string& name, const Action& action)
 {
-    bool contains =  (actionCatalogue.find(name_) != actionCatalogue.end());
+    bool contains =  (_actionCatalogue.find(name) != _actionCatalogue.end());
     if (contains == true)
     {
-        std::cout << "The Planner already contains action \"" + name_ + "\".\n";
+        std::cout << "The Planner already contains action \"" + name + "\".\n";
         return false;
     }
-    actionCatalogue.insert(std::make_pair(std::string(name_), action_ ));
+    _actionCatalogue.insert(std::make_pair(std::string(name), action ));
     return true;
 }
 
-bool Planner::RegisterAction(const std::string& name_, const WorldState& cnd_, const WorldState& eff_, unsigned cost_)
+bool Planner::RegisterAction(const std::string& name, const WorldState& cnd, const WorldState& eff, unsigned cost)
 {
-    bool contains =  (actionCatalogue.find(name_) != actionCatalogue.end());
+    bool contains =  (_actionCatalogue.find(name) != _actionCatalogue.end());
     if (contains == true)
     {
-        std::cout << "The Planner already contains action \"" + name_ + "\".\n";
+        std::cout << "The Planner already contains action \"" + name + "\".\n";
         return false;
     }
-    actionCatalogue.insert(std::make_pair(std::string(name_), Action(cnd_, eff_, cost_)));
+    _actionCatalogue.insert(std::make_pair(std::string(name), Action(cnd, eff, cost)));
     return true;
 }
 
-bool Planner::RegisterGoal	(const std::string& name_, const WorldState& goal_)
+bool Planner::RegisterGoal	(const std::string& name, const WorldState& goal_)
 {
-    bool contains = (goalCatalogue.find(name_) != goalCatalogue.end());
+    bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
     if (contains == true)
     {
-        std::cout << "The Planner already contains goal \"" + name_ + "\".\n";
+        std::cout << "The Planner already contains goal \"" + name + "\".\n";
         return false;
     }
-    goalCatalogue.insert(std::make_pair(std::string(name_), goal_ ));
+    _goalCatalogue.insert(std::make_pair(std::string(name), goal_ ));
     return true;
 }
 
-bool Planner::RegisterGoal(const std::string& name_, const std::unordered_map<std::string, std::string>& nameValuePairs_)
+bool Planner::RegisterGoal(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs)
 {
-    bool contains = (goalCatalogue.find(name_) != goalCatalogue.end());
+    bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
     if (contains == true)
     {
-        std::cout << "The Planner already contains goal \"" + name_ + "\".\n";
+        std::cout << "The Planner already contains goal \"" + name + "\".\n";
         return false;
     }
-    goalCatalogue.insert(std::make_pair(std::string(name_), WorldState(nameValuePairs_)));
+    _goalCatalogue.insert(std::make_pair(std::string(name), WorldState(nameValuePairs)));
     return true;
 }
 
-const Attribute& Planner::GetAttribute(const std::string& name_) const
+const Attribute& Planner::GetAttribute(const std::string& name) const
 {
-    auto search = attributeCatalogue.find(name_);
-    if (search == attributeCatalogue.end())
+    auto search = _attributeCatalogue.find(name);
+    if (search == _attributeCatalogue.end())
     {
-        std::cout << "Attribute \"" + name_ + "\" is not in the catalogue\n";
+        std::cout << "Attribute \"" + name + "\" is not in the catalogue\n";
         return Attribute();
     }
     return search->second;
 }
 
-const Action& Planner::GetAction(const std::string& name_) const
+const Action& Planner::GetAction(const std::string& name) const
 {
-    auto search = actionCatalogue.find(name_);
-    if (search == actionCatalogue.end())
+    auto search = _actionCatalogue.find(name);
+    if (search == _actionCatalogue.end())
     {
-        std::cout << "Action \"" + name_ + "\" is not in the catalogue\n";
+        std::cout << "Action \"" + name + "\" is not in the catalogue\n";
         return Action();
     }
     return search->second;
 }
 
-const WorldState& Planner::GetGoal(const std::string& name_) const
+const WorldState& Planner::GetGoal(const std::string& name) const
 {
-    auto search = goalCatalogue.find(name_);
-    if (search == goalCatalogue.end())
+    auto search = _goalCatalogue.find(name);
+    if (search == _goalCatalogue.end())
     {
-        std::cout << "Goal \"" + name_ + "\" is not in the catalogue\n";
+        std::cout << "Goal \"" + name + "\" is not in the catalogue\n";
         return WorldState();
     }
     return search->second;
@@ -148,57 +148,57 @@ const WorldState& Planner::GetGoal(const std::string& name_) const
 bool Planner::ConstructPlan(Plan& plan_) const
 {
     Path<Vertex> path;
-    const auto& goal = GetGoal(plan_.goalName);
+    const auto& goal = GetGoal(plan_.GoalName);
     std::set<std::string> availableActionNames;
-    for (auto& actionName : actionCatalogue)
+    for (auto& actionName : _actionCatalogue)
         availableActionNames.insert(actionName.first);
     Vertex start(goal, availableActionNames, ""); // we build the path from goal state to current state
-    Vertex finish(plan_.startingWs, {}, "");
+    Vertex finish(plan_.StartingWs, {}, "");
     bool foundPath = Pathfind(path, start, finish);
     if (foundPath == false)
         return false;
-    auto planLength = path.vertices.size() - 1;
-    plan_.actionNames.resize(planLength);
-    for (auto i = 1; i < path.vertices.size(); i++)
-        plan_.actionNames[i - 1] = path.vertices[path.vertices.size() - i].prevAction;
-    plan_.cost = path.cost;
+    auto planLength = path.Vertices.size() - 1;
+    plan_._actionNames.resize(planLength);
+    for (auto i = 1; i < path.Vertices.size(); i++)
+        plan_._actionNames[i - 1] = path.Vertices[path.Vertices.size() - i].prevAction;
+    plan_._cost = path.Cost;
     return true;
 }
 
-void Planner::GetNeighbors(std::vector<Vertex>& neighbors_, const Vertex& vertex_, const Vertex& finish_) const
+void Planner::GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex, const Vertex& finish) const
 {
-    for (auto& actionName : vertex_.availableActionNames)
+    for (auto& actionName : vertex.availableActionNames)
     {
         WorldState nextState; //change state by action
         auto& action = GetAction(actionName);
-        if (WorldState::IsActionUseful(nextState, vertex_.state, action)) //check if nextState is closer to finish_ than vertex_.state
+        if (WorldState::IsActionUseful(nextState, vertex.state, action)) //check if nextState is closer to finish_ than vertex_.state
             {
-            auto neighborAvailableActions = vertex_.availableActionNames;
+            auto neighborAvailableActions = vertex.availableActionNames;
             neighborAvailableActions.erase(actionName);
-            neighbors_.emplace_back(nextState, neighborAvailableActions, actionName);
+            neighbors.emplace_back(nextState, neighborAvailableActions, actionName);
             }
     }
 }
 
-bool Planner::Satisfies(const Vertex& vertex_, const Vertex& targetVertex_) const
+bool Planner::Satisfies(const Vertex& vertex, const Vertex& targetVertex_) const
 {
     const auto& initialState = targetVertex_.state;
-    const auto& activeCndSet = vertex_.state;
+    const auto& activeCndSet = vertex.state;
     return initialState.SatisfiesMask(activeCndSet);
 }
 
-t_node_id Planner::GetId(const Vertex& vertex_) const
+t_node_id Planner::GetId(const Vertex& vertex) const
 {
     if (typeid(t_node_id) != typeid(t_mask))
     {
         std::cout << "t_node_id and t_mask have to same types! \n";
         exit(-1);
     }
-    return t_node_id(vertex_.state.GetMask());
+    return t_node_id(vertex.state.GetMask());
 }
 
-unsigned Planner::GetDist(const Vertex& from_, const Vertex& to_) const
+unsigned Planner::GetDist(const Vertex& from, const Vertex& to) const
 {
-    return GetAction(to_.prevAction).GetCost();
+    return GetAction(to.prevAction).GetCost();
 }
 

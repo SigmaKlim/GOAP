@@ -19,43 +19,43 @@ struct Vertex
 
 struct Plan
 {
-	WorldState startingWs;
-	std::string goalName;
+	WorldState StartingWs;
+	std::string GoalName;
 	const std::vector<std::string>& GetActionSequence() const;
 	unsigned GetCost() const;
 private:
-	std::vector <std::string> actionNames;
-	unsigned cost;
+	std::vector <std::string> _actionNames;
+	unsigned _cost;
 
 	friend class Planner;
 };
 
 class Planner : public BasePathfinder<Vertex>
 {
-	std::unordered_map<std::string, WorldState> goalCatalogue;
-	std::unordered_map<std::string, Action> actionCatalogue;
-	std::unordered_map<std::string, Attribute> attributeCatalogue;
+	std::unordered_map<std::string, WorldState> _goalCatalogue;
+	std::unordered_map<std::string, Action> _actionCatalogue;
+	std::unordered_map<std::string, Attribute> _attributeCatalogue;
 
 public:
 
 						Planner();
 						~Planner();
-	bool				RegisterAttribute	(const std::string& name_, const Attribute& attribute_);
-	bool				RegisterAttribute	(const std::string& name_, const std::vector<std::string>& enumerators_);
-	bool				RegisterAction		(const std::string& name_, const Action& action_);
-	bool				RegisterAction		(const std::string& name_, const WorldState& cnd_, const WorldState& eff_, unsigned cost_);
-	bool				RegisterGoal		(const std::string& name_, const WorldState& goal_);
-	bool				RegisterGoal		(const std::string& name_, const std::unordered_map<std::string, std::string>& nameValuePairs_);
-	const Attribute&	GetAttribute		(const std::string& name_) const;
-	const Action&		GetAction			(const std::string& name_) const;
-	const WorldState&	GetGoal				(const std::string& name_) const;
+	bool				RegisterAttribute	(const std::string& name, const Attribute& attribute);
+	bool				RegisterAttribute	(const std::string& name, const std::vector<std::string>& enumerators);
+	bool				RegisterAction		(const std::string& name, const Action& action);
+	bool				RegisterAction		(const std::string& name, const WorldState& cnd, const WorldState& eff, unsigned cost);
+	bool				RegisterGoal		(const std::string& name, const WorldState& goal_);
+	bool				RegisterGoal		(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs);
+	const Attribute&	GetAttribute		(const std::string& name) const;
+	const Action&		GetAction			(const std::string& name) const;
+	const WorldState&	GetGoal				(const std::string& name) const;
 
 	bool ConstructPlan(Plan& plan_) const;
 	
-	void		GetNeighbors(std::vector<Vertex>& neighbors_, const Vertex& vertex_, const Vertex& finish_ = Vertex()) const override;
-	bool		Satisfies	(const Vertex& vertex_, const Vertex& finish_ = Vertex()) const override;
-	t_node_id	GetId		(const Vertex& vertex_) const override;
-	unsigned	GetDist		(const Vertex& from_, const Vertex& to_) const override;
+	void		GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex, const Vertex& finish = Vertex()) const override;
+	bool		Satisfies	(const Vertex& vertex, const Vertex& finish = Vertex()) const override;
+	t_node_id	GetId		(const Vertex& vertex) const override;
+	unsigned	GetDist		(const Vertex& from, const Vertex& to) const override;
 	const unsigned MAX_ATTRIBUTES = 20;
 };
 

@@ -11,8 +11,8 @@
 
 int main()
 {
-	return TestMask();
-	//return testGoap();
+	//return TestMask();
+	return TestGoap();
 }
 
 

@@ -3,19 +3,19 @@
 
 class Action
 {
-	WorldState cnd;
-	WorldState eff;
-	unsigned cost;
+	WorldState _condition;
+	WorldState _effect;
+	unsigned _cost;
 
 public:
-	Action() = default;
-	Action(const WorldState& cnd_, const WorldState& eff_, const unsigned cost_);
-	~Action();
+						Action() = default;
+						Action(const WorldState& cnd_, const WorldState& eff_, const unsigned cost_);
+						~Action();
 
-	const WorldState& GetCnd() const;
-	const WorldState& GetEff() const;
-	unsigned GetCost() const;
-	void SetCost(const int cost_);
+	const WorldState&	GetCondition() const;
+	const WorldState&	GetEffect() const;
+	unsigned			GetCost() const;
+	void				SetCost(const int cost_);
 
 	friend class Planner;
 };

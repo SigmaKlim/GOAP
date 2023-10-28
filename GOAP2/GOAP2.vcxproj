@@ -134,7 +134,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Action.cpp" />
-    <ClCompile Include="GoapPlanner.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="Plan.cpp" />
     <ClCompile Include="Source.cpp" />
@@ -144,12 +143,10 @@
     <ClInclude Include="Action.h" />
     <ClInclude Include="Attribute.h" />
     <ClInclude Include="FibonacciHeap.hpp" />
-    <ClInclude Include="GoapPlanner.h" />
     <ClInclude Include="NumPathfinder.h" />
     <ClInclude Include="Pathfind.hpp" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="Plan.h" />
-    <ClInclude Include="Search.h" />
     <ClInclude Include="Testing.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>

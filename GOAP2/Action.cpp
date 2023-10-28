@@ -1,6 +1,6 @@
 #include "Action.h"
 
-Action::Action(const WorldState& cnd_, const WorldState& eff_, const unsigned cost_) : cnd(cnd_), eff(eff_), cost(cost_)
+Action::Action(const WorldState& cnd_, const WorldState& eff_, const unsigned cost_) : _condition(cnd_), _effect(eff_), _cost(cost_)
 {
 	
 }
@@ -9,22 +9,22 @@ Action::~Action()
 {
 }
 
-const WorldState& Action::GetCnd() const
+const WorldState& Action::GetCondition() const
 {
-	return cnd;
+	return _condition;
 }
 
-const WorldState& Action::GetEff() const
+const WorldState& Action::GetEffect() const
 {
-	return eff;
+	return _effect;
 }
 
 unsigned Action::GetCost() const
 {
-	return cost;
+	return _cost;
 }
 
 void Action::SetCost(const int cost_)
 {
-	cost = cost_;
+	_cost = cost_;
 }

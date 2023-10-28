@@ -4,10 +4,8 @@
 #include <queue>
 #include <map>
 #include <random>
-#include <ctime>
 #include <string>
 #include <iostream>
-#include <stdbool.h>
 
 #include "MathHelper.h"
 #include "FibonacciHeap.hpp"
@@ -23,8 +21,8 @@ const t_node_id NO_ID = UINT_MAX;
 template <typename t_vertex>
 struct Path
 {
-	std::vector<t_vertex> vertices;
-	int cost = 0;
+	std::vector<t_vertex> Vertices;
+	int Cost = 0;
 };
 
 struct Node
@@ -33,20 +31,20 @@ struct Node
 		 t_node_id prevNodeId_,
 		 unsigned distFromStart_,
 		 unsigned heuristic_)
-		 : id(id_), prevNodeId(prevNodeId_), distFromStart(distFromStart_), heuristic(heuristic_) {};
+		 : _id(id_), _prevNodeId(prevNodeId_), _distFromStart(distFromStart_), _heuristic(heuristic_) {};
 	bool operator<(const Node& right) const
 	{
-		return distFromStart + heuristic < right.distFromStart + right.heuristic;
+		return _distFromStart + _heuristic < right._distFromStart + right._heuristic;
 	};
 	bool operator>(const Node& right) const
 	{
-		return distFromStart + heuristic > right.distFromStart + right.heuristic;
+		return _distFromStart + _heuristic > right._distFromStart + right._heuristic;
 	};
-	t_node_id id = 0;
-	t_node_id prevNodeId = 0;
+	t_node_id _id = 0;
+	t_node_id _prevNodeId = 0;
 	//arc_id prevArcId = arc_id();
-	unsigned distFromStart = 0;
-	unsigned heuristic = 0;
+	unsigned _distFromStart = 0;
+	unsigned _heuristic = 0;
 
 
 };
@@ -56,18 +54,18 @@ class BasePathfinder
 {
 	
 protected:
-	virtual int			GetHeuristic(const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const
+	virtual int			GetHeuristic	(const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const
 	{
 		return 0;
 	};
-	virtual void		GetNeighbors(std::vector<t_vertex>&	neighbors_, const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const = 0; //returns array of newly created node's neighbors
-	virtual bool		Satisfies(const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const = 0; //checks whether this node satisfies conditions of the target node; target is a shell for Node(T* cond), i.e. for any node with set cond field
-	virtual t_node_id	GetId(const t_vertex& vertex_) const = 0;
-	virtual unsigned	GetDist(const t_vertex& from_, const t_vertex& to_) const = 0;
+	virtual void		GetNeighbors	(std::vector<t_vertex>&	neighbors_, const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const = 0; //returns array of newly created node's neighbors
+	virtual bool		Satisfies		(const t_vertex& vertex_, const t_vertex& finish_ = t_vertex()) const = 0; //checks whether this node satisfies conditions of the target node; target is a shell for Node(T* cond), i.e. for any node with set cond field
+	virtual t_node_id	GetId			(const t_vertex& vertex_) const = 0;
+	virtual unsigned	GetDist			(const t_vertex& from_, const t_vertex& to_) const = 0;
 public:
-	BasePathfinder() {};
-	virtual ~BasePathfinder() {};
-	bool Pathfind(Path<t_vertex>& path_, t_vertex start_, t_vertex finish_ = t_vertex()) const
+						BasePathfinder	() {};
+	virtual				~BasePathfinder	() {};
+			bool		Pathfind		(Path<t_vertex>& path_, t_vertex start_, t_vertex finish_ = t_vertex()) const
 	{
 
 		FibonacciHeap<Node> discovered; //a queue of discovered but not expanded nodes
@@ -81,7 +79,7 @@ public:
 		vertices.insert({ startId, start_ });
 		cameFrom.insert({ startId, NO_ID });
 		Element<Node>* currentElement = discovered.insert(currentNode);
-		discMap.insert({ currentNode.id, currentElement });
+		discMap.insert({ currentNode._id, currentElement });
 		
 		std::vector <t_vertex> neighborVertices;
 		while (true)
@@ -92,11 +90,11 @@ public:
 				return false;
 			}
 			currentNode = discovered.extractMin();
-			discMap.erase(currentNode.id);
-			t_vertex currentVertex = vertices.at(currentNode.id);
+			discMap.erase(currentNode._id);
+			t_vertex currentVertex = vertices.at(currentNode._id);
 			if (Satisfies(currentVertex, finish_) == true)
 				break;
-			expanded.insert({ currentNode.id });
+			expanded.insert({ currentNode._id });
 			GetNeighbors(neighborVertices, currentVertex, finish_);
 			for (int i = 0; i < neighborVertices.size(); i++)
 			{
@@ -106,29 +104,29 @@ public:
 				Element<Node>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
 				bool wasExpanded = expanded.find(neighborId) != expanded.end();
 				Node neighborNode(	neighborId, 
-									currentNode.id, 
-									currentNode.distFromStart + GetDist(currentVertex, neighborVertices[i]), 
+									currentNode._id, 
+									currentNode._distFromStart + GetDist(currentVertex, neighborVertices[i]), 
 									GetHeuristic(neighborVertices[i], finish_));
 				if (wasDiscovered == false && wasExpanded == false)
 				{
 					neighborElement = discovered.insert({ neighborNode });
 					discMap.insert({ neighborId, neighborElement });
 					vertices.insert({neighborId, neighborVertices[i]});
-					if (cameFrom.insert({neighborId, currentNode.id}).second != true)
+					if (cameFrom.insert({neighborId, currentNode._id}).second != true)
 						std::cout << "!";
 				}
 				else if (	wasDiscovered == true && 
-							neighborElement->getKey().distFromStart > neighborNode.distFromStart)
+							neighborElement->getKey().distFromStart > neighborNode._distFromStart)
 				{
 					discovered.decreaseKey(neighborElement, neighborNode);
-					if (cameFrom.insert_or_assign(neighborId, currentNode.id).second != false)
+					if (cameFrom.insert_or_assign(neighborId, currentNode._id).second != false)
 						std::cout << "!";
 				}
 			}
 			neighborVertices.clear();
 		}
-		path_.cost = currentNode.distFromStart;
-		t_node_id anotherId = currentNode.id;
+		path_.Cost = currentNode._distFromStart;
+		t_node_id anotherId = currentNode._id;
 		while (anotherId != NO_ID)
 		{
 			t_vertex anotherVertex = vertices.at(anotherId);

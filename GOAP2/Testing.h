@@ -192,8 +192,8 @@ inline int TestGoap()
 	
 	//5. Pack the in-out structure 
 	Plan plan;
-	plan.startingWs = start;
-	plan.goalName = "KillEnemy";
+	plan.StartingWs = start;
+	plan.GoalName = "KillEnemy";
 
 	//6. Construct plan
 	bool builtPlan = planner.ConstructPlan(plan);
@@ -205,10 +205,10 @@ inline int TestGoap()
 		auto attributeNames = WorldState::GetAttributeNamesSet();
 		for (auto& attributeName : attributeNames)
 		{
-			std::cout << "\t" + attributeName + ": " + plan.startingWs.GetAttributeEnumerator(attributeName) + "\n";
+			std::cout << "\t" + attributeName + ": " + plan.StartingWs.GetAttributeEnumerator(attributeName) + "\n";
 		}
 		std::cout << "Goal:\n";
-		std::cout << "\t" + plan.goalName + "\n";
+		std::cout << "\t" + plan.GoalName + "\n";
 		std::cout << "Plan started:\n";
 		for (auto i = 0; i < plan.GetActionSequence().size(); i++)
 			std::cout << "\t" << std::to_string(i) << ". " << plan.GetActionSequence()[i] << "\n";

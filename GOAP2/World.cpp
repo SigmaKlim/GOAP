@@ -297,7 +297,7 @@ unsigned WorldState::GetNumAttributes() const
 bool WorldState::IsActionUseful(WorldState& modifiedState_, const WorldState& thisState_, const Action& action_)
 {
 	modifiedState_ = thisState_;
-	const auto& effects = action_.GetEff();
+	const auto& effects = action_.GetEffect();
 	bool wereAnyConditionsSatisfied = false; 
 	for (unsigned i = 0; i < numAttributes; i++)
 	{
@@ -309,7 +309,7 @@ bool WorldState::IsActionUseful(WorldState& modifiedState_, const WorldState& th
 	}
 	if (wereAnyConditionsSatisfied == false)
 		return false; // if no conditions were satisfied within the first loop, the action is not useful
-	const auto& conditions = action_.GetCnd();
+	const auto& conditions = action_.GetCondition();
 	for (unsigned i = 0; i < numAttributes; i++)
 	{
 		if (conditions.GetAttributeValue(i) != 0)

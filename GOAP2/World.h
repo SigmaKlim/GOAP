@@ -64,9 +64,9 @@ struct WorldState
 	
 	static const std::set<std::string>& GetAttributeNamesSet();
 	//Returns true of the action fullfilled any of active conditions
-	static bool		IsActionUseful	 (WorldState& modifiedState_,  const WorldState& thisState_, const Action& action_);
+	static bool			IsActionUseful	 (WorldState& modifiedState_,  const WorldState& thisState_, const Action& action_);
 	//Returns the position of the attribute and numAttributes if the attribute was not found.
-	static unsigned	FindAttribute	 (const std::string& name_); 
+	static unsigned		FindAttribute	 (const std::string& name_); 
 private:
 
 	WsMask								mask;
