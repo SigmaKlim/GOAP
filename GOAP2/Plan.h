@@ -1,51 +1,61 @@
 #pragma once
 #include "Action.h"
-
 #include <string>
 #include <vector>
 #include <map>
-
-class Plan
+#include <unordered_map>
+#include "Pathfind.hpp"
+#include "Pathfind.hpp"
+struct Vertex
 {
-	WsMask startingWs;
-	std::string goalName;
-	std::vector <std::string*> actionNames;
+	Vertex					()  = default;
+	Vertex					(const WorldState& state_, const std::set <std::string>& availableActionNames_, const std::string& prevAction_) :
+								availableActionNames(availableActionNames_), state(state_), prevAction(prevAction_) {};
 
-public:
-	Plan(const WsMask& startingWs_, const std::string& goalName_, const std::vector<std::string*>& actionNames_);
-	const WsMask& GetStartingWs() const;
-	const std::string& GetGoalName() const;
-	const std::vector<std::string*>& GetActionNames() const;
+	std::set<std::string> availableActionNames;
+	WorldState state;
+	std::string prevAction;
+};
+
+struct Plan
+{
+	WorldState StartingWs;
+	std::string GoalName;
+	const std::vector<std::string>& GetActionSequence() const;
+	unsigned GetCost() const;
+private:
+	std::vector <std::string> _actionNames;
+	unsigned _cost;
 
 	friend class Planner;
 };
 
-class Planner
+class Planner : public BasePathfinder<Vertex>
 {
-	std::map<std::string, WsMask> goalCatalogue;
-	std::map<std::string, Action> actionCatalogue;
-	std::vector<std::string> attributeNamesCatalogue;
-	const int ATTRIBUTES_MAX_NUM = 20;
+	std::unordered_map<std::string, WorldState> _goalCatalogue;
+	std::unordered_map<std::string, Action> _actionCatalogue;
+	std::unordered_map<std::string, Attribute> _attributeCatalogue;
 
 public:
-	WsMask MakeWs() const;
-	bool FillInWs(WsMask& emptyWs, const std::map <std::string, bool> attrs) const;
-	Action MakeAction() const;
-	std::vector <const std::string*> GetActionNamesVector() const;
-	//public:
-	Planner();
-	~Planner();
-	bool AddAttribute(const std::string& name);
-	bool GetGoalByName(WsMask* result, const std::string& name) const;
-	bool GetActionByName(Action* result, const std::string& name) const;
-	bool AddAction(const std::string& name, const std::map <std::string, bool> cnd, const std::map <std::string, bool> eff, const int cost);
-	bool AddGoal(const std::string& name, const std::map <std::string, bool> attrs);
+
+						Planner();
+						~Planner();
+	bool				RegisterAttribute	(const std::string& name, const Attribute& attribute);
+	bool				RegisterAttribute	(const std::string& name, const std::vector<std::string>& enumerators);
+	bool				RegisterAction		(const std::string& name, const Action& action);
+	bool				RegisterAction		(const std::string& name, const WorldState& cnd, const WorldState& eff, unsigned cost);
+	bool				RegisterGoal		(const std::string& name, const WorldState& goal_);
+	bool				RegisterGoal		(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs);
+	const Attribute&	GetAttribute		(const std::string& name) const;
+	const Action&		GetAction			(const std::string& name) const;
+	const WorldState&	GetGoal				(const std::string& name) const;
+
+	bool ConstructPlan(Plan& plan_) const;
+	
+	void		GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex, const Vertex& finish = Vertex()) const override;
+	bool		Satisfies	(const Vertex& vertex, const Vertex& finish = Vertex()) const override;
+	t_node_id	GetId		(const Vertex& vertex) const override;
+	unsigned	GetDist		(const Vertex& from, const Vertex& to) const override;
+	const unsigned MAX_ATTRIBUTES = 20;
 };
 
-struct Vertex
-{
-	std::vector<const std::string*> availableActions;
-	std::vector<const std::string*> path;
-	WsMask cnd;
-	WsMask state;
-};

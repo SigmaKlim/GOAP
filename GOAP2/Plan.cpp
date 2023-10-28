@@ -1,138 +1,204 @@
 #include "Plan.h"
-#include <algorithm>
 #include <iostream>
-#include <algorithm>
-Plan::Plan(const WsMask& startingWs_, const std::string& goalName_, const std::vector<std::string*>& actionNames_) : startingWs(startingWs_), goalName(goalName_), actionNames(actionNames_)
-{
+#include <stdbool.h>
 
+
+const std::vector<std::string>& Plan::GetActionSequence() const
+{
+    return _actionNames;
 }
 
-const WsMask& Plan::GetStartingWs() const
+unsigned Plan::GetCost() const
 {
-    return startingWs;
-}
-
-const std::string& Plan::GetGoalName() const
-{
-    return goalName;
-}
-
-const std::vector<std::string*>& Plan::GetActionNames() const
-{
-    return actionNames;
-}
-
-WsMask Planner::MakeWs() const
-{
-    return WsMask(ATTRIBUTES_MAX_NUM);
-}
-
-bool Planner::FillInWs(WsMask& newWs, const std::map<std::string, bool> attrs) const
-{
-    std::vector <int> affectedAttributes;
-    for (auto const &i : attrs)
-    {
-        int index = std::find(attributeNamesCatalogue.begin(), attributeNamesCatalogue.end(), i.first) - attributeNamesCatalogue.begin();
-        if (index < attributeNamesCatalogue.size())
-        {
-            newWs.SetAttributeByIndex(index, i.second);
-            affectedAttributes.push_back(index);
-        }
-        else
-        {
-            std::cout << "Could not find attribute \"" + i.first + "\" in catalogue.\n";
-            return false;
-        }
-    }
-    newWs.SetMask(affectedAttributes);
-    newWs.affectedAttributesNum = affectedAttributes.size();
-    return true;
-}
-
-Action Planner::MakeAction() const
-{
-    return Action(MakeWs(), MakeWs(), 1);
-}
-
-std::vector<const std::string*> Planner::GetActionNamesVector() const
-{
-    std::vector<const std::string*> anVector;
-    for (auto& a : actionCatalogue)
-        anVector.push_back(&a.first);
-    return anVector;
+    return _cost;
 }
 
 Planner::Planner()
 {
-    goalCatalogue = std::map<std::string, WsMask>();
-    actionCatalogue = std::map<std::string, Action>();
-    attributeNamesCatalogue = std::vector<std::string>();
+    WorldState::planner = this;
 }
 
 Planner::~Planner()
 {
 }
 
-bool Planner::AddAttribute(const std::string& name)
+bool Planner::RegisterAttribute(const std::string& name, const Attribute& attribute)
 {
-    bool contains = (std::find(attributeNamesCatalogue.begin(), attributeNamesCatalogue.end(), name)) != attributeNamesCatalogue.end();
+    bool contains =  (_attributeCatalogue.find(name) != _attributeCatalogue.end());
     if (contains)
     {
         std::cout << "The Planner already contains attribute \"" + name + "\".\n";
         return false;
     }
-    attributeNamesCatalogue.push_back(name);
-    return true;
-}
-
-bool Planner::GetGoalByName(WsMask* result, const std::string& name) const
-{
-    auto it = goalCatalogue.find(name);
-    if (it == goalCatalogue.end())
-        return false;
-    *result = it._Ptr->_Myval.second;
-    return true;
-}
-
-bool Planner::GetActionByName(Action* result, const std::string& name) const
-{
-    auto it = actionCatalogue.find(name);
-    if (it == actionCatalogue.end())
-        return false;
-    *result = it._Ptr->_Myval.second;
-    return true;
-}
-
-bool Planner::AddAction(const std::string& name, const std::map <std::string, bool> cnd, const std::map <std::string, bool> eff, const int cost)
-{
-    WsMask cndWs = MakeWs();
-    if (FillInWs(cndWs, cnd) == false)
-        return false;
-    WsMask effWs = MakeWs();
-    if (FillInWs(effWs, eff) == false)
-        return false;
-    auto status = actionCatalogue.insert({ name, Action(cndWs, effWs, cost) });
-    if (status.second == false)
+    bool isOutOfRange = (_attributeCatalogue.size() == MAX_ATTRIBUTES);
+    if (isOutOfRange == true)
     {
-        std::cout << "Insertion of action \"" + name + "\" into the catalogue failed.\n";
+        std::cout << "Can't register attribute \"" + name + 
+            "\": number of attributes reached MAX_ATTRIBUTES(" + std::to_string(MAX_ATTRIBUTES) + ").\n";
         return false;
     }
+    _attributeCatalogue.insert(std::make_pair(std::string(name), attribute));
+    WorldState::attributeNames.emplace(std::string(name));
+    WorldState::numAttributes++;
     return true;
 }
 
-bool Planner::AddGoal(const std::string& name, const std::map<std::string, bool> attrs)
+bool Planner::RegisterAttribute(const std::string& name, const std::vector<std::string>& enumerators)
 {
-    WsMask goalWs = MakeWs();
-    if (FillInWs(goalWs, attrs) == false)
-        return false;
-    auto status = goalCatalogue.insert({ name, goalWs });
-    if (status.second == false)
+    bool contains = (_attributeCatalogue.find(name) != _attributeCatalogue.end());
+    if (contains)
     {
-        std::cout << "Insertion of goal \"" + name + "\" into the catalogue failed.\n";
+        std::cout << "The Planner already contains attribute \"" + name + "\".\n";
         return false;
     }
+    bool isOutOfRange = _attributeCatalogue.size() == MAX_ATTRIBUTES;
+    if (isOutOfRange == true)
+    {
+        std::cout << "Can't register attribute \"" + name +
+            "\": number of attributes reached MAX_ATTRIBUTES(" + std::to_string(MAX_ATTRIBUTES) + ").\n";
+        return false;
+    }
+    _attributeCatalogue.emplace(std::make_pair(std::string(name), Attribute(enumerators)));
+    WorldState::attributeNames.emplace(std::string(name));
+    WorldState::numAttributes++;
     return true;
 }
 
+bool Planner::RegisterAction(const std::string& name, const Action& action)
+{
+    bool contains =  (_actionCatalogue.find(name) != _actionCatalogue.end());
+    if (contains == true)
+    {
+        std::cout << "The Planner already contains action \"" + name + "\".\n";
+        return false;
+    }
+    _actionCatalogue.insert(std::make_pair(std::string(name), action ));
+    return true;
+}
 
+bool Planner::RegisterAction(const std::string& name, const WorldState& cnd, const WorldState& eff, unsigned cost)
+{
+    bool contains =  (_actionCatalogue.find(name) != _actionCatalogue.end());
+    if (contains == true)
+    {
+        std::cout << "The Planner already contains action \"" + name + "\".\n";
+        return false;
+    }
+    _actionCatalogue.insert(std::make_pair(std::string(name), Action(cnd, eff, cost)));
+    return true;
+}
+
+bool Planner::RegisterGoal	(const std::string& name, const WorldState& goal_)
+{
+    bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
+    if (contains == true)
+    {
+        std::cout << "The Planner already contains goal \"" + name + "\".\n";
+        return false;
+    }
+    _goalCatalogue.insert(std::make_pair(std::string(name), goal_ ));
+    return true;
+}
+
+bool Planner::RegisterGoal(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs)
+{
+    bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
+    if (contains == true)
+    {
+        std::cout << "The Planner already contains goal \"" + name + "\".\n";
+        return false;
+    }
+    _goalCatalogue.insert(std::make_pair(std::string(name), WorldState(nameValuePairs)));
+    return true;
+}
+
+const Attribute& Planner::GetAttribute(const std::string& name) const
+{
+    auto search = _attributeCatalogue.find(name);
+    if (search == _attributeCatalogue.end())
+    {
+        std::cout << "Attribute \"" + name + "\" is not in the catalogue\n";
+        return Attribute();
+    }
+    return search->second;
+}
+
+const Action& Planner::GetAction(const std::string& name) const
+{
+    auto search = _actionCatalogue.find(name);
+    if (search == _actionCatalogue.end())
+    {
+        std::cout << "Action \"" + name + "\" is not in the catalogue\n";
+        return Action();
+    }
+    return search->second;
+}
+
+const WorldState& Planner::GetGoal(const std::string& name) const
+{
+    auto search = _goalCatalogue.find(name);
+    if (search == _goalCatalogue.end())
+    {
+        std::cout << "Goal \"" + name + "\" is not in the catalogue\n";
+        return WorldState();
+    }
+    return search->second;
+}
+
+bool Planner::ConstructPlan(Plan& plan_) const
+{
+    Path<Vertex> path;
+    const auto& goal = GetGoal(plan_.GoalName);
+    std::set<std::string> availableActionNames;
+    for (auto& actionName : _actionCatalogue)
+        availableActionNames.insert(actionName.first);
+    Vertex start(goal, availableActionNames, ""); // we build the path from goal state to current state
+    Vertex finish(plan_.StartingWs, {}, "");
+    bool foundPath = Pathfind(path, start, finish);
+    if (foundPath == false)
+        return false;
+    auto planLength = path.Vertices.size() - 1;
+    plan_._actionNames.resize(planLength);
+    for (auto i = 1; i < path.Vertices.size(); i++)
+        plan_._actionNames[i - 1] = path.Vertices[path.Vertices.size() - i].prevAction;
+    plan_._cost = path.Cost;
+    return true;
+}
+
+void Planner::GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex, const Vertex& finish) const
+{
+    for (auto& actionName : vertex.availableActionNames)
+    {
+        WorldState nextState; //change state by action
+        auto& action = GetAction(actionName);
+        if (WorldState::IsActionUseful(nextState, vertex.state, action)) //check if nextState is closer to finish_ than vertex_.state
+            {
+            auto neighborAvailableActions = vertex.availableActionNames;
+            neighborAvailableActions.erase(actionName);
+            neighbors.emplace_back(nextState, neighborAvailableActions, actionName);
+            }
+    }
+}
+
+bool Planner::Satisfies(const Vertex& vertex, const Vertex& targetVertex_) const
+{
+    const auto& initialState = targetVertex_.state;
+    const auto& activeCndSet = vertex.state;
+    return initialState.SatisfiesMask(activeCndSet);
+}
+
+t_node_id Planner::GetId(const Vertex& vertex) const
+{
+    if (typeid(t_node_id) != typeid(t_mask))
+    {
+        std::cout << "t_node_id and t_mask have to same types! \n";
+        exit(-1);
+    }
+    return t_node_id(vertex.state.GetMask());
+}
+
+unsigned Planner::GetDist(const Vertex& from, const Vertex& to) const
+{
+    return GetAction(to.prevAction).GetCost();
+}
 
