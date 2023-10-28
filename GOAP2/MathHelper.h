@@ -20,15 +20,5 @@ public:
 	static bool SatisfiesMask(const unsigned& mask_, const unsigned& value_);
 	static bool SatisfiesMask(const unsigned long& mask_, const unsigned long& value_);
 	static bool SatisfiesMask(const unsigned long long& mask_, const unsigned long long& value_);
-	
-};
+	};
 
-template<class T> struct PtrLess
-{
-	static int a;
-	bool operator()(T* lhs, T* rhs) const
-	{
-
-		return *lhs < *rhs;
-	}
-};

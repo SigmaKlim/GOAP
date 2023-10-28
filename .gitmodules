@@ -1,0 +1,4 @@
+[submodule "BitMask"]
+	path = BitMask
+	url = https://github.com/SigmaKlim/BitMask.git
+	branch = main

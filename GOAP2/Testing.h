@@ -7,9 +7,12 @@
 #include "MathHelper.h"
 #include "NumPathfinder.h"
 #include "Plan.h"
+#include "BitMask.h"
+
 #pragma optimize( "", off )
 
-int test()
+
+inline int TestGoap()
 {
 	srand(time(0));
 	const std::vector<size_t> DIMS = { /*5, 15, 30, 100,*/ 500 };
@@ -214,5 +217,30 @@ int test()
 	}
 	else
 		std::cout << "Could not construct a plan!";
+	return 0;
+}
+
+inline int TestMask()
+{
+	BitMask m1 = BitMask::MakeOne(100); //00..01
+	BitMask m2(m1);
+	bool areSame = (m1 == m2); //true
+
+	BitMask m3 = m1 << 30;
+	BitMask m4 = BitMask::MakeAllZeros(100); //00..0
+	m4.SetBitValue(30, 1);
+	areSame = (m3 == m4); //true
+
+	BitMask m5 = BitMask::MakeAllOnes(50); //11..1
+	m5.SetBitValue(25, 0);
+	BitMask m6 = ~m5;
+	areSame = (m6 == (BitMask::MakeOne(50) << 25)); //true
+
+	BitMask m7 = BitMask::MakeAllZeros(1000);
+	m7.Invert();
+	BitMask m8 = m7;
+	m7.SetBitValue(0, 0);
+	bool is7LargerThan8 = (m7 > m8); //false
+
 	return 0;
 }
