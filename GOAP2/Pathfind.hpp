@@ -86,7 +86,7 @@ public:
 		{
 			if (discovered.isEmpty() == true)
 			{
-				path_.vertices.clear();
+				path_.Vertices.clear();
 				return false;
 			}
 			currentNode = discovered.extractMin();
@@ -116,7 +116,7 @@ public:
 						std::cout << "!";
 				}
 				else if (	wasDiscovered == true && 
-							neighborElement->getKey().distFromStart > neighborNode._distFromStart)
+							neighborElement->getKey()._distFromStart > neighborNode._distFromStart)
 				{
 					discovered.decreaseKey(neighborElement, neighborNode);
 					if (cameFrom.insert_or_assign(neighborId, currentNode._id).second != false)
@@ -130,12 +130,12 @@ public:
 		while (anotherId != NO_ID)
 		{
 			t_vertex anotherVertex = vertices.at(anotherId);
-			path_.vertices.push_back(anotherVertex);
+			path_.Vertices.push_back(anotherVertex);
 			anotherId = cameFrom.at(anotherId);
 		}
 		//path_.vertices.push_back(finish_);
-		for (u_int i = 0; i < path_.vertices.size() / 2; i++)
-			std::swap(path_.vertices[i], path_.vertices[path_.vertices.size() - 1 - i]);
+		for (u_int i = 0; i < path_.Vertices.size() / 2; i++)
+			std::swap(path_.Vertices[i], path_.Vertices[path_.Vertices.size() - 1 - i]);
 		return true;
 	}
 	
