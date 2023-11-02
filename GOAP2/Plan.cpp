@@ -1,6 +1,5 @@
 #include "Plan.h"
 #include <iostream>
-#include <stdbool.h>
 
 
 const std::vector<std::string>& Plan::GetActionSequence() const
@@ -15,7 +14,7 @@ unsigned Plan::GetCost() const
 
 Planner::Planner()
 {
-    WorldState::planner = this;
+    WorldState::_planner = this;
 }
 
 Planner::~Planner()
@@ -38,8 +37,8 @@ bool Planner::RegisterAttribute(const std::string& name, const Attribute& attrib
         return false;
     }
     _attributeCatalogue.insert(std::make_pair(std::string(name), attribute));
-    WorldState::attributeNames.emplace(std::string(name));
-    WorldState::numAttributes++;
+    WorldState::_attributeNames.emplace(std::string(name));
+    WorldState::_numAttributes++;
     return true;
 }
 
@@ -59,8 +58,8 @@ bool Planner::RegisterAttribute(const std::string& name, const std::vector<std::
         return false;
     }
     _attributeCatalogue.emplace(std::make_pair(std::string(name), Attribute(enumerators)));
-    WorldState::attributeNames.emplace(std::string(name));
-    WorldState::numAttributes++;
+    WorldState::_attributeNames.emplace(std::string(name));
+    WorldState::_numAttributes++;
     return true;
 }
 
@@ -171,7 +170,7 @@ void Planner::GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex,
     {
         WorldState nextState; //change state by action
         auto& action = GetAction(actionName);
-        if (WorldState::IsActionUseful(nextState, vertex.state, action)) //check if nextState is closer to finish_ than vertex_.state
+        if (WorldState::IsActionUseful(nextState, vertex.state, action)) //check if nextState is closer to finish_ than vertex_.state and does not corrupt conditionSet
             {
             auto neighborAvailableActions = vertex.availableActionNames;
             neighborAvailableActions.erase(actionName);
@@ -180,21 +179,17 @@ void Planner::GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex,
     }
 }
 
-bool Planner::Satisfies(const Vertex& vertex, const Vertex& targetVertex_) const
+
+bool Planner::Satisfies(const Vertex& vertex, const Vertex& targetVertex) const
 {
-    const auto& initialState = targetVertex_.state;
-    const auto& activeCndSet = vertex.state;
-    return initialState.SatisfiesMask(activeCndSet);
+    const auto& initialState = targetVertex.state;
+    const auto& activeConditionSet = vertex.state;
+    return (initialState._valueMask & activeConditionSet._valueMask) == activeConditionSet._valueMask;
 }
 
-t_node_id Planner::GetId(const Vertex& vertex) const
+BitMask Planner::GetId(const Vertex& vertex) const
 {
-    if (typeid(t_node_id) != typeid(t_mask))
-    {
-        std::cout << "t_node_id and t_mask have to same types! \n";
-        exit(-1);
-    }
-    return t_node_id(vertex.state.GetMask());
+    return vertex.state._valueMask;
 }
 
 unsigned Planner::GetDist(const Vertex& from, const Vertex& to) const

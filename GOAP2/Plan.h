@@ -2,15 +2,14 @@
 #include "Action.h"
 #include <string>
 #include <vector>
-#include <map>
 #include <unordered_map>
 #include "Pathfind.hpp"
-#include "Pathfind.hpp"
+#include "BitMask.h"
 struct Vertex
 {
-	Vertex					()  = default;
-	Vertex					(const WorldState& state_, const std::set <std::string>& availableActionNames_, const std::string& prevAction_) :
-								availableActionNames(availableActionNames_), state(state_), prevAction(prevAction_) {};
+	Vertex	()  = default;
+	Vertex	(const WorldState& state_, const std::set <std::string>& availableActionNames_, const std::string& prevAction_) :
+					availableActionNames(availableActionNames_), state(state_), prevAction(prevAction_) {};
 
 	std::set<std::string> availableActionNames;
 	WorldState state;
@@ -25,16 +24,21 @@ struct Plan
 	unsigned GetCost() const;
 private:
 	std::vector <std::string> _actionNames;
-	unsigned _cost;
+	unsigned _cost = 0;
+
 
 	friend class Planner;
 };
+template <typename t_vertex, typename t_id>
+class Planner : public BasePathfinder<t_vertex, t_id> {};
 
-class Planner : public BasePathfinder<Vertex>
+template <>
+class Planner 
 {
 	std::unordered_map<std::string, WorldState> _goalCatalogue;
 	std::unordered_map<std::string, Action> _actionCatalogue;
 	std::unordered_map<std::string, Attribute> _attributeCatalogue;
+
 
 public:
 
@@ -52,10 +56,14 @@ public:
 
 	bool ConstructPlan(Plan& plan_) const;
 	
+private:
 	void		GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex, const Vertex& finish = Vertex()) const override;
-	bool		Satisfies	(const Vertex& vertex, const Vertex& finish = Vertex()) const override;
-	t_node_id	GetId		(const Vertex& vertex) const override;
+	//Returns true of the action fulfills any of active conditions
+
+	bool		Satisfies	(const Vertex& vertex, const Vertex& targetVertex = Vertex()) const override;
+	BitMask		GetId		(const Vertex& vertex) const override;
 	unsigned	GetDist		(const Vertex& from, const Vertex& to) const override;
-	const unsigned MAX_ATTRIBUTES = 20;
+	static const unsigned MAX_ATTRIBUTES = std::numeric_limits<unsigned>::digits;
+;
 };
 

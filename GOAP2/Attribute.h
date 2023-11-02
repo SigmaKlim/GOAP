@@ -11,26 +11,24 @@ struct Attribute
 	Attribute() {};
 	Attribute(const std::vector<std::string>& enumerators_)
 	{
-		if (enumerators_.size() > MAX_VALUES - 1)
+		if (enumerators_.size() >= MAX_VALUES)
 		{
 			std::cout << "Number of values cannot exceed MAX_VALUES - 1 + (" + std::to_string(MAX_VALUES - 1) + ".\n";
 			return;
 		}
-		_enumeratorArray.resize(enumerators_.size() + 1);
+		_enumeratorArray.resize(enumerators_.size());
 		for (auto i = 0; i < enumerators_.size(); i++)
 		{
-			_enumeratorValuePairs.insert({ enumerators_[i], i + 1 });
-			_enumeratorArray[i + 1] = enumerators_[i];
+			_enumeratorValuePairs.insert({ enumerators_[i], i });
+			_enumeratorArray[i] = enumerators_[i];
 		}
-		_enumeratorValuePairs.insert({ "NO_VALUE", 0 });
-		_enumeratorArray[0] = "NO_VALUE";
 	}
 	u_char GetEnumValue(const std::string enumeratorName_) const
 	{
 		auto search = _enumeratorValuePairs.find(enumeratorName_);
 		if (search == _enumeratorValuePairs.end())
 		{
-			std::cout << enumeratorName_ + "is not an enumerator name of teh attribute.\n";
+			std::cout << enumeratorName_ + "is not an enumerator name of the attribute.\n";
 			return MAX_VALUES;
 		}
 		return search->second;
