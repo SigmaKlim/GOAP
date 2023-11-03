@@ -15,20 +15,17 @@ struct WorldState
 {
 	friend class Action;
 	friend class GPlanner;
-						WorldState				(const t_attr_enum_map& nameValuePairs);
-						WorldState				();
-						WorldState				(const WorldState& other);
-	WorldState&			operator=				(const WorldState& other);
-						~WorldState				();
-	bool				SetAttributeValue		(const std::string& name, u_char value);
-	bool				SetAttributeValue		(const unsigned index, u_char value);
-	u_char				GetAttributeValue		(const unsigned index) const;
-	u_char				GetAttributeValue		(const std::string& name) const;
-	const std::string&	GetAttributeEnumerator	(const std::string& name) const;
-	// BitMask				GetMask					() const;
-	// unsigned			GetNumAttributes		() const;
-	
-	
+								WorldState				(const t_attr_enum_map& nameValuePairs);
+								WorldState				();
+								WorldState				(const WorldState& other);
+	WorldState&					operator=				(const WorldState& other);
+								~WorldState				();
+	bool						SetAttributeValue		(const std::string& name, u_char value);
+	bool						SetAttributeValue		(const unsigned index, u_char value);
+	std::vector<u_char>			GetAttributeValues(const unsigned index) const;
+	std::vector<u_char>			GetAttributeValues		(const std::string& name) const;
+	std::vector<std::string>	GetAttributeEnumerators	(const std::string& name) const;
+
 	static const std::set<std::string>& GetAttributeNamesSet();
 	static bool IsActionUseful	 (WorldState& modifiedConditionSet,  const WorldState& conditionSet, const Action& action);
 	//Returns the position of the attribute and numAttributes if the attribute was not found.

@@ -63,6 +63,7 @@ private:
 		{
 			WorldState nextState; //change state by action
 			auto& action = GetAction(actionName);
+
 			if (WorldState::IsActionUseful(nextState, vertex.state, action)) //check if nextState is closer to finish_ than vertex_.state and does not corrupt conditionSet
 				{
 				auto neighborAvailableActions = vertex.availableActionNames;

@@ -74,7 +74,8 @@ bool WorldState::SetAttributeValue(const unsigned index, u_char value)
 	_valueMask.SetBitValue(index + value, 1);
 	return true;
 }
-u_char WorldState::GetAttributeValue(const unsigned index) const
+
+std::vector<u_char> WorldState::GetAttributeValues(const unsigned index) const
 {
 	if (index > _numAttributes)
 	{
@@ -82,52 +83,48 @@ u_char WorldState::GetAttributeValue(const unsigned index) const
 			std::to_string(_numAttributes) + ").\n";
 		exit(-1);
 	}
-	BitMask copyMask = _valueMask;
-	copyMask >>= index * Attribute::MAX_VALUES;
-	const BitMask FILTER_MASK = BitMask::MakeRightOnes(_valueMask.GetNumBits(), Attribute::MAX_VALUES);
-	copyMask &= FILTER_MASK;
-	return _valueMask.GetBitValue(index);
+	BitMask filteredMask = (_valueMask >> (index * Attribute::MAX_VALUES));
+	unsigned attributeMask = filteredMask[0];
+	std::vector<u_char> values;
+	values.reserve(Attribute::MAX_VALUES);
+	for (u_char i = 0; i < Attribute::MAX_VALUES; i++)
+		if (((attributeMask >> i) & 1) == 1)
+			values.push_back(i);
+	return values;
 }
-u_char WorldState::GetAttributeValue(const std::string& name) const
+std::vector<u_char> WorldState::GetAttributeValues(const std::string& name) const
 {
-	auto pos = FindAttribute(name);
-	if (pos == _numAttributes)
+	auto index = FindAttribute(name);
+	if (index == _numAttributes)
 	{
 		std::cout << "Incorrect attribute name: " + name + "\n";
 		exit(-1);
 	}
-	return _valueMask.GetBitValue(pos);
+	return GetAttributeValues(index);
 }
 
-const std::string& WorldState::GetAttributeEnumerator(const std::string& name) const
+std::vector<std::string> WorldState::GetAttributeEnumerators(const std::string& name) const
 {
-	auto pos = FindAttribute(name);
-	if (pos == _numAttributes)
+	auto index = FindAttribute(name);
+	if (index == _numAttributes)
 	{
 		std::cout << "Incorrect attribute name: " + name + "\n";
 		exit(-1);
 	}
-	auto value = _valueMask.GetBitValue(pos);
+	auto values = GetAttributeValues(index);
 	const auto& attribute = _planner->GetAttribute(name);
-	const auto& enumerator = attribute.GetEnumerator(value); 
-	return enumerator;
+	std::vector<std::string> enumerators;
+	enumerators.reserve(Attribute::MAX_VALUES);
+	for (auto& value : values)
+		enumerators.push_back(attribute.GetEnumerator(value)); 
+	return enumerators;
 }
 
-
-// t_mask WorldState::GetMask() const
-// {
-// 	return _valueMask.GetMask();
-// }
 unsigned WorldState::FindAttribute(const std::string& name)
 {
 	auto search =  _attributeNames.find(name);
 	return std::distance(_attributeNames.begin(), search);
 }
-
-// unsigned WorldState::GetNumAttributes() const
-// {
-// 	return _numAttributes;
-// }
 
 bool WorldState::IsActionUseful(WorldState& modifiedConditionSet, const WorldState& conditionSet, const Action& action)
 {
@@ -138,7 +135,8 @@ bool WorldState::IsActionUseful(WorldState& modifiedConditionSet, const WorldSta
 		return false;
 	modifiedConditionSet._valueMask = conditionSet._valueMask & ~action._effect._valueMask; //remove fulfilled conditions form the set
 	modifiedConditionSet._affectedAttributesMask = conditionSet._affectedAttributesMask & ~action._effect._affectedAttributesMask; //remove fulfilled conditions form the set
-	BitMask significantActionConditions = conditionSet._affectedAttributesMask & action._condition._affectedAttributesMask; //leave only conditions on attributes shared between action conditions and conditions set
+	BitMask significantActionConditions = modifiedConditionSet._affectedAttributesMask & action._condition._valueMask; //leave only conditions on attributes shared between action conditions and conditions set
+	significantConditionSet = conditionSet._valueMask & action._condition._affectedAttributesMask;
 	if ((significantActionConditions & significantConditionSet) != significantActionConditions) // check if the action conditions don't violate conditions from the set 
 		return false;
 	modifiedConditionSet._valueMask |= action._condition._valueMask;
