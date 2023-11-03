@@ -13,7 +13,7 @@ struct Attribute
 	{
 		if (enumerators_.size() >= MAX_VALUES)
 		{
-			std::cout << "Number of values cannot exceed MAX_VALUES - 1 + (" + std::to_string(MAX_VALUES - 1) + ".\n";
+			std::cout << "Number of values cannot exceed MAX_VALUES (" + std::to_string(MAX_VALUES) + ".\n";
 			return;
 		}
 		_enumeratorArray.resize(enumerators_.size());
@@ -28,7 +28,7 @@ struct Attribute
 		auto search = _enumeratorValuePairs.find(enumeratorName_);
 		if (search == _enumeratorValuePairs.end())
 		{
-			std::cout << enumeratorName_ + "is not an enumerator name of the attribute.\n";
+			std::cout << enumeratorName_ + " is not an enumerator name of the attribute.\n";
 			return MAX_VALUES;
 		}
 		return search->second;

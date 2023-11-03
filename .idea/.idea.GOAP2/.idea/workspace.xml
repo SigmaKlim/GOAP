@@ -10,15 +10,14 @@
     <list default="true" id="f2b96d9d-4464-4050-b1e3-f9237ac1656e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BitMask" beforeDir="false" afterPath="$PROJECT_DIR$/BitMask" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Action.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Action.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Action.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Action.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Attribute.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Attribute.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj.filters" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj.filters" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/NumPathfinder.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/NumPathfinder.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/MathHelper.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/MathHelper.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/MathHelper.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/MathHelper.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Pathfind.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Pathfind.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Plan.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Plan.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Plan.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Plan.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Testing.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Testing.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/World.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/World.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.h" afterDir="false" />
     </list>
@@ -35,10 +34,42 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/utility" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/xhash" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/xtree" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/xutility" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/3rdparty/boost/container_hash/hash.hpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/BitMask/BitMask/BitMask.h" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="2XODo90QGosfIwa8R3FHF0n7OSS" />
   <component name="ProjectViewState">
@@ -125,7 +156,10 @@
       <workItem from="1698825303461" duration="6717000" />
       <workItem from="1698907998626" duration="15100000" />
       <workItem from="1698938611043" duration="1800000" />
-      <workItem from="1698941020698" duration="2994000" />
+      <workItem from="1698941020698" duration="3078000" />
+      <workItem from="1698944549634" duration="38000" />
+      <workItem from="1698955698415" duration="10149000" />
+      <workItem from="1698969049090" duration="1229000" />
     </task>
     <servers />
   </component>
@@ -140,18 +174,53 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/GOAP2/Pathfind.hpp</url>
-          <line>129</line>
+          <line>130</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/GOAP2/Pathfind.hpp</url>
-          <line>136</line>
+          <line>137</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/GOAP2/Attribute.h</url>
+          <line>30</line>
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/GOAP2/Attribute.h</url>
+          <line>39</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/GOAP2/World.cpp</url>
+          <line>132</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/GOAP2/Pathfind.hpp</url>
+          <line>112</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/GOAP2/Plan.h</url>
-          <line>6</line>
-          <option name="timeStamp" value="4" />
+          <line>78</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/GOAP2/World.cpp</url>
+          <line>35</line>
+          <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/GOAP2/World.cpp</url>
+          <line>24</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/GOAP2/World.cpp</url>
+          <line>11</line>
+          <option name="timeStamp" value="28" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -17,6 +17,7 @@ public:
 	unsigned			GetCost() const;
 	void				SetCost(const int cost_);
 	
-	friend class Planner;
+	template <typename t_vertex, typename t_id>
+	friend class AStartPathfinder;
 	friend struct WorldState;
 };

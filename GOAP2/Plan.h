@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include "Pathfind.hpp"
 #include "BitMask.h"
+
 struct Vertex
 {
 	Vertex	()  = default;
@@ -27,23 +28,20 @@ private:
 	unsigned _cost = 0;
 
 
-	friend class Planner;
+	friend class GPlanner;
 };
-template <typename t_vertex, typename t_id>
-class Planner : public BasePathfinder<t_vertex, t_id> {};
 
-template <>
-class Planner 
+
+class GPlanner : public AStartPathfinder<Vertex, BitMask>
 {
 	std::unordered_map<std::string, WorldState> _goalCatalogue;
-	std::unordered_map<std::string, Action> _actionCatalogue;
+	std::unordered_map<std::string, Action>		_actionCatalogue;
 	std::unordered_map<std::string, Attribute> _attributeCatalogue;
-
 
 public:
 
-						Planner();
-						~Planner();
+						GPlanner			();
+						~GPlanner			() override = default;
 	bool				RegisterAttribute	(const std::string& name, const Attribute& attribute);
 	bool				RegisterAttribute	(const std::string& name, const std::vector<std::string>& enumerators);
 	bool				RegisterAction		(const std::string& name, const Action& action);
@@ -53,17 +51,46 @@ public:
 	const Attribute&	GetAttribute		(const std::string& name) const;
 	const Action&		GetAction			(const std::string& name) const;
 	const WorldState&	GetGoal				(const std::string& name) const;
+	bool				ConstructPlan(Plan& plan_) const;
+		
+	const unsigned MAX_ATTRIBUTES = std::numeric_limits<unsigned>::digits;
 
-	bool ConstructPlan(Plan& plan_) const;
-	
 private:
-	void		GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex, const Vertex& finish = Vertex()) const override;
-	//Returns true of the action fulfills any of active conditions
+	
+	void GetNeighbors (std::vector<Vertex>&	neighbors, const Vertex& vertex, const Vertex& finish = Vertex()) const override
+	{
+		for (auto& actionName : vertex.availableActionNames)
+		{
+			WorldState nextState; //change state by action
+			auto& action = GetAction(actionName);
+			if (WorldState::IsActionUseful(nextState, vertex.state, action)) //check if nextState is closer to finish_ than vertex_.state and does not corrupt conditionSet
+				{
+				auto neighborAvailableActions = vertex.availableActionNames;
+				neighborAvailableActions.erase(actionName);
+				neighbors.emplace_back(nextState, neighborAvailableActions, actionName);
+				}
+		}
+	}
+	
+	bool Satisfies (const Vertex& vertex, const Vertex& targetVertex = Vertex()) const override
+	{
+		const auto& initialState = targetVertex.state;
+		const auto& activeConditionSet = vertex.state;
+		return (initialState._valueMask & activeConditionSet._valueMask) == activeConditionSet._valueMask;
+	}
+	BitMask	GetId (const Vertex& vertex) const
+	{
+		return vertex.state._valueMask;
+	}
+	unsigned GetDist (const Vertex& from, const Vertex& to) const
+	{
+		return GetAction(to.prevAction).GetCost();
+	}
 
-	bool		Satisfies	(const Vertex& vertex, const Vertex& targetVertex = Vertex()) const override;
-	BitMask		GetId		(const Vertex& vertex) const override;
-	unsigned	GetDist		(const Vertex& from, const Vertex& to) const override;
-	static const unsigned MAX_ATTRIBUTES = std::numeric_limits<unsigned>::digits;
-;
 };
+
+
+
+
+
 

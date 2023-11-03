@@ -5,7 +5,7 @@
 typedef unsigned int u_int;
 typedef std::vector <std::vector<u_int>> mtrx;
 
-const int INFTY = INT_MAX;
+const unsigned U_INFTY = UINT_MAX;
 
 class MathHelper
 {

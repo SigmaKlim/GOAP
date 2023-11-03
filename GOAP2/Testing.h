@@ -87,45 +87,45 @@ inline int TestGoap()
 #pragma endregion
 
 	//0. Initialize planner
-	Planner planner;
+	GPlanner planner;
 	//1. Register all attributes and enumerate their values
 	planner.RegisterAttribute("location",		{"IN_COVER",
-												 "NEAR_COVER",
+												 /*"NEAR_COVER",*/
 												 "NOT_IN_COVER"});
 	planner.RegisterAttribute("pose",			{"CROUCHING",
 												 "STANDING"});
-	planner.RegisterAttribute("isWeaponDrawn",	{"FALSE",
-												 "TRUE"});
-	planner.RegisterAttribute("isWeaponLoaded", {"FALSE",
-												 "TRUE"});
-	planner.RegisterAttribute("isKnifeDrawn",	{"FALSE",
-												 "TRUE"});
-	planner.RegisterAttribute("isGrenadeDrawn",	{"FALSE",
-												 "TRUE"});
-	planner.RegisterAttribute("enemyStatus",	{"IN_CLOSE_COMBAT_RANGE",
-												 "VISIBLE",
-												 "NON_VISIBLE",
-												 "DEAD"});
-	planner.RegisterAttribute("hasAmmo",		{"FALSE",
-												 "TRUE"});
-	planner.RegisterAttribute("hasGrenades",	{"FALSE",
-												 "TRUE"});
+	//planner.RegisterAttribute("isWeaponDrawn",	{"FALSE",
+	//											 "TRUE"});
+	//planner.RegisterAttribute("isWeaponLoaded", {"FALSE",
+	//											 "TRUE"});
+	//planner.RegisterAttribute("isKnifeDrawn",	{"FALSE",
+	//											 "TRUE"});
+	//planner.RegisterAttribute("isGrenadeDrawn",	{"FALSE",
+	//											 "TRUE"});
+	//planner.RegisterAttribute("enemyStatus",	{"IN_CLOSE_COMBAT_RANGE",
+	//											 "VISIBLE",
+	//											 "NON_VISIBLE",
+	//											 "DEAD"});
+	//planner.RegisterAttribute("hasAmmo",		{"FALSE",
+	//											 "TRUE"});
+	//planner.RegisterAttribute("hasGrenades",	{"FALSE",
+	//											 "TRUE"});
 
 	//2. Register all goals
 	planner.RegisterGoal("GetToCover",t_attr_enum_map({	{"pose", "CROUCHING"},
 														{"location", "IN_COVER"}}));
-	planner.RegisterGoal("KillEnemy", t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
+	/*planner.RegisterGoal("KillEnemy", t_attr_enum_map({	{"enemyStatus", "DEAD"}}));*/
 	
 	//3. Define start state of the world
 	WorldState start(	t_attr_enum_map({	{"pose", "CROUCHING"},
 											{"location", "NOT_IN_COVER"},
-											{"isWeaponDrawn", "FALSE"},
+											/*{"isWeaponDrawn", "FALSE"},
 											{"isWeaponLoaded", "FALSE"},
 											{"isKnifeDrawn", "FALSE"},
 											{"isGrenadeDrawn", "FALSE"},
 											{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
 											{"hasAmmo", "TRUE"},
-											{"hasGrenades", "FALSE"}}));
+											{"hasGrenades", "FALSE"}*/}));
 
 	//4. Register all available actions by defining their conditions and effects
 	WorldState crouchCnd;
@@ -133,18 +133,18 @@ inline int TestGoap()
 	planner.RegisterAction("Crouch", crouchCnd, crouchEff, 2);
 	
 	WorldState goToCoverCnd(t_attr_enum_map({{"pose", "STANDING"}}));
-	WorldState goToCoverEff(t_attr_enum_map({{"location", "NEAR_COVER"}}));
+	WorldState goToCoverEff(t_attr_enum_map({{"location", /*"NEAR_COVER"*/"IN_COVER"}}));
 	planner.RegisterAction("GoToCover", goToCoverCnd, goToCoverEff, 7);
 
-	WorldState takeCoverCnd(t_attr_enum_map({{"location", "NEAR_COVER"}}));
-	WorldState takeCoverEff(t_attr_enum_map({{"location", "IN_COVER"}}));
-	planner.RegisterAction("TakeCover", takeCoverCnd, takeCoverEff, 2);
+	//WorldState takeCoverCnd(t_attr_enum_map({{"location", "NEAR_COVER"}}));
+	//WorldState takeCoverEff(t_attr_enum_map({{"location", "IN_COVER"}}));
+	//planner.RegisterAction("TakeCover", takeCoverCnd, takeCoverEff, 2);
 	
 	WorldState standUpCnd;
 	WorldState standUpEff(t_attr_enum_map({{"pose", "STANDING"}}));
 	planner.RegisterAction("StandUp", standUpCnd, standUpEff, 2);
 	
-	WorldState drawWeaponCnd;
+	/*WorldState drawWeaponCnd;
 	WorldState drawWeaponEff(t_attr_enum_map({{"isWeaponDrawn", "TRUE"}}));
 	planner.RegisterAction("DrawWeapon", drawWeaponCnd, drawWeaponEff, 3);
 	
@@ -189,11 +189,11 @@ inline int TestGoap()
 											{"isKnifeDrawn","TRUE"}}));
 	WorldState attackKEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
 	planner.RegisterAction("AttackKnife", attackKCnd, attackKEff, 2);
-	
+	*/
 	//5. Pack the in-out structure 
 	Plan plan;
 	plan.StartingWs = start;
-	plan.GoalName = "KillEnemy";
+	plan.GoalName = "GetToCover";
 
 	//6. Construct plan
 	bool builtPlan = planner.ConstructPlan(plan);

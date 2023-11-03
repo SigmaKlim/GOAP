@@ -8,45 +8,13 @@
 #include "BitMask.h"
 #include <boost/functional/hash.hpp>
 typedef std::unordered_map<std::string,std::string> t_attr_enum_map;
-//typedef unsigned t_mask;
-class Action;
 
-// struct WsMask
-// {
-// 					WsMask				();
-// 					WsMask				(const BitMask& valueMask_);
-// 					~WsMask				();
-// 	WsMask&			operator=		(const WsMask& other_);
-// 	WsMask&			operator+=		(const WsMask& other_);
-// 	WsMask			operator~		();
-// 	WsMask&			operator<<=		(unsigned offset_);
-// 	WsMask&			operator>>=		(unsigned offset_);
-// 	WsMask&			operator|=		(const WsMask& other_);
-// 	WsMask&			operator&=		(const WsMask& other_);
-// 	u_char			GetValue		(u_char index_) const;
-// 	bool			GetSignificance	(u_char index_) const;
-// 	void			SetValue		(u_char index_, u_char value_);
-// 	const BitMask&	GetMask			() const;
-// 	void			SetMask			(const BitMask& mask_);
-// 	bool			SatisfiesMask	(const WsMask& mask_) const;
-// 	
-// 	friend bool   operator==	(const WsMask& left_, const WsMask& right_);
-// 	friend WsMask operator&		(const WsMask& left_, const WsMask& right_);
-// 	friend WsMask operator>>	(const WsMask& mask_, unsigned offset_);
-// 	friend WsMask operator<<	(const WsMask& mask_, unsigned offset_);
-// 	
-// 	BitMask mask = BitMask();
-// 	const unsigned NUM_BITS_CELL = std::log2(Attribute::MAX_VALUES);
-// 	const unsigned NUM_CELLS = std::numeric_limits<BitMask>::digits / NUM_BITS_CELL;
-// 	//debug
-// 	std::vector <std::string> binaryCells;
-// };
+struct Vertex;
 
-class Vertex;
 struct WorldState
 {
 	friend class Action;
-	friend class Planner;
+	friend class GPlanner;
 						WorldState				(const t_attr_enum_map& nameValuePairs);
 						WorldState				();
 						WorldState				(const WorldState& other);
@@ -72,7 +40,7 @@ private:
 	
 	static std::set<std::string>	_attributeNames;
 	static unsigned					_numAttributes;
-	static Planner*					_planner;
+	static GPlanner*				_planner;
 
 };
 
