@@ -51,7 +51,7 @@ public:
 	const Attribute&	GetAttribute		(const std::string& name) const;
 	const Action&		GetAction			(const std::string& name) const;
 	const WorldState&	GetGoal				(const std::string& name) const;
-	bool				ConstructPlan(Plan& plan_) const;
+	bool				ConstructPlan		(Plan& plan_, TelemetryData* telemetryData = nullptr) const;
 		
 	const unsigned MAX_ATTRIBUTES = std::numeric_limits<unsigned>::digits;
 

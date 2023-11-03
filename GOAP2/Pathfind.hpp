@@ -96,13 +96,14 @@ public:
 		std::vector <t_vertex> neighborVertices;
 		while (true)
 		{
+			int discoveredHeapSizeDelta = 0;
 			if (discovered.isEmpty() == true)
 			{
 				path.Vertices.clear();
 				return false;
 			}
 			currentNode = discovered.extractMin();
-			discoveredHeapSize--;
+			discoveredHeapSizeDelta--;
 			discMap.erase(currentNode._id);
 			t_vertex currentVertex = vertices.at(currentNode._id);
 			if (Satisfies(currentVertex, finish) == true)
@@ -126,6 +127,9 @@ public:
 				{
 					neighborElement = discovered.insert({ neighborNode });
 					discMap.insert({ neighborId, neighborElement });
+					if (telemetryData != nullptr)
+						++telemetryData->discoveredNum;
+					discoveredHeapSizeDelta++;
 					vertices.insert({neighborId, neighborVertices[i]});
 					if (cameFrom.insert({neighborId, currentNode._id}).second != true)
 						std::cout << "!";
@@ -139,6 +143,8 @@ public:
 				}
 			}
 			neighborVertices.clear();
+			if (discoveredHeapSizeDelta > 0)
+				discoveredHeapSize += discoveredHeapSizeDelta;
 		}
 		path.Cost = currentNode._distFromStart;
 		t_id anotherId = currentNode._id;
@@ -150,17 +156,17 @@ public:
 		}
 		for (u_int i = 0; i < path.Vertices.size() / 2; i++)
 			std::swap(path.Vertices[i], path.Vertices[path.Vertices.size() - 1 - i]);
-				const unsigned DISCOVERED_HEAP_ELEMENT_SIZE = sizeof(decltype(discovered.getMin()));
-				const unsigned DISCOVERED_MAP_ELEMENT_SIZE	= sizeof(decltype(*discMap.begin()));
-				const unsigned EXPANDED_ELEMENT_SIZE		= sizeof(decltype(*expanded.begin()));
-				const unsigned VERTICES_ELEMENT_SIZE		= sizeof(decltype(*vertices.begin()));
-				const unsigned CAME_FROM_ELEMENT_SIZE		= sizeof(decltype(*cameFrom.begin()));
-				if (telemetryData != nullptr)
-					telemetryData->totalBytesUsed	+= discoveredHeapSize * DISCOVERED_HEAP_ELEMENT_SIZE
-													+ discMap.size() * DISCOVERED_MAP_ELEMENT_SIZE
-													+ expanded.size() * EXPANDED_ELEMENT_SIZE
-													+ vertices.size() * VERTICES_ELEMENT_SIZE
-													+ cameFrom.size() * CAME_FROM_ELEMENT_SIZE;
+		const unsigned DISCOVERED_HEAP_ELEMENT_SIZE = sizeof(decltype(discovered.getMin()));
+		const unsigned DISCOVERED_MAP_ELEMENT_SIZE	= sizeof(decltype(*discMap.begin()));
+		const unsigned EXPANDED_ELEMENT_SIZE		= sizeof(decltype(*expanded.begin()));
+		const unsigned VERTICES_ELEMENT_SIZE		= sizeof(decltype(*vertices.begin()));
+		const unsigned CAME_FROM_ELEMENT_SIZE		= sizeof(decltype(*cameFrom.begin()));
+		if (telemetryData != nullptr)
+			telemetryData->totalBytesUsed	+= discoveredHeapSize * DISCOVERED_HEAP_ELEMENT_SIZE
+											+ discMap.size() * DISCOVERED_MAP_ELEMENT_SIZE
+											+ expanded.size() * EXPANDED_ELEMENT_SIZE
+											+ vertices.size() * VERTICES_ELEMENT_SIZE
+											+ cameFrom.size() * CAME_FROM_ELEMENT_SIZE;
 		return true;
 	}
 };

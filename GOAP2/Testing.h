@@ -196,7 +196,8 @@ inline int TestGoap()
 	plan.GoalName = "GetToCover";
 
 	//6. Construct plan
-	bool builtPlan = planner.ConstructPlan(plan);
+	TelemetryData telemetryData;
+	bool builtPlan = planner.ConstructPlan(plan, &telemetryData);
 
 	//6. Fetch results
 	if (builtPlan == true)

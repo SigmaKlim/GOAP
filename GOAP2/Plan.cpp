@@ -141,7 +141,7 @@ const WorldState& GPlanner::GetGoal(const std::string& name) const
     return search->second;
 }
 
-bool GPlanner::ConstructPlan(Plan& plan_) const
+bool GPlanner::ConstructPlan(Plan& plan_, TelemetryData* telemetryData) const
 {
     Path<Vertex> path;
     const auto& goal = GetGoal(plan_.GoalName);
@@ -150,7 +150,7 @@ bool GPlanner::ConstructPlan(Plan& plan_) const
         availableActionNames.insert(actionName.first);
     Vertex start(goal, availableActionNames, ""); // we build the path from goal state to current state
     Vertex finish(plan_.StartingWs, {}, "");
-    bool foundPath = Pathfind(path, start, finish);
+    bool foundPath = Pathfind(path, start, finish, telemetryData);
     if (foundPath == false)
         return false;
     auto planLength = path.Vertices.size() - 1;
