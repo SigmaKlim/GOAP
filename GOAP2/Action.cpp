@@ -9,12 +9,12 @@ Action::~Action()
 {
 }
 
-const WorldState& Action::GetCondition() const
+const WorldState& Action::GetConditions() const
 {
 	return _condition;
 }
 
-const WorldState& Action::GetEffect() const
+const WorldState& Action::GetEffects() const
 {
 	return _effect;
 }

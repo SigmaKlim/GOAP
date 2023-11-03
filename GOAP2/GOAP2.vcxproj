@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)3rdparty;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)BitMask\x64\Debug;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(SolutionDir)BitMask\BitMask;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>

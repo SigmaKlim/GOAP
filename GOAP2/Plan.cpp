@@ -1,6 +1,5 @@
 #include "Plan.h"
 #include <iostream>
-#include <stdbool.h>
 
 
 const std::vector<std::string>& Plan::GetActionSequence() const
@@ -13,16 +12,13 @@ unsigned Plan::GetCost() const
     return _cost;
 }
 
-Planner::Planner()
+
+GPlanner::GPlanner()
 {
-    WorldState::planner = this;
+    WorldState::_planner = this;
 }
 
-Planner::~Planner()
-{
-}
-
-bool Planner::RegisterAttribute(const std::string& name, const Attribute& attribute)
+bool GPlanner::RegisterAttribute(const std::string& name, const Attribute& attribute)
 {
     bool contains =  (_attributeCatalogue.find(name) != _attributeCatalogue.end());
     if (contains)
@@ -38,12 +34,12 @@ bool Planner::RegisterAttribute(const std::string& name, const Attribute& attrib
         return false;
     }
     _attributeCatalogue.insert(std::make_pair(std::string(name), attribute));
-    WorldState::attributeNames.emplace(std::string(name));
-    WorldState::numAttributes++;
+    WorldState::_attributeNames.emplace(std::string(name));
+    WorldState::_numAttributes++;
     return true;
 }
 
-bool Planner::RegisterAttribute(const std::string& name, const std::vector<std::string>& enumerators)
+bool GPlanner::RegisterAttribute(const std::string& name, const std::vector<std::string>& enumerators)
 {
     bool contains = (_attributeCatalogue.find(name) != _attributeCatalogue.end());
     if (contains)
@@ -59,12 +55,12 @@ bool Planner::RegisterAttribute(const std::string& name, const std::vector<std::
         return false;
     }
     _attributeCatalogue.emplace(std::make_pair(std::string(name), Attribute(enumerators)));
-    WorldState::attributeNames.emplace(std::string(name));
-    WorldState::numAttributes++;
+    WorldState::_attributeNames.emplace(std::string(name));
+    WorldState::_numAttributes++;
     return true;
 }
 
-bool Planner::RegisterAction(const std::string& name, const Action& action)
+bool GPlanner::RegisterAction(const std::string& name, const Action& action)
 {
     bool contains =  (_actionCatalogue.find(name) != _actionCatalogue.end());
     if (contains == true)
@@ -76,7 +72,7 @@ bool Planner::RegisterAction(const std::string& name, const Action& action)
     return true;
 }
 
-bool Planner::RegisterAction(const std::string& name, const WorldState& cnd, const WorldState& eff, unsigned cost)
+bool GPlanner::RegisterAction(const std::string& name, const WorldState& cnd, const WorldState& eff, unsigned cost)
 {
     bool contains =  (_actionCatalogue.find(name) != _actionCatalogue.end());
     if (contains == true)
@@ -88,7 +84,7 @@ bool Planner::RegisterAction(const std::string& name, const WorldState& cnd, con
     return true;
 }
 
-bool Planner::RegisterGoal	(const std::string& name, const WorldState& goal_)
+bool GPlanner::RegisterGoal	(const std::string& name, const WorldState& goal_)
 {
     bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
     if (contains == true)
@@ -100,7 +96,7 @@ bool Planner::RegisterGoal	(const std::string& name, const WorldState& goal_)
     return true;
 }
 
-bool Planner::RegisterGoal(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs)
+bool GPlanner::RegisterGoal(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs)
 {
     bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
     if (contains == true)
@@ -112,7 +108,7 @@ bool Planner::RegisterGoal(const std::string& name, const std::unordered_map<std
     return true;
 }
 
-const Attribute& Planner::GetAttribute(const std::string& name) const
+const Attribute& GPlanner::GetAttribute(const std::string& name) const
 {
     auto search = _attributeCatalogue.find(name);
     if (search == _attributeCatalogue.end())
@@ -123,7 +119,7 @@ const Attribute& Planner::GetAttribute(const std::string& name) const
     return search->second;
 }
 
-const Action& Planner::GetAction(const std::string& name) const
+const Action& GPlanner::GetAction(const std::string& name) const
 {
     auto search = _actionCatalogue.find(name);
     if (search == _actionCatalogue.end())
@@ -134,7 +130,7 @@ const Action& Planner::GetAction(const std::string& name) const
     return search->second;
 }
 
-const WorldState& Planner::GetGoal(const std::string& name) const
+const WorldState& GPlanner::GetGoal(const std::string& name) const
 {
     auto search = _goalCatalogue.find(name);
     if (search == _goalCatalogue.end())
@@ -145,7 +141,7 @@ const WorldState& Planner::GetGoal(const std::string& name) const
     return search->second;
 }
 
-bool Planner::ConstructPlan(Plan& plan_) const
+bool GPlanner::ConstructPlan(Plan& plan_, TelemetryData* telemetryData) const
 {
     Path<Vertex> path;
     const auto& goal = GetGoal(plan_.GoalName);
@@ -154,7 +150,7 @@ bool Planner::ConstructPlan(Plan& plan_) const
         availableActionNames.insert(actionName.first);
     Vertex start(goal, availableActionNames, ""); // we build the path from goal state to current state
     Vertex finish(plan_.StartingWs, {}, "");
-    bool foundPath = Pathfind(path, start, finish);
+    bool foundPath = Pathfind(path, start, finish, telemetryData);
     if (foundPath == false)
         return false;
     auto planLength = path.Vertices.size() - 1;
@@ -165,40 +161,4 @@ bool Planner::ConstructPlan(Plan& plan_) const
     return true;
 }
 
-void Planner::GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex, const Vertex& finish) const
-{
-    for (auto& actionName : vertex.availableActionNames)
-    {
-        WorldState nextState; //change state by action
-        auto& action = GetAction(actionName);
-        if (WorldState::IsActionUseful(nextState, vertex.state, action)) //check if nextState is closer to finish_ than vertex_.state
-            {
-            auto neighborAvailableActions = vertex.availableActionNames;
-            neighborAvailableActions.erase(actionName);
-            neighbors.emplace_back(nextState, neighborAvailableActions, actionName);
-            }
-    }
-}
-
-bool Planner::Satisfies(const Vertex& vertex, const Vertex& targetVertex_) const
-{
-    const auto& initialState = targetVertex_.state;
-    const auto& activeCndSet = vertex.state;
-    return initialState.SatisfiesMask(activeCndSet);
-}
-
-t_node_id Planner::GetId(const Vertex& vertex) const
-{
-    if (typeid(t_node_id) != typeid(t_mask))
-    {
-        std::cout << "t_node_id and t_mask have to same types! \n";
-        exit(-1);
-    }
-    return t_node_id(vertex.state.GetMask());
-}
-
-unsigned Planner::GetDist(const Vertex& from, const Vertex& to) const
-{
-    return GetAction(to.prevAction).GetCost();
-}
 

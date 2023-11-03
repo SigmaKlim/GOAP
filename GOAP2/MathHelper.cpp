@@ -27,7 +27,7 @@ void MathHelper::MakeRndIncidenceMatrx(mtrx& result, u_int dim, float discChance
 	for (size_t i = 0; i < dim; i++)
 	{
 		for (size_t j = 0; j < dim; j++)
-			result[i][j] = (rand() % 101 <= discValue || i == j) ? INFTY : 1 + u_int(rand() % 100);
+			result[i][j] = (rand() % 101 <= discValue || i == j) ? U_INFTY : 1 + u_int(rand() % 100);
 	}
 }
 

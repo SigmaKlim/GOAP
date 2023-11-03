@@ -11,8 +11,7 @@
 
 #pragma optimize( "", off )
 
-
-inline int TestGoap()
+inline int TestNumeric()
 {
 	srand(time(0));
 	const std::vector<size_t> DIMS = { /*5, 15, 30, 100,*/ 500 };
@@ -85,9 +84,12 @@ inline int TestGoap()
 	//	}
 	//}
 #pragma endregion
-
+	return 0;
+}
+inline int TestGoap()
+{
 	//0. Initialize planner
-	Planner planner;
+	GPlanner planner;
 	//1. Register all attributes and enumerate their values
 	planner.RegisterAttribute("location",		{"IN_COVER",
 												 "NEAR_COVER",
@@ -123,7 +125,7 @@ inline int TestGoap()
 											{"isWeaponLoaded", "FALSE"},
 											{"isKnifeDrawn", "FALSE"},
 											{"isGrenadeDrawn", "FALSE"},
-											{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
+											{"enemyStatus", "NON_VISIBLE"},
 											{"hasAmmo", "TRUE"},
 											{"hasGrenades", "FALSE"}}));
 
@@ -156,7 +158,8 @@ inline int TestGoap()
 	WorldState drawGrenadeEff(t_attr_enum_map({{"isGrenadeDrawn", "TRUE"}}));
 	planner.RegisterAction("DrawGrenade", drawGrenadeCnd, drawGrenadeEff, 2);
 	
-	WorldState reloadCnd(t_attr_enum_map({	{"hasAmmo", "TRUE"}}));
+	WorldState reloadCnd(t_attr_enum_map({	{"hasAmmo", "TRUE"}, 
+											{"isWeaponDrawn", "TRUE"}}));
 	WorldState reloadEff(t_attr_enum_map({	{"isWeaponLoaded", "TRUE"}}));
 	planner.RegisterAction("Reload", reloadCnd, reloadEff, 3);
 	
@@ -196,7 +199,8 @@ inline int TestGoap()
 	plan.GoalName = "KillEnemy";
 
 	//6. Construct plan
-	bool builtPlan = planner.ConstructPlan(plan);
+	TelemetryData telemetryData;
+	bool builtPlan = planner.ConstructPlan(plan, &telemetryData);
 
 	//6. Fetch results
 	if (builtPlan == true)
@@ -205,7 +209,9 @@ inline int TestGoap()
 		auto attributeNames = WorldState::GetAttributeNamesSet();
 		for (auto& attributeName : attributeNames)
 		{
-			std::cout << "\t" + attributeName + ": " + plan.StartingWs.GetAttributeEnumerator(attributeName) + "\n";
+			if (plan.StartingWs.GetAttributeEnumerators(attributeName).size() != 1)
+				std::cout << "!";
+			std::cout << "\t" + attributeName + ": " + plan.StartingWs.GetAttributeEnumerators(attributeName)[0] + "\n";
 		}
 		std::cout << "Goal:\n";
 		std::cout << "\t" + plan.GoalName + "\n";
@@ -213,7 +219,10 @@ inline int TestGoap()
 		for (auto i = 0; i < plan.GetActionSequence().size(); i++)
 			std::cout << "\t" << std::to_string(i) << ". " << plan.GetActionSequence()[i] << "\n";
 		std::cout << "Plan completed\n";
-		std::cout << "Cost: " << std::to_string(plan.GetCost());
+		std::cout << "Cost: " << std::to_string(plan.GetCost()) << "\n";
+		std::cout << "Memory used on stack: " << std::to_string(telemetryData.totalBytesUsed) << " bytes.\n";
+		std::cout << "Total vertices discovered: " << std::to_string(telemetryData.discoveredNum) << "\n";
+		std::cout << "Total vertices expanded: " << std::to_string(telemetryData.expandedNum) << "\n";
 	}
 	else
 		std::cout << "Could not construct a plan!";
