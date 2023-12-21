@@ -57,7 +57,7 @@ struct TelemetryData
 
 //Utilizes A* pathfinding algorithm. All methods except for Pathfind must be overriden in class template specialization. t_id type must support >,<, == operations. Also std::size_t hash_value(const t_id& id) method must exist.
 template <typename t_vertex, typename t_id>
-class AStartPathfinder
+class AStarPathfinder
 {
 	virtual		int			GetHeuristic	(const t_vertex& vertex, const t_vertex& finish = t_vertex()) const
 	{
@@ -71,8 +71,8 @@ class AStartPathfinder
 	virtual		unsigned	GetDist			(const t_vertex& from, const t_vertex& to) const = 0;
 
 public:
-							AStartPathfinder	() {}
-	virtual					~AStartPathfinder	() {}
+							AStarPathfinder	() {}
+	virtual					~AStarPathfinder	() {}
 				bool		Pathfind		(Path<t_vertex>& path, t_vertex start, t_vertex finish = t_vertex(), TelemetryData* telemetryData = nullptr) const
 	{
 

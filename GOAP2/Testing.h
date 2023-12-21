@@ -182,9 +182,9 @@ inline int TestGoap()
 	WorldState attackGEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
 	planner.RegisterAction("AttackGrenade", attackGCnd, attackGEff, 4);
 	
-	WorldState attackWCnd(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
-											{"isWeaponDrawn","TRUE"},
-											{"isWeaponLoaded","TRUE"}}));
+	WorldState attackWCnd(t_attr_enums_map({	{"enemyStatus", {"VISIBLE", "IN_CLOSE_COMBAT_RANGE"}},
+												{"isWeaponDrawn",{"TRUE"}},
+												{"isWeaponLoaded",{"TRUE"}}}));
 	WorldState attackWEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
 	planner.RegisterAction("AttackWeapon", attackWCnd, attackWEff, 2);
 	
@@ -217,7 +217,7 @@ inline int TestGoap()
 		std::cout << "\t" + plan.GoalName + "\n";
 		std::cout << "Plan started:\n";
 		for (auto i = 0; i < plan.GetActionSequence().size(); i++)
-			std::cout << "\t" << std::to_string(i) << ". " << plan.GetActionSequence()[i] << "\n";
+			std::cout << "\t" << std::to_string(i + 1) << ". " << plan.GetActionSequence()[i] << "\n";
 		std::cout << "Plan completed\n";
 		std::cout << "Cost: " << std::to_string(plan.GetCost()) << "\n";
 		std::cout << "Memory used on stack: " << std::to_string(telemetryData.totalBytesUsed) << " bytes.\n";

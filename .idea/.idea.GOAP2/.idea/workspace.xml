@@ -10,6 +10,9 @@
     <list default="true" id="f2b96d9d-4464-4050-b1e3-f9237ac1656e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BitMask" beforeDir="false" afterPath="$PROJECT_DIR$/BitMask" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Action.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Action.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Action.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Action.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Pathfind.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Pathfind.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Plan.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Plan.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Testing.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Testing.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/World.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.cpp" afterDir="false" />
@@ -146,25 +149,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;rider.external.source.directories&quot;: [
-      &quot;C:\\Users\\nyast\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\DecompilerCache&quot;,
-      &quot;C:\\Users\\nyast\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\SourcesCache&quot;,
-      &quot;C:\\Users\\nyast\\AppData\\Local\\Symbols\\src&quot;
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "C:\\Users\\nyast\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\DecompilerCache",
+      "C:\\Users\\nyast\\AppData\\Roaming\\JetBrains\\Rider2023.1\\resharper-host\\SourcesCache",
+      "C:\\Users\\nyast\\AppData\\Local\\Symbols\\src"
     ]
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="GOAP2" type="CppProject" factoryName="C++ Project">
       <configuration_1>
@@ -231,7 +235,12 @@
       <workItem from="1698955698415" duration="10149000" />
       <workItem from="1698969049090" duration="1229000" />
       <workItem from="1699004131936" duration="1557000" />
-      <workItem from="1699008459505" duration="7421000" />
+      <workItem from="1699008459505" duration="7528000" />
+      <workItem from="1699696801058" duration="613000" />
+      <workItem from="1700983448881" duration="1892000" />
+      <workItem from="1702628320543" duration="3538000" />
+      <workItem from="1703067556683" duration="2528000" />
+      <workItem from="1703147589179" duration="6487000" />
     </task>
     <servers />
   </component>
@@ -266,18 +275,23 @@
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/GOAP2/Plan.h</url>
-          <line>69</line>
+          <line>63</line>
           <option name="timeStamp" value="30" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/GOAP2/Testing.h</url>
-          <line>119</line>
+          <line>121</line>
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/GOAP2/Plan.h</url>
-          <line>90</line>
+          <line>82</line>
           <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/GOAP2/Testing.h</url>
+          <line>13</line>
+          <option name="timeStamp" value="36" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

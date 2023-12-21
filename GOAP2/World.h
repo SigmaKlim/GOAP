@@ -8,6 +8,8 @@
 #include "BitMask.h"
 #include <boost/functional/hash.hpp>
 typedef std::unordered_map<std::string,std::string> t_attr_enum_map;
+typedef std::unordered_map<std::string, std::vector<std::string>> t_attr_enums_map;
+typedef std::unordered_map<std::string, unsigned> t_attr_mask_map;
 
 struct Vertex;
 
@@ -15,7 +17,12 @@ struct WorldState
 {
 	friend class Action;
 	friend class GPlanner;
+								//a constructor for states where each attribute has a concrete single value, used for action effects and actual world states
 								WorldState				(const t_attr_enum_map& nameValuePairs);
+								//a constructor for states where each attribute has a set of values, used for conditions
+								WorldState				(const t_attr_enums_map& nameValuePairs);
+								//a constructor for states where each attribute has a set of values, used for conditions
+								WorldState				(const t_attr_mask_map& nameValuePairs);
 								WorldState				();
 								WorldState				(const WorldState& other);
 	WorldState&					operator=				(const WorldState& other);

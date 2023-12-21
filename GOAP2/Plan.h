@@ -32,7 +32,7 @@ private:
 };
 
 
-class GPlanner : public AStartPathfinder<Vertex, BitMask>
+class GPlanner : public AStarPathfinder<Vertex, BitMask>
 {
 	std::unordered_map<std::string, WorldState> _goalCatalogue;
 	std::unordered_map<std::string, Action>		_actionCatalogue;
@@ -63,7 +63,10 @@ private:
 		{
 			WorldState nextState; //change state by action
 			auto& action = GetAction(actionName);
-
+			std::string debugName = actionName;
+			auto debugSize = std::string("SearchEnemy").size();
+			if (actionName == "AttackWeapon")
+				std::cout << "";
 			if (WorldState::IsActionUseful(nextState, vertex.state, action)) //check if nextState is closer to finish_ than vertex_.state and does not corrupt conditionSet
 				{
 				auto neighborAvailableActions = vertex.availableActionNames;
@@ -77,7 +80,8 @@ private:
 	{
 		const auto& initialState = targetVertex.state;
 		const auto& activeConditionSet = vertex.state;
-		return (initialState._valueMask & activeConditionSet._valueMask) == activeConditionSet._valueMask;
+		BitMask significantInitialStateMask = initialState._valueMask & activeConditionSet._affectedAttributesMask;
+		return (significantInitialStateMask & activeConditionSet._valueMask) == significantInitialStateMask;
 	}
 	BitMask	GetId (const Vertex& vertex) const
 	{
@@ -85,7 +89,7 @@ private:
 	}
 	unsigned GetDist (const Vertex& from, const Vertex& to) const
 	{
-		return GetAction(to.prevAction).GetCost();
+		return GetAction(to.prevAction).GetOrCalculateCost();
 	}
 
 };

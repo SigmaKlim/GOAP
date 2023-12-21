@@ -1,11 +1,19 @@
 #include "Action.h"
 
-Action::Action(const WorldState& cnd_, const WorldState& eff_, const unsigned cost_) : _condition(cnd_), _effect(eff_), _cost(cost_)
+Action::Action(const WorldState& condition, const WorldState& effect, unsigned cost) : _condition(condition), _effect(effect), _cost(cost)
 {
 	
 }
 
-Action::~Action()
+Action::Action(const WorldState& condition, WorldState(* EvaluateEffect)(const WorldState& desiredState, void* data), unsigned cost) : _condition(condition), EvaluateEffect(EvaluateEffect), _cost(cost)
+{
+}
+
+Action::Action(const WorldState& condition, const WorldState& effect, unsigned(* CalculateCost)(void* data)) : _condition(condition), _effect(effect), CalculateCost(CalculateCost)
+{
+}
+
+Action::Action(const WorldState& condition, WorldState(* EvaluateEffect)(const WorldState& desiredState, void* data), unsigned(* CalculateCost)(void* data)): _condition(condition), EvaluateEffect(EvaluateEffect), CalculateCost(CalculateCost)
 {
 }
 
@@ -14,17 +22,22 @@ const WorldState& Action::GetConditions() const
 	return _condition;
 }
 
-const WorldState& Action::GetEffects() const
+WorldState Action::GetOrEvaluateEffect(const WorldState& desiredState, void* data) const
 {
-	return _effect;
+	if (EvaluateEffect == nullptr)
+		return _effect;
+	return EvaluateEffect(desiredState, data);
 }
 
-unsigned Action::GetCost() const
+unsigned Action::GetOrCalculateCost(void* data) const
 {
-	return _cost;
+	if (CalculateCost == nullptr)
+		return _cost;
+	return CalculateCost(data);
 }
 
-void Action::SetCost(const int cost_)
+
+void Action::SetCost(int cost)
 {
-	_cost = cost_;
+	_cost = cost;
 }
