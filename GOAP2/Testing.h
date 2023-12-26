@@ -5,9 +5,10 @@
 #include <iostream> 
 #include <fstream>
 #include "MathHelper.h"
-#include "NumPathfinder.h"
-#include "Plan.h"
+
+#include "GPlanner.h"
 #include "BitMask.h"
+#include "CustomFunctions.h"
 
 #pragma optimize( "", off )
 
@@ -91,11 +92,15 @@ inline int TestGoap()
 	//0. Initialize planner
 	GPlanner planner;
 	//1. Register all attributes and enumerate their values
-	planner.RegisterAttribute("location",		{"IN_COVER",
-												 "NEAR_COVER",
+	planner.RegisterAttribute("atPoint",		{"ARBITRARY",
+												 "COVER",
+												 "HEALING_STATION",
+												 "AMMO_BOX"
 												 "NOT_IN_COVER"});
 	planner.RegisterAttribute("pose",			{"CROUCHING",
 												 "STANDING"});
+	planner.RegisterAttribute("coverStatus",	{"IN_COVER",
+												 "NOT_IN_COVER"});
 	planner.RegisterAttribute("isWeaponDrawn",	{"FALSE",
 												 "TRUE"});
 	planner.RegisterAttribute("isWeaponLoaded", {"FALSE",
@@ -112,38 +117,42 @@ inline int TestGoap()
 												 "TRUE"});
 	planner.RegisterAttribute("hasGrenades",	{"FALSE",
 												 "TRUE"});
+	planner.RegisterAttribute("hasKnife",		{"FALSE",
+												 "TRUE" });
 
 	//2. Register all goals
-	planner.RegisterGoal("GetToCover",t_attr_enum_map({	{"pose", "CROUCHING"},
-														{"location", "IN_COVER"}}));
+	planner.RegisterGoal("GetToCover",t_attr_enum_map({	{"coverStatus", "IN_COVER"}}));
 	planner.RegisterGoal("KillEnemy", t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
 	
 	//3. Define start state of the world
 	WorldState start(	t_attr_enum_map({	{"pose", "CROUCHING"},
-											{"location", "NOT_IN_COVER"},
+											{"atPoint", "ARBITRARY"},
+											{"coverStatus", "NOT_IN_COVER"},
 											{"isWeaponDrawn", "FALSE"},
 											{"isWeaponLoaded", "FALSE"},
 											{"isKnifeDrawn", "FALSE"},
 											{"isGrenadeDrawn", "FALSE"},
-											{"enemyStatus", "NON_VISIBLE"},
-											{"hasAmmo", "TRUE"},
-											{"hasGrenades", "FALSE"}}));
+											{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
+											{"hasAmmo", "FALSE"},
+											{"hasKnife", "FALSE"},
+											{"hasGrenades", "TRUE"}}));
 
 	//4. Register all available actions by defining their conditions and effects
 	WorldState crouchCnd;
 	WorldState crouchEff(t_attr_enum_map({{"pose","CROUCHING"}}));
 	planner.RegisterAction("Crouch", crouchCnd, crouchEff, 2);
 	
-	WorldState goToCoverCnd(t_attr_enum_map({{"pose", "STANDING"}}));
-	WorldState goToCoverEff(t_attr_enum_map({{"location", "NEAR_COVER"}}));
-	planner.RegisterAction("GoToCover", goToCoverCnd, goToCoverEff, 7);
+	WorldState goToCnd(t_attr_enum_map({{"pose", "STANDING"}}));
+	planner.RegisterAction("GoTo", goToCnd, {"atPoint"}, MakeEffectFromDesiredState, CalculateCostGoTo);
 
-	WorldState takeCoverCnd(t_attr_enum_map({{"location", "NEAR_COVER"}}));
-	WorldState takeCoverEff(t_attr_enum_map({{"location", "IN_COVER"}}));
+	WorldState takeCoverCnd(t_attr_enum_map({{"atPoint", "COVER"},
+											 {"pose", "CROUCHING"}}));
+	WorldState takeCoverEff(t_attr_enum_map({{"coverStatus", "IN_COVER"}}));
 	planner.RegisterAction("TakeCover", takeCoverCnd, takeCoverEff, 2);
 	
 	WorldState standUpCnd;
-	WorldState standUpEff(t_attr_enum_map({{"pose", "STANDING"}}));
+	WorldState standUpEff(t_attr_enum_map({	{"pose", "STANDING"},
+											{"coverStatus", "NOT_IN_COVER"}}));
 	planner.RegisterAction("StandUp", standUpCnd, standUpEff, 2);
 	
 	WorldState drawWeaponCnd;
@@ -166,15 +175,17 @@ inline int TestGoap()
 	WorldState searchCnd(t_attr_enum_map({	{"pose", "STANDING"},
 											{"enemyStatus", "NON_VISIBLE"}}));
 	WorldState searchEff(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
-											{"location","NOT_IN_COVER"}}));
+											{"atPoint","ARBITRARY"}}));
 	planner.RegisterAction("SearchEnemy", searchCnd, searchEff, 10);
 	
 	WorldState approachCnd(t_attr_enum_map({{"enemyStatus", "VISIBLE"}}));
-	WorldState approachEff(t_attr_enum_map({{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"}}));
+	WorldState approachEff(t_attr_enum_map({{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
+											{"atPoint","ARBITRARY"}}));
 	planner.RegisterAction("ApproachEnemy", approachCnd, approachEff, 7);
 	
 	WorldState moveAwayFromEnemyCnd(t_attr_enum_map({{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"}}));
-	WorldState moveAwayFromEnemyEff(t_attr_enum_map({{"enemyStatus", "VISIBLE"}}));
+	WorldState moveAwayFromEnemyEff(t_attr_enum_map({{"enemyStatus", "VISIBLE"},
+													 {"atPoint","ARBITRARY"}}));
 	planner.RegisterAction("MoveAwayFromEnemy", moveAwayFromEnemyCnd, moveAwayFromEnemyEff, 7);
 	
 	WorldState attackGCnd(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
@@ -189,7 +200,8 @@ inline int TestGoap()
 	planner.RegisterAction("AttackWeapon", attackWCnd, attackWEff, 2);
 	
 	WorldState attackKCnd(t_attr_enum_map({	{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
-											{"isKnifeDrawn","TRUE"}}));
+											{"isKnifeDrawn","TRUE"},
+											{"hasKnife","TRUE"} }));
 	WorldState attackKEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
 	planner.RegisterAction("AttackKnife", attackKCnd, attackKEff, 2);
 	
@@ -198,9 +210,21 @@ inline int TestGoap()
 	plan.StartingWs = start;
 	plan.GoalName = "KillEnemy";
 
+	//6.Create navigation pathfinder
+	std::ifstream fin("ata/test_matrix_set_30_0.txt");
+	matrix distanceMatrix(30, std::vector<u_int>(30));
+	MathHelper::ReadMtrxFromFile(distanceMatrix, fin);
+	std::map<std::string, std::vector<unsigned>> pointNameToVertexIds;
+	pointNameToVertexIds.insert({"COVER", {1, 5, 9, 17}});
+	pointNameToVertexIds.insert({"AMMO_BOX", {2, 13, 19}});
+	pointNameToVertexIds.insert({"HEALING_STATION", {6, 14}});
+	NavPathfinder navPathfinder(distanceMatrix, pointNameToVertexIds);
+	
 	//6. Construct plan
 	TelemetryData telemetryData;
-	bool builtPlan = planner.ConstructPlan(plan, &telemetryData);
+	ActionInputDataBase actionInputData;
+	actionInputData.NavPathfinder = &navPathfinder;
+	bool builtPlan = planner.ConstructPlan(plan, &telemetryData, &navPathfinder);
 
 	//6. Fetch results
 	if (builtPlan == true)
@@ -228,7 +252,6 @@ inline int TestGoap()
 		std::cout << "Could not construct a plan!";
 	return 0;
 }
-
 inline int TestMask()
 {
 	BitMask m1 = BitMask::MakeOne(100); //00..01

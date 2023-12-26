@@ -3,7 +3,7 @@
 #include <utility>
 #include <queue>
 #include <map>
-#include <random>
+#include <cassert>
 #include <string>
 #include <iostream>
 
@@ -14,7 +14,6 @@
 #include <boost/functional/hash.hpp>
 
 
-extern const int INFTY;
 typedef unsigned long long ull;
 
 template <typename t_vertex>
@@ -24,6 +23,8 @@ struct Path
 	int Cost = 0;
 };
 
+//An internal class for constructing path in graph. The algorithm only uses ids to distinguish between nodes.
+//Each id is associated with a concrete user-class vertex. User must override protected methods. User himself is responsible for dealing with vertex-object internals. 
 template <typename t_id>
 struct Node
 {
@@ -35,11 +36,11 @@ struct Node
 	bool operator<(const Node& right) const
 	{
 		return _distFromStart + _heuristic < right._distFromStart + right._heuristic;
-	};
+	}
 	bool operator>(const Node& right) const
 	{
 		return _distFromStart + _heuristic > right._distFromStart + right._heuristic;
-	};
+	}
 	t_id	  _id = t_id();
 	t_id _prevNodeId = 0;
 	unsigned _distFromStart = 0;
@@ -55,36 +56,39 @@ struct TelemetryData
 };
 
 
-//Utilizes A* pathfinding algorithm. All methods except for Pathfind must be overriden in class template specialization. t_id type must support >,<, == operations. Also std::size_t hash_value(const t_id& id) method must exist.
+//Utilizes A* pathfinding algorithm. All protected methods must be overriden in class template specialization.
+//t_id type must support >,<, == operations. Also std::size_t hash_value(const t_id& id) function must be implemented.
 template <typename t_vertex, typename t_id>
-class AStarPathfinder
+class AStarSolver
 {
-	virtual		int			GetHeuristic	(const t_vertex& vertex, const t_vertex& finish = t_vertex()) const
+protected:
+	virtual unsigned GetHeuristic(const t_vertex& vertex, const t_vertex& finish = t_vertex(), void* userData = nullptr) const
 	{
 		return 0;
 	}
-			//returns array of newly created node's neighbors
-	virtual		void		GetNeighbors	(std::vector<t_vertex>&	neighbors, const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
-			//checks whether this node satisfies conditions of the target node; target is a shell for Node(T* cond), i.e. for any node with set cond field
-	virtual		bool		Satisfies		(const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
+	//Fills the array with newly created node's neighbors
+	virtual		void		GetNeighbors	(std::vector<t_vertex>&	neighbors, const t_vertex& vertex, const t_vertex& finish = t_vertex(), void* userData = nullptr) const = 0;
+	//Checks whether this node satisfies conditions of the target node.
+	virtual		bool		Satisfies		(const t_vertex& vertex, const t_vertex& finish = t_vertex(), void* userData = nullptr) const = 0;
 	virtual		t_id		GetId			(const t_vertex& vertex) const = 0;
-	virtual		unsigned	GetDist			(const t_vertex& from, const t_vertex& to) const = 0;
+	virtual		unsigned	GetDistance		(const t_vertex& from, const t_vertex& to, void* userData) const = 0;
 
 public:
-							AStarPathfinder	() {}
-	virtual					~AStarPathfinder	() {}
-				bool		Pathfind		(Path<t_vertex>& path, t_vertex start, t_vertex finish = t_vertex(), TelemetryData* telemetryData = nullptr) const
+							AStarSolver	() {}
+	virtual					~AStarSolver	() {}
+				bool		Pathfind		(Path<t_vertex>& path, t_vertex start, t_vertex finish = t_vertex(),
+												TelemetryData* telemetryData = nullptr, void* userData = nullptr) const
 	{
 
-		FibonacciHeap<Node<t_id>>											discovered; //a queue of discovered but not expanded nodes
-		std::unordered_map<t_id, Element<Node<t_id>>*, boost::hash<t_id>>	discMap; //used to access elements of heap and check if a node had been discovered (by id)
-		std::unordered_set<t_id, boost::hash<t_id>>							expanded; //a set of expanded nodes, used to check if a node had been expanded
-		std::unordered_map<t_id, t_vertex, boost::hash<t_id>>				vertices;
-		std::unordered_map <t_id, t_id, boost::hash<t_id>>					cameFrom; // <nodeId, prevNodeId>
+		FibonacciHeap<Node<t_id>>											discovered; //A queue of discovered but not expanded nodes
+		std::unordered_map<t_id, Element<Node<t_id>>*, boost::hash<t_id>>	discMap;	//Used to access elements of heap and check if a node had been discovered (by id)
+		std::unordered_set<t_id, boost::hash<t_id>>							expanded;	//A set of expanded nodes, used to check if a node had been expanded
+		std::unordered_map<t_id, t_vertex, boost::hash<t_id>>				vertices;	//Used to map node id to vertex object
+		std::unordered_map <t_id, t_id, boost::hash<t_id>>					cameFrom;	//Used to map node to its preceding node
 
 		unsigned discoveredHeapSize = 0;
 		auto startId = GetId(start);
-		Node<t_id> currentNode(startId, t_id(), 0, GetHeuristic(start, finish));
+		Node<t_id> currentNode(startId, t_id(), 0, GetHeuristic(start, finish, userData));
 		vertices.insert({ startId, start });
 		cameFrom.insert({ startId, t_id() });
 		Element<Node<t_id>>* currentElement = discovered.insert(currentNode);
@@ -106,12 +110,12 @@ public:
 			discoveredHeapSizeDelta--;
 			discMap.erase(currentNode._id);
 			t_vertex currentVertex = vertices.at(currentNode._id);
-			if (Satisfies(currentVertex, finish) == true)
+			if (Satisfies(currentVertex, finish, userData) == true)
 				break;
 			expanded.insert({ currentNode._id });
 			if (telemetryData != nullptr)
 				++telemetryData->expandedNum;
-			GetNeighbors(neighborVertices, currentVertex, finish);
+			GetNeighbors(neighborVertices, currentVertex, finish, userData);
 			for (int i = 0; i < neighborVertices.size(); i++)
 			{
 				auto neighborId = GetId(neighborVertices[i]);
@@ -120,9 +124,9 @@ public:
 				Element<Node<t_id>>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
 				bool wasExpanded = expanded.find(neighborId) != expanded.end();
 				Node<t_id> neighborNode(	neighborId, 
-									currentNode._id, 
-									currentNode._distFromStart + GetDist(currentVertex, neighborVertices[i]), 
-									GetHeuristic(neighborVertices[i], finish));
+											currentNode._id, 
+											currentNode._distFromStart + GetDistance(currentVertex, neighborVertices[i], userData), 
+											GetHeuristic(neighborVertices[i], finish, userData));
 				if (wasDiscovered == false && wasExpanded == false)
 				{
 					neighborElement = discovered.insert({ neighborNode });
@@ -131,15 +135,13 @@ public:
 						++telemetryData->discoveredNum;
 					discoveredHeapSizeDelta++;
 					vertices.insert({neighborId, neighborVertices[i]});
-					if (cameFrom.insert({neighborId, currentNode._id}).second != true)
-						std::cout << "!";
+					assert(cameFrom.insert({neighborId, currentNode._id}).second != true);
 				}
 				else if (	wasDiscovered == true && 
 							neighborElement->getKey()._distFromStart > neighborNode._distFromStart)
 				{
 					discovered.decreaseKey(neighborElement, neighborNode);
-					if (cameFrom.insert_or_assign(neighborId, currentNode._id).second != false)
-						std::cout << "!";
+					assert(cameFrom.insert_or_assign(neighborId, currentNode._id).second != false);
 				}
 			}
 			neighborVertices.clear();

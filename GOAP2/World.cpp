@@ -1,11 +1,19 @@
 #include "World.h"
 #include "Action.h"
 #include <bitset>
-#include "Plan.h"
+#include "GPlanner.h"
+#include "ActionInputDataBase.h"
 
 std::set<std::string> WorldState::_attributeNames;
 unsigned WorldState::_numAttributes = 0;
 GPlanner* WorldState::_planner = nullptr;
+
+WorldState::WorldState(const BitMask& valueMask, const BitMask& affectedAttributesMask)
+{
+	assert((valueMask & affectedAttributesMask) == valueMask);
+	_valueMask = valueMask;
+	_affectedAttributesMask = affectedAttributesMask;
+}
 
 WorldState::WorldState(const t_attr_enum_map& nameValuePairs)
 {
@@ -79,6 +87,7 @@ WorldState::WorldState(const WorldState& other)
 WorldState& WorldState::operator=(const WorldState& other)
 {
 	_valueMask = other._valueMask;
+	_affectedAttributesMask = other._affectedAttributesMask;
 	return *this;
 }
 WorldState::~WorldState()
@@ -93,9 +102,11 @@ bool WorldState::SetAttributeValue(const std::string& name, u_char value)
 		exit(-1);
 	}
 	_valueMask.SetBitValue(attributeOffset + value, 1);
+	_affectedAttributesMask = BitMask::MakeRightOnes(_valueMask.GetNumBits(), Attribute::MAX_VALUES);
+	_affectedAttributesMask <<= attributeOffset;
 	return true;
 }
-bool WorldState::SetAttributeValue(const unsigned index, u_char value)
+bool WorldState::SetAttributeValue(unsigned index, u_char value)
 {
 	if (index > _numAttributes)
 	{
@@ -104,19 +115,15 @@ bool WorldState::SetAttributeValue(const unsigned index, u_char value)
 		exit(-1);
 	}
 	_valueMask.SetBitValue(index + value, 1);
+	_affectedAttributesMask = BitMask::MakeRightOnes(_valueMask.GetNumBits(), Attribute::MAX_VALUES);
+	_affectedAttributesMask <<= index;
 	return true;
 }
 
-std::vector<u_char> WorldState::GetAttributeValues(const unsigned index) const
+std::vector<u_char> WorldState::GetAttributeValues(unsigned index) const
 {
-	if (index > _numAttributes)
-	{
-		std::cout << "Index(" + std::to_string(index) + ") exceeds numAttributes(" +
-			std::to_string(_numAttributes) + ").\n";
-		exit(-1);
-	}
-	BitMask filteredMask = (_valueMask >> (index * Attribute::MAX_VALUES));
-	unsigned attributeMask = filteredMask[0];
+	
+	auto attributeMask = GetAttributeMask(index);
 	std::vector<u_char> values;
 	values.reserve(Attribute::MAX_VALUES);
 	for (u_char i = 0; i < Attribute::MAX_VALUES; i++)
@@ -152,31 +159,62 @@ std::vector<std::string> WorldState::GetAttributeEnumerators(const std::string& 
 	return enumerators;
 }
 
+unsigned WorldState::GetAttributeMask(unsigned index) const
+{
+	if (index > _numAttributes)
+	{
+		std::cout << "Index(" + std::to_string(index) + ") exceeds numAttributes(" +
+			std::to_string(_numAttributes) + ").\n";
+		exit(-1);
+	}
+	BitMask filteredMask = (_valueMask >> (index * Attribute::MAX_VALUES));
+	unsigned attributeMask = filteredMask[0];
+	unsigned residueFilter = BitMask::MakeRightOnes(Attribute::MAX_VALUES);
+	attributeMask &= residueFilter;
+	return attributeMask;
+	
+}
+
+const BitMask& WorldState::GetValueMask() const
+{
+	return _valueMask;
+}
+
+const BitMask& WorldState::GetAffectedAttributesMask() const
+{
+	return _affectedAttributesMask;
+}
+
 unsigned WorldState::FindAttribute(const std::string& name)
 {
 	auto search =  _attributeNames.find(name);
 	return std::distance(_attributeNames.begin(), search);
 }
 
-bool WorldState::IsActionUseful(WorldState& modifiedConditionSet, const WorldState& conditionSet, const Action& action)
+unsigned WorldState::GetAttributeNumber()
 {
-
-	BitMask significantConditionSet = conditionSet._valueMask & action._effect._affectedAttributesMask; //leave only conditions affected by effects of the action
-	BitMask significantActionEffects = conditionSet._affectedAttributesMask & action._effect._valueMask; //leave only effects that influence conditions from the condition set
-	if ((significantActionEffects & significantConditionSet) != significantActionEffects 
-		|| significantConditionSet == BitMask::MakeAllZeros(significantConditionSet.GetNumBits())) // check if the action effects don't violate conditions from the set and if there are any affected conditions at all 
-		return false;
-	//modifiedConditionSet._valueMask = conditionSet._valueMask & ~action._effect._valueMask;
-	modifiedConditionSet._valueMask = conditionSet._valueMask & ~action._effect._affectedAttributesMask; //remove fulfilled conditions from the set
-	modifiedConditionSet._affectedAttributesMask = conditionSet._affectedAttributesMask & ~action._effect._affectedAttributesMask; //remove fulfilled conditions from the set
-	BitMask significantActionConditions = modifiedConditionSet._affectedAttributesMask & action._condition._valueMask; //leave only conditions on attributes shared between action conditions and conditions set
-	significantConditionSet = conditionSet._valueMask & action._condition._affectedAttributesMask;
-	if ((significantActionConditions & significantConditionSet) != significantActionConditions) // check if the action conditions don't violate conditions from the set 
-		return false;
-	modifiedConditionSet._valueMask |= action._condition._valueMask;
-	modifiedConditionSet._affectedAttributesMask |= action._condition._affectedAttributesMask;
-	return true;
+	return _numAttributes;
 }
+
+// bool WorldState::IsActionUseful(WorldState& modifiedConditionSet, const WorldState& conditionSet, const Action& action, const void* userData)
+// {
+//
+// 	BitMask significantConditionSet = conditionSet._valueMask & action._effect._affectedAttributesMask; //leave only conditions affected by effects of the action
+// 	BitMask significantActionEffects = conditionSet._affectedAttributesMask & action._effect._valueMask; //leave only effects that influence conditions from the condition set
+// 	if ((significantActionEffects & significantConditionSet) != significantActionEffects 
+// 		|| significantConditionSet == BitMask::MakeAllZeros(significantConditionSet.GetNumBits())) // check if the action effects don't violate conditions from the set and if there are any affected conditions at all 
+// 		return false;
+// 	//modifiedConditionSet._valueMask = conditionSet._valueMask & ~action._effect._valueMask;
+// 	modifiedConditionSet._valueMask = conditionSet._valueMask & ~action._effect._affectedAttributesMask; //remove fulfilled conditions from the set
+// 	modifiedConditionSet._affectedAttributesMask = conditionSet._affectedAttributesMask & ~action._effect._affectedAttributesMask; //remove fulfilled conditions from the set
+// 	BitMask significantActionConditions = modifiedConditionSet._affectedAttributesMask & action._condition._valueMask; //leave only conditions on attributes shared between action conditions and conditions set
+// 	significantConditionSet = conditionSet._valueMask & action._condition._affectedAttributesMask;
+// 	if ((significantActionConditions & significantConditionSet) != significantActionConditions) // check if the action conditions don't violate conditions from the set 
+// 		return false;
+// 	modifiedConditionSet._valueMask |= action._condition._valueMask;
+// 	modifiedConditionSet._affectedAttributesMask |= action._condition._affectedAttributesMask;
+// 	return true;
+// }
 
 const std::set<std::string>& WorldState::GetAttributeNamesSet()
 {
