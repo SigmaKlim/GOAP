@@ -67,11 +67,11 @@ protected:
 		return 0;
 	}
 	//Fills the array with newly created node's neighbors
-	virtual		void		GetNeighbors	(std::vector<t_vertex>&	neighbors, const t_vertex& vertex, const t_vertex& finish = t_vertex(), void* userData = nullptr) const = 0;
+	virtual		void		GetNeighbors	(std::vector<t_vertex>&	neighbors, const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
 	//Checks whether this node satisfies conditions of the target node.
-	virtual		bool		Satisfies		(const t_vertex& vertex, const t_vertex& finish = t_vertex(), void* userData = nullptr) const = 0;
+	virtual		bool		Satisfies		(const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
 	virtual		t_id		GetId			(const t_vertex& vertex) const = 0;
-	virtual		unsigned	GetDistance		(const t_vertex& from, const t_vertex& to, void* userData) const = 0;
+	virtual		unsigned	GetDistance		(const t_vertex& from, const t_vertex& to) const = 0;
 
 public:
 							AStarSolver	() {}
@@ -110,12 +110,12 @@ public:
 			discoveredHeapSizeDelta--;
 			discMap.erase(currentNode._id);
 			t_vertex currentVertex = vertices.at(currentNode._id);
-			if (Satisfies(currentVertex, finish, userData) == true)
+			if (Satisfies(currentVertex, finish) == true)
 				break;
 			expanded.insert({ currentNode._id });
 			if (telemetryData != nullptr)
 				++telemetryData->expandedNum;
-			GetNeighbors(neighborVertices, currentVertex, finish, userData);
+			GetNeighbors(neighborVertices, currentVertex, finish);
 			for (int i = 0; i < neighborVertices.size(); i++)
 			{
 				auto neighborId = GetId(neighborVertices[i]);
@@ -125,7 +125,7 @@ public:
 				bool wasExpanded = expanded.find(neighborId) != expanded.end();
 				Node<t_id> neighborNode(	neighborId, 
 											currentNode._id, 
-											currentNode._distFromStart + GetDistance(currentVertex, neighborVertices[i], userData), 
+											currentNode._distFromStart + GetDistance(currentVertex, neighborVertices[i]), 
 											GetHeuristic(neighborVertices[i], finish, userData));
 				if (wasDiscovered == false && wasExpanded == false)
 				{
@@ -135,13 +135,13 @@ public:
 						++telemetryData->discoveredNum;
 					discoveredHeapSizeDelta++;
 					vertices.insert({neighborId, neighborVertices[i]});
-					assert(cameFrom.insert({neighborId, currentNode._id}).second != true);
+					assert(cameFrom.insert({neighborId, currentNode._id}).second == true);
 				}
 				else if (	wasDiscovered == true && 
 							neighborElement->getKey()._distFromStart > neighborNode._distFromStart)
 				{
 					discovered.decreaseKey(neighborElement, neighborNode);
-					assert(cameFrom.insert_or_assign(neighborId, currentNode._id).second != false);
+					assert(cameFrom.insert_or_assign(neighborId, currentNode._id).second == true);
 				}
 			}
 			neighborVertices.clear();

@@ -1,8 +1,6 @@
 #include "World.h"
-#include "Action.h"
 #include <bitset>
 #include "GPlanner.h"
-#include "ActionInputDataBase.h"
 
 std::set<std::string> WorldState::_attributeNames;
 unsigned WorldState::_numAttributes = 0;
@@ -13,6 +11,7 @@ WorldState::WorldState(const BitMask& valueMask, const BitMask& affectedAttribut
 	assert((valueMask & affectedAttributesMask) == valueMask);
 	_valueMask = valueMask;
 	_affectedAttributesMask = affectedAttributesMask;
+	UpdateDebugAttributeValueList();
 }
 
 WorldState::WorldState(const t_attr_enum_map& nameValuePairs)
@@ -41,6 +40,7 @@ WorldState::WorldState(const t_attr_enum_map& nameValuePairs)
 		}
 		_valueMask.SetBitValue(attributeOffset *  Attribute::MAX_VALUES + valueOffset, 1);
 	}
+	UpdateDebugAttributeValueList();
 }
 
 WorldState::WorldState(const t_attr_enums_map& nameValuePairs)
@@ -72,6 +72,7 @@ WorldState::WorldState(const t_attr_enums_map& nameValuePairs)
 			_valueMask.SetBitValue(attributeOffset *  Attribute::MAX_VALUES + valueOffset, 1);
 		}
 	}
+	UpdateDebugAttributeValueList();
 }
 
 WorldState::WorldState()
@@ -83,11 +84,13 @@ WorldState::WorldState(const WorldState& other)
 {
 	_valueMask = other._valueMask;
 	_affectedAttributesMask = other._affectedAttributesMask;
+	UpdateDebugAttributeValueList();
 }
 WorldState& WorldState::operator=(const WorldState& other)
 {
 	_valueMask = other._valueMask;
 	_affectedAttributesMask = other._affectedAttributesMask;
+	UpdateDebugAttributeValueList();
 	return *this;
 }
 WorldState::~WorldState()
@@ -101,11 +104,18 @@ bool WorldState::SetAttributeValue(const std::string& name, u_char value)
 		std::cout << "Incorrect attribute name: " + name + "\n";
 		exit(-1);
 	}
-	_valueMask.SetBitValue(attributeOffset + value, 1);
+	_valueMask.SetBitValue(attributeOffset * Attribute::MAX_VALUES + value, 1);
 	_affectedAttributesMask = BitMask::MakeRightOnes(_valueMask.GetNumBits(), Attribute::MAX_VALUES);
-	_affectedAttributesMask <<= attributeOffset;
+	_affectedAttributesMask <<= attributeOffset * Attribute::MAX_VALUES;
+	UpdateDebugAttributeValueList();
 	return true;
 }
+
+bool WorldState::SetAttributeValue(const std::string& name, const std::string& enumerator)
+{
+	return SetAttributeValue(name, _planner->GetAttribute(name).GetEnumValue(enumerator));
+}
+
 bool WorldState::SetAttributeValue(unsigned index, u_char value)
 {
 	if (index > _numAttributes)
@@ -114,9 +124,10 @@ bool WorldState::SetAttributeValue(unsigned index, u_char value)
 			std::to_string(_numAttributes) + ").\n";
 		exit(-1);
 	}
-	_valueMask.SetBitValue(index + value, 1);
+	_valueMask.SetBitValue(index * Attribute::MAX_VALUES + value, 1);
 	_affectedAttributesMask = BitMask::MakeRightOnes(_valueMask.GetNumBits(), Attribute::MAX_VALUES);
-	_affectedAttributesMask <<= index;
+	_affectedAttributesMask <<= index * Attribute::MAX_VALUES;
+	UpdateDebugAttributeValueList();
 	return true;
 }
 
@@ -196,25 +207,23 @@ unsigned WorldState::GetAttributeNumber()
 	return _numAttributes;
 }
 
-// bool WorldState::IsActionUseful(WorldState& modifiedConditionSet, const WorldState& conditionSet, const Action& action, const void* userData)
-// {
-//
-// 	BitMask significantConditionSet = conditionSet._valueMask & action._effect._affectedAttributesMask; //leave only conditions affected by effects of the action
-// 	BitMask significantActionEffects = conditionSet._affectedAttributesMask & action._effect._valueMask; //leave only effects that influence conditions from the condition set
-// 	if ((significantActionEffects & significantConditionSet) != significantActionEffects 
-// 		|| significantConditionSet == BitMask::MakeAllZeros(significantConditionSet.GetNumBits())) // check if the action effects don't violate conditions from the set and if there are any affected conditions at all 
-// 		return false;
-// 	//modifiedConditionSet._valueMask = conditionSet._valueMask & ~action._effect._valueMask;
-// 	modifiedConditionSet._valueMask = conditionSet._valueMask & ~action._effect._affectedAttributesMask; //remove fulfilled conditions from the set
-// 	modifiedConditionSet._affectedAttributesMask = conditionSet._affectedAttributesMask & ~action._effect._affectedAttributesMask; //remove fulfilled conditions from the set
-// 	BitMask significantActionConditions = modifiedConditionSet._affectedAttributesMask & action._condition._valueMask; //leave only conditions on attributes shared between action conditions and conditions set
-// 	significantConditionSet = conditionSet._valueMask & action._condition._affectedAttributesMask;
-// 	if ((significantActionConditions & significantConditionSet) != significantActionConditions) // check if the action conditions don't violate conditions from the set 
-// 		return false;
-// 	modifiedConditionSet._valueMask |= action._condition._valueMask;
-// 	modifiedConditionSet._affectedAttributesMask |= action._condition._affectedAttributesMask;
-// 	return true;
-// }
+void WorldState::UpdateDebugAttributeValueList()
+{
+	if (_isInDebugMode == false)
+		return;
+	_debugAttributeValueList.clear();
+	for (auto& attributePair : _planner->GetAttributeCatalogue())
+	{
+		auto& attributeName = attributePair.first;
+		auto& attribute = attributePair.second;
+		auto values = GetAttributeValues(attributeName);
+		std::vector<std::string> enums;
+		for (auto& value : values)
+			enums.push_back(attribute.GetEnumerator(value));
+		if (enums.size() > 0)
+			_debugAttributeValueList.insert({attributeName, enums});
+	}
+}
 
 const std::set<std::string>& WorldState::GetAttributeNamesSet()
 {

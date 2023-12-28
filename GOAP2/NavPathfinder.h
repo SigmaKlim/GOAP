@@ -13,12 +13,12 @@ public:
     //Placeholder for engine function returning the navgraph vertex at which the agent is located currently. Returns random valid vertex id.
     unsigned EmulateGetCurrentVertex() const;
     //Placeholder for engine function returning the navgraph vertex where the closest point is located byt its name
-    unsigned EmulateGetClosestObjectByName(const std::string& name) const;
+    unsigned EmulateGetDestinationVertexByName(const std::string& name) const;
 private:
-    void GetNeighbors(std::vector<unsigned>& neighbors, const unsigned& vertex, const unsigned& finish, void* userData) const override;
-    bool Satisfies(const unsigned& vertex, const unsigned& finish, void* userData) const override;
+    void GetNeighbors(std::vector<unsigned>& neighbors, const unsigned& vertex, const unsigned& finish = 0) const override;
+    bool Satisfies(const unsigned& vertex, const unsigned& finish = 0) const override;
     unsigned GetId(const unsigned& vertex) const override;
-    unsigned GetDistance(const unsigned& from, const unsigned& to, void* userData) const override;
+    unsigned GetDistance(const unsigned& from, const unsigned& to) const override;
 
 
 

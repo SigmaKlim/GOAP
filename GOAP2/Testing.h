@@ -8,8 +8,9 @@
 
 #include "GPlanner.h"
 #include "BitMask.h"
-#include "CustomFunctions.h"
-
+#include "Actions/GoToAction.h"
+#include "Actions/SimpleAction.h"
+#include "NavPathfinder.h"
 #pragma optimize( "", off )
 
 inline int TestNumeric()
@@ -89,14 +90,23 @@ inline int TestNumeric()
 }
 inline int TestGoap()
 {
+	//Create navigation pathfinder
+	std::ifstream fin("ata/test_matrix_set_30_0.txt");
+	matrix distanceMatrix(30, std::vector<u_int>(30));
+	MathHelper::ReadMtrxFromFile(distanceMatrix, fin);
+	std::map<std::string, std::vector<unsigned>> pointNameToVertexIds;
+	pointNameToVertexIds.insert({"COVER", {1, 5, 9, 17}});
+	pointNameToVertexIds.insert({"AMMO_BOX", {2, 13, 19}});
+	pointNameToVertexIds.insert({"HEALING_STATION", {6, 14}});
+	NavPathfinder navPathfinder(distanceMatrix, pointNameToVertexIds);
+	
 	//0. Initialize planner
 	GPlanner planner;
 	//1. Register all attributes and enumerate their values
 	planner.RegisterAttribute("atPoint",		{"ARBITRARY",
 												 "COVER",
 												 "HEALING_STATION",
-												 "AMMO_BOX"
-												 "NOT_IN_COVER"});
+												 "AMMO_BOX"});
 	planner.RegisterAttribute("pose",			{"CROUCHING",
 												 "STANDING"});
 	planner.RegisterAttribute("coverStatus",	{"IN_COVER",
@@ -113,16 +123,22 @@ inline int TestGoap()
 												 "VISIBLE",
 												 "NON_VISIBLE",
 												 "DEAD"});
-	planner.RegisterAttribute("hasAmmo",		{"FALSE",
-												 "TRUE"});
 	planner.RegisterAttribute("hasGrenades",	{"FALSE",
 												 "TRUE"});
 	planner.RegisterAttribute("hasKnife",		{"FALSE",
 												 "TRUE" });
+	planner.RegisterAttribute("hpLevel",		{"LOW",
+												 "AVERAGE",
+												 "HIGH"});
+	planner.RegisterAttribute("ammoLeft", { "NO",
+											"LOW",
+											"AVERAGE",
+											"FULL"});
 
 	//2. Register all goals
 	planner.RegisterGoal("GetToCover",t_attr_enum_map({	{"coverStatus", "IN_COVER"}}));
 	planner.RegisterGoal("KillEnemy", t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
+	planner.RegisterGoal("StayHealthy", t_attr_enum_map({{"hpLevel", "HIGH"}}));
 	
 	//3. Define start state of the world
 	WorldState start(	t_attr_enum_map({	{"pose", "CROUCHING"},
@@ -132,99 +148,114 @@ inline int TestGoap()
 											{"isWeaponLoaded", "FALSE"},
 											{"isKnifeDrawn", "FALSE"},
 											{"isGrenadeDrawn", "FALSE"},
-											{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
-											{"hasAmmo", "FALSE"},
+											{"enemyStatus", "NON_VISIBLE"},
+											{"ammoLeft", "NO"},
 											{"hasKnife", "FALSE"},
-											{"hasGrenades", "TRUE"}}));
+											{"hasGrenades", "FALSE"},
+											{"hpLevel", "AVERAGE"}}));
 
 	//4. Register all available actions by defining their conditions and effects
 	WorldState crouchCnd;
 	WorldState crouchEff(t_attr_enum_map({{"pose","CROUCHING"}}));
-	planner.RegisterAction("Crouch", crouchCnd, crouchEff, 2);
+	SimpleAction crouch(crouchCnd, crouchEff, 2);
+	planner.RegisterAction("Crouch", crouch);
 	
 	WorldState goToCnd(t_attr_enum_map({{"pose", "STANDING"}}));
-	planner.RegisterAction("GoTo", goToCnd, {"atPoint"}, MakeEffectFromDesiredState, CalculateCostGoTo);
+	GoToAction goTo(navPathfinder, goToCnd);
+	planner.RegisterAction("GoTo", goTo);
 
 	WorldState takeCoverCnd(t_attr_enum_map({{"atPoint", "COVER"},
 											 {"pose", "CROUCHING"}}));
 	WorldState takeCoverEff(t_attr_enum_map({{"coverStatus", "IN_COVER"}}));
-	planner.RegisterAction("TakeCover", takeCoverCnd, takeCoverEff, 2);
+	SimpleAction takeCover(takeCoverCnd, takeCoverEff, 2);
+	planner.RegisterAction("TakeCover", takeCover);
 	
 	WorldState standUpCnd;
 	WorldState standUpEff(t_attr_enum_map({	{"pose", "STANDING"},
 											{"coverStatus", "NOT_IN_COVER"}}));
-	planner.RegisterAction("StandUp", standUpCnd, standUpEff, 2);
+	SimpleAction standUp(standUpCnd, standUpEff, 2);
+	planner.RegisterAction("StandUp", standUp);
 	
 	WorldState drawWeaponCnd;
 	WorldState drawWeaponEff(t_attr_enum_map({{"isWeaponDrawn", "TRUE"}}));
-	planner.RegisterAction("DrawWeapon", drawWeaponCnd, drawWeaponEff, 3);
+	SimpleAction drawWeapon(drawWeaponCnd, drawWeaponEff, 3);
+	planner.RegisterAction("DrawWeapon", drawWeapon);
 	
 	WorldState drawKnifeCnd;
 	WorldState drawKnifeEff(t_attr_enum_map({{"isKnifeDrawn", "TRUE"}}));
-	planner.RegisterAction("DrawKnife", drawKnifeCnd, drawKnifeEff, 1);
+	SimpleAction drawKnife(drawKnifeCnd, drawKnifeEff, 1);
+	planner.RegisterAction("DrawKnife", drawKnife);
 	
 	WorldState drawGrenadeCnd(t_attr_enum_map({{"hasGrenades", "TRUE"}}));
 	WorldState drawGrenadeEff(t_attr_enum_map({{"isGrenadeDrawn", "TRUE"}}));
-	planner.RegisterAction("DrawGrenade", drawGrenadeCnd, drawGrenadeEff, 2);
+	SimpleAction drawGrenade(drawGrenadeCnd, drawGrenadeEff, 2);
+	planner.RegisterAction("DrawGrenade", drawGrenade);
 	
-	WorldState reloadCnd(t_attr_enum_map({	{"hasAmmo", "TRUE"}, 
-											{"isWeaponDrawn", "TRUE"}}));
+	WorldState reloadCnd(t_attr_enums_map({	{"ammoLeft", {"AVERAGE", "FULL"}}, 
+											{"isWeaponDrawn", {"TRUE"}}}));
 	WorldState reloadEff(t_attr_enum_map({	{"isWeaponLoaded", "TRUE"}}));
-	planner.RegisterAction("Reload", reloadCnd, reloadEff, 3);
+	SimpleAction reload(reloadCnd, reloadEff, 3);
+	planner.RegisterAction("Reload", reload);
 	
 	WorldState searchCnd(t_attr_enum_map({	{"pose", "STANDING"},
 											{"enemyStatus", "NON_VISIBLE"}}));
 	WorldState searchEff(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
 											{"atPoint","ARBITRARY"}}));
-	planner.RegisterAction("SearchEnemy", searchCnd, searchEff, 10);
+	SimpleAction search(searchCnd, searchEff, 10);
+	planner.RegisterAction("SearchEnemy", search);
 	
 	WorldState approachCnd(t_attr_enum_map({{"enemyStatus", "VISIBLE"}}));
 	WorldState approachEff(t_attr_enum_map({{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
 											{"atPoint","ARBITRARY"}}));
-	planner.RegisterAction("ApproachEnemy", approachCnd, approachEff, 7);
+	SimpleAction approachEnemy(approachCnd, approachEff, 7);
+	planner.RegisterAction("ApproachEnemy", approachEnemy);
 	
 	WorldState moveAwayFromEnemyCnd(t_attr_enum_map({{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"}}));
 	WorldState moveAwayFromEnemyEff(t_attr_enum_map({{"enemyStatus", "VISIBLE"},
 													 {"atPoint","ARBITRARY"}}));
-	planner.RegisterAction("MoveAwayFromEnemy", moveAwayFromEnemyCnd, moveAwayFromEnemyEff, 7);
+	SimpleAction moveAwayFromEnemy(moveAwayFromEnemyCnd, moveAwayFromEnemyEff, 7);
+	planner.RegisterAction("MoveAwayFromEnemy", moveAwayFromEnemy);
 	
 	WorldState attackGCnd(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
 											{"isGrenadeDrawn","TRUE"}}));
 	WorldState attackGEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
-	planner.RegisterAction("AttackGrenade", attackGCnd, attackGEff, 4);
+	SimpleAction attackGrenade(attackGCnd, attackGEff, 4);
+	planner.RegisterAction("AttackGrenade", attackGrenade);
 	
 	WorldState attackWCnd(t_attr_enums_map({	{"enemyStatus", {"VISIBLE", "IN_CLOSE_COMBAT_RANGE"}},
 												{"isWeaponDrawn",{"TRUE"}},
 												{"isWeaponLoaded",{"TRUE"}}}));
 	WorldState attackWEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
-	planner.RegisterAction("AttackWeapon", attackWCnd, attackWEff, 2);
+	SimpleAction attackWeapon(attackWCnd, attackGEff, 2);
+	planner.RegisterAction("AttackWeapon", attackWeapon);
 	
 	WorldState attackKCnd(t_attr_enum_map({	{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
 											{"isKnifeDrawn","TRUE"},
 											{"hasKnife","TRUE"} }));
 	WorldState attackKEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
-	planner.RegisterAction("AttackKnife", attackKCnd, attackKEff, 2);
-	
+	SimpleAction attackKnife(attackKCnd, attackKEff, 2);
+	planner.RegisterAction("AttackKnife", attackKnife);
+
+	WorldState healCnd(t_attr_enum_map({{"atPoint", "HEALING_STATION"}}));
+	WorldState healEff(t_attr_enum_map({{"hpLevel", "HIGH"}}));
+	SimpleAction heal(healCnd, healEff, 5);
+	planner.RegisterAction("Heal", heal);
+
+	WorldState refillAmmoAndGrenadesCnd(t_attr_enum_map({{"atPoint", "AMMO_BOX"}}));
+	WorldState refillAmmoAndGrenadesEff(t_attr_enum_map({{"ammoLeft", "FULL"},
+														 {"hasGrenades", "TRUE"}}));
+	SimpleAction refillAmmoAndGrenades(refillAmmoAndGrenadesCnd, refillAmmoAndGrenadesEff, 5);
+	planner.RegisterAction("RefillAmmoAndGrenades", refillAmmoAndGrenades);
 	//5. Pack the in-out structure 
 	Plan plan;
 	plan.StartingWs = start;
 	plan.GoalName = "KillEnemy";
 
-	//6.Create navigation pathfinder
-	std::ifstream fin("ata/test_matrix_set_30_0.txt");
-	matrix distanceMatrix(30, std::vector<u_int>(30));
-	MathHelper::ReadMtrxFromFile(distanceMatrix, fin);
-	std::map<std::string, std::vector<unsigned>> pointNameToVertexIds;
-	pointNameToVertexIds.insert({"COVER", {1, 5, 9, 17}});
-	pointNameToVertexIds.insert({"AMMO_BOX", {2, 13, 19}});
-	pointNameToVertexIds.insert({"HEALING_STATION", {6, 14}});
-	NavPathfinder navPathfinder(distanceMatrix, pointNameToVertexIds);
+	//6.
 	
 	//6. Construct plan
 	TelemetryData telemetryData;
-	ActionInputDataBase actionInputData;
-	actionInputData.NavPathfinder = &navPathfinder;
-	bool builtPlan = planner.ConstructPlan(plan, &telemetryData, &navPathfinder);
+	bool builtPlan = planner.ConstructPlan(plan, &telemetryData);
 
 	//6. Fetch results
 	if (builtPlan == true)

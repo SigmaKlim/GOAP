@@ -8,22 +8,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2b96d9d-4464-4050-b1e3-f9237ac1656e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/GOAP2/ActionInputDataBase.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/CustomFunctions.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/NavPathfinder.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/NavPathfinder.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/IAction.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/InputData.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/SimpleAction.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BitMask" beforeDir="false" afterPath="$PROJECT_DIR$/BitMask" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Action.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Action.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Action.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Action.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/AStar.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/AStar.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Action.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Action.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/ActionInputDataBase.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/CustomFunctions.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/MathHelper.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/MathHelper.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/MathHelper.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/MathHelper.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/NumPathfinder.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Pathfind.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/AStar.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Plan.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GPlanner.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Plan.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GPlanner.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Source.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Source.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj.user" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/GPlanner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GPlanner.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/GPlanner.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GPlanner.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/NavPathfinder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/NavPathfinder.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/NavPathfinder.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/NavPathfinder.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Testing.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Testing.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/World.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/World.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.h" afterDir="false" />
@@ -43,6 +45,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/unordered_map" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/utility" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/xmemory" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/utility" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/xhash" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/xmemory" root0="SKIP_HIGHLIGHTING" />
@@ -151,7 +154,10 @@
       <workItem from="1703147589179" duration="16117000" />
       <workItem from="1703227491978" duration="8914000" />
       <workItem from="1703501035345" duration="4676000" />
-      <workItem from="1703579907875" duration="12913000" />
+      <workItem from="1703579907875" duration="17335000" />
+      <workItem from="1703660768786" duration="9080000" />
+      <workItem from="1703690661219" duration="3373000" />
+      <workItem from="1703748852555" duration="11195000" />
     </task>
     <servers />
   </component>
@@ -176,12 +182,12 @@
         </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/GOAP2/GPlanner.h</url>
-          <line>65</line>
+          <line>66</line>
           <option name="timeStamp" value="30" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/GOAP2/Testing.h</url>
-          <line>226</line>
+          <line>257</line>
           <option name="timeStamp" value="35" />
         </line-breakpoint>
       </breakpoints>

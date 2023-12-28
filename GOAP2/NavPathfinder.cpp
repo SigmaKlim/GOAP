@@ -9,14 +9,14 @@ NavPathfinder::NavPathfinder(const matrix& distanceMatrix,
     _pointNameToVertexIds = pointNameToVertexId;
 }
 
-void NavPathfinder::GetNeighbors(std::vector<unsigned>& neighbors, const unsigned& vertex, const unsigned& finish, void* userData) const
+void NavPathfinder::GetNeighbors(std::vector<unsigned>& neighbors, const unsigned& vertex, const unsigned& finish) const
 {
     for (unsigned i = 0; i < _numVertices; i++)
         if (_distanceMatrix[vertex][i] < MathHelper::INFTY)
             neighbors.push_back(i);
 }
 
-bool NavPathfinder::Satisfies(const unsigned& vertex, const unsigned& finish, void* userData) const
+bool NavPathfinder::Satisfies(const unsigned& vertex, const unsigned& finish) const
 {
     return vertex == finish;
 }
@@ -26,7 +26,7 @@ unsigned NavPathfinder::GetId(const unsigned& vertex) const
     return vertex;
 }
 
-unsigned NavPathfinder::GetDistance(const unsigned& from, const unsigned& to, void* userData) const
+unsigned NavPathfinder::GetDistance(const unsigned& from, const unsigned& to) const
 {
     return _distanceMatrix[from][to];
 }
@@ -36,7 +36,7 @@ unsigned NavPathfinder::EmulateGetCurrentVertex() const
     return std::rand() % _numVertices;
 }
 
-unsigned NavPathfinder::EmulateGetClosestObjectByName(const std::string& name) const
+unsigned NavPathfinder::EmulateGetDestinationVertexByName(const std::string& name) const
 {
     const auto& it = _pointNameToVertexIds.find(name);
     if (it == _pointNameToVertexIds.end())

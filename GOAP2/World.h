@@ -15,7 +15,7 @@ struct Vertex;
 
 struct WorldState
 {
-	friend class Action;
+	friend class IAction;
 	friend class GPlanner;
 								WorldState(const BitMask& valueMask, const BitMask& affectedAttributesMask);
 								//a constructor for states where each attribute has a concrete single value, used for action effects and actual world states
@@ -29,7 +29,9 @@ struct WorldState
 	WorldState&					operator=				(const WorldState& other);
 								~WorldState				();
 	bool						SetAttributeValue		(const std::string& name, u_char value);
+	bool						SetAttributeValue		(const std::string& name, const std::string& enumerator);
 	bool						SetAttributeValue		(unsigned index, u_char value);
+	
 	std::vector<u_char>			GetAttributeValues		(unsigned index) const;
 	std::vector<u_char>			GetAttributeValues		(const std::string& name) const;
 	std::vector<std::string>	GetAttributeEnumerators	(const std::string& name) const;
@@ -51,9 +53,15 @@ private:
 	BitMask							_valueMask; //1s on position of all affected  values within an attribute, 00..0 blocks on positions of all unaffected attributes
 	BitMask							_affectedAttributesMask; // auxiliary mask; 11..1 blocks on positions of all affected attributes, 00..0 blocks on other positions
 	
+	//debug
+	static const bool _isInDebugMode = true;
+	std::unordered_map <std::string, std::vector <std::string>> _debugAttributeValueList;
+	void UpdateDebugAttributeValueList();
+	//
+
 	static std::set<std::string>	_attributeNames;
 	static unsigned					_numAttributes;
-	static GPlanner*				_planner;
+	static GPlanner*				_planner; //shitty design, rework!!!
 
 };
 
