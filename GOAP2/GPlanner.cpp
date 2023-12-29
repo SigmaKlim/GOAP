@@ -169,7 +169,7 @@ void GPlanner::GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex
     {
         WorldState nextState; //change state by action
         auto& action = GetAction(actionName);
-        if (actionName == "TakeCover")
+        if (actionName == "GoTo")
             std::cout << "";
         if (IsActionUseful(nextState, vertex.ActiveConditionSet, action)) //check if nextState is closer to finish_ than vertex_.state and does not corrupt conditionSet
         {

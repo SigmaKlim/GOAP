@@ -98,17 +98,13 @@ WorldState::~WorldState()
 }
 bool WorldState::SetAttributeValue(const std::string& name, u_char value)
 {
-	auto attributeOffset = FindAttribute(name);
-	if (attributeOffset == _numAttributes)
+	auto attributeIndex = FindAttribute(name);
+	if (attributeIndex == _numAttributes)
 	{
 		std::cout << "Incorrect attribute name: " + name + "\n";
 		exit(-1);
 	}
-	_valueMask.SetBitValue(attributeOffset * Attribute::MAX_VALUES + value, 1);
-	_affectedAttributesMask = BitMask::MakeRightOnes(_valueMask.GetNumBits(), Attribute::MAX_VALUES);
-	_affectedAttributesMask <<= attributeOffset * Attribute::MAX_VALUES;
-	UpdateDebugAttributeValueList();
-	return true;
+	return SetAttributeValue(attributeIndex, value);
 }
 
 bool WorldState::SetAttributeValue(const std::string& name, const std::string& enumerator)
@@ -125,8 +121,9 @@ bool WorldState::SetAttributeValue(unsigned index, u_char value)
 		exit(-1);
 	}
 	_valueMask.SetBitValue(index * Attribute::MAX_VALUES + value, 1);
-	_affectedAttributesMask = BitMask::MakeRightOnes(_valueMask.GetNumBits(), Attribute::MAX_VALUES);
-	_affectedAttributesMask <<= index * Attribute::MAX_VALUES;
+	BitMask tmpAffectedAttributesMask = BitMask::MakeRightOnes(_valueMask.GetNumBits(), Attribute::MAX_VALUES);
+	tmpAffectedAttributesMask <<= index * Attribute::MAX_VALUES;
+	_affectedAttributesMask |= tmpAffectedAttributesMask;
 	UpdateDebugAttributeValueList();
 	return true;
 }

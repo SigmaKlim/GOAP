@@ -141,7 +141,7 @@ inline int TestGoap()
 	planner.RegisterGoal("StayHealthy", t_attr_enum_map({{"hpLevel", "HIGH"}}));
 	
 	//3. Define start state of the world
-	WorldState start(	t_attr_enum_map({	{"pose", "CROUCHING"},
+	WorldState start(	t_attr_enum_map({	{"pose", "STANDING"},
 											{"atPoint", "ARBITRARY"},
 											{"coverStatus", "NOT_IN_COVER"},
 											{"isWeaponDrawn", "FALSE"},
@@ -226,7 +226,7 @@ inline int TestGoap()
 												{"isWeaponDrawn",{"TRUE"}},
 												{"isWeaponLoaded",{"TRUE"}}}));
 	WorldState attackWEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
-	SimpleAction attackWeapon(attackWCnd, attackGEff, 2);
+	SimpleAction attackWeapon(attackWCnd, attackWEff, 2);
 	planner.RegisterAction("AttackWeapon", attackWeapon);
 	
 	WorldState attackKCnd(t_attr_enum_map({	{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
