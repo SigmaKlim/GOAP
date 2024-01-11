@@ -133,6 +133,13 @@ const WorldState& GPlanner::GetGoal(const std::string& name) const
 
 bool GPlanner::ConstructPlan(Plan& plan, TelemetryData* telemetryData, void* userData) const
 {
+    if (plan.StartingWs.GetAffectedAttributesMask() !=
+        BitMask::MakeAllOnes(plan.StartingWs.GetAffectedAttributesMask().GetNumBits()))
+    {
+        std::cout << "Failed to construct plan: You didn't set all attributes in starting state.\n";
+        return false;
+    }
+        
     Path<Vertex> path;
     const auto& goal = GetGoal(plan.GoalName);
     std::set<std::string> availableActionNames;
@@ -196,7 +203,7 @@ BitMask GPlanner::GetId(const Vertex& vertex) const
 unsigned GPlanner::GetDistance(const Vertex& from, const Vertex& to) const
 {
     auto& action = GetAction(to.PrevActionName);
-    CalculateActionCostInputData actionData;
+    CalculateActionCostInputBase actionData;
     actionData.prevState = &from.ActiveConditionSet;
     return action.GetCost(&actionData);
 }
@@ -216,7 +223,7 @@ unsigned GPlanner::GetHeuristic(const Vertex& vertex, const Vertex& target, void
 
 bool GPlanner::IsActionUseful(WorldState& modifiedConditionSet, const WorldState& conditionSet, const IAction& action) const
 {
-    EvaluateActionEffectInputData actionData;
+    EvaluateActionEffectInputBase actionData;
     actionData.DesiredStateMask = &conditionSet;
     BitMask significantConditionSet = conditionSet._valueMask & action.GetEffect(&actionData)._affectedAttributesMask; //leave only conditions affected by effects of the action
     BitMask significantActionEffects = conditionSet._affectedAttributesMask & action.GetEffect(&actionData)._valueMask; //leave only effects that influence conditions from the condition set

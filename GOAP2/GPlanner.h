@@ -47,7 +47,7 @@ public:
 	const IAction&		GetAction			(const std::string& name) const;
 	const WorldState&	GetGoal				(const std::string& name) const;
 	bool				ConstructPlan		(Plan& plan, TelemetryData* telemetryData = nullptr, void* userData = nullptr) const;
-
+	
 	const std::unordered_map<std::string, Attribute>& GetAttributeCatalogue() const;
 	const unsigned MAX_ATTRIBUTES = std::numeric_limits<unsigned>::digits;
 
@@ -61,8 +61,8 @@ private:
 	unsigned GetHeuristic(const Vertex& vertex, const Vertex& target, void* userData = nullptr) const override;
 
 	//The function checks if the action satisfies any conditions from the set and does not violate any specific rules. If so, returns
-	//true, evaluates resulted condition set after the action has been included in the plan and sets modifiedConditionSet to it. Otherwise,
-	//returns false.
+	//true, evaluates resulted condition set after the action has been included in the plan and sets modifiedConditionSet to it.
+	//Otherwise, returns false.
 	bool IsActionUseful	 (WorldState& modifiedConditionSet, const WorldState& conditionSet, const IAction& action) const;
 	std::unordered_map<std::string, WorldState> _goalCatalogue;
 	std::unordered_map<std::string, IAction&>	_actionCatalogue;

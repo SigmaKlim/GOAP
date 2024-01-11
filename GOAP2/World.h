@@ -11,7 +11,7 @@ typedef std::unordered_map<std::string,std::string> t_attr_enum_map;
 typedef std::unordered_map<std::string, std::vector<std::string>> t_attr_enums_map;
 typedef std::unordered_map<std::string, unsigned> t_attr_mask_map;
 
-struct Vertex;
+//struct Vertex;
 
 struct WorldState
 {
@@ -28,9 +28,12 @@ struct WorldState
 								WorldState				(const WorldState& other);
 	WorldState&					operator=				(const WorldState& other);
 								~WorldState				();
-	bool						SetAttributeValue		(const std::string& name, u_char value);
-	bool						SetAttributeValue		(const std::string& name, const std::string& enumerator);
-	bool						SetAttributeValue		(unsigned index, u_char value);
+	bool						SetAttributeValues		(const std::string& name, const std::vector<std::string>& enumerators);
+	bool						ClearAttributeValue		(const std::string& name);
+	bool						ClearAttributeValue		(unsigned index);
+	bool						AddAttributeValue		(const std::string& name, u_char value);
+	bool						AddAttributeValue		(const std::string& name, const std::string& enumerator);
+	bool						AddAttributeValue		(unsigned index, u_char value);
 	
 	std::vector<u_char>			GetAttributeValues		(unsigned index) const;
 	std::vector<u_char>			GetAttributeValues		(const std::string& name) const;

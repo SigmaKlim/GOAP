@@ -15,7 +15,7 @@ public:
     GoToAction(NavPathfinder& navPathfinder, const WorldState& condition);
 
     WorldState  GetCondition()                                          const override;
-    WorldState  GetEffect(const EvaluateActionEffectInputData* data)    const override;
-    unsigned    GetCost(const CalculateActionCostInputData* data)       const override;
+    WorldState  GetEffect(EvaluateActionEffectInputBase* data)    const override;
+    unsigned    GetCost(CalculateActionCostInputBase* data)       const override;
     std::string GetPostfixName(const WorldState& desiredState)          const override;
 };

@@ -111,46 +111,41 @@ inline int TestGoap()
 												 "STANDING"});
 	planner.RegisterAttribute("coverStatus",	{"IN_COVER",
 												 "NOT_IN_COVER"});
-	planner.RegisterAttribute("isWeaponDrawn",	{"FALSE",
-												 "TRUE"});
-	planner.RegisterAttribute("isWeaponLoaded", {"FALSE",
-												 "TRUE"});
-	planner.RegisterAttribute("isKnifeDrawn",	{"FALSE",
-												 "TRUE"});
-	planner.RegisterAttribute("isGrenadeDrawn",	{"FALSE",
-												 "TRUE"});
+	planner.RegisterAttribute("weaponDrawn",	{"RIFLE",
+												 "KNIFE",
+												 "GRENADE"});
+	planner.RegisterAttribute("ammoLeftInMagazine", {"NO",
+													 "LOW",
+													 "AVERAGE",
+													 "FULL"});
 	planner.RegisterAttribute("enemyStatus",	{"IN_CLOSE_COMBAT_RANGE",
 												 "VISIBLE",
 												 "NON_VISIBLE",
 												 "DEAD"});
 	planner.RegisterAttribute("hasGrenades",	{"FALSE",
 												 "TRUE"});
-	planner.RegisterAttribute("hasKnife",		{"FALSE",
-												 "TRUE" });
 	planner.RegisterAttribute("hpLevel",		{"LOW",
 												 "AVERAGE",
 												 "HIGH"});
-	planner.RegisterAttribute("ammoLeft", { "NO",
-											"LOW",
-											"AVERAGE",
-											"FULL"});
+	planner.RegisterAttribute("ammoLeftInBag", { "NO",
+												 "LOW",
+												 "AVERAGE",
+												 "FULL"});
 
 	//2. Register all goals
 	planner.RegisterGoal("GetToCover",t_attr_enum_map({	{"coverStatus", "IN_COVER"}}));
 	planner.RegisterGoal("KillEnemy", t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
 	planner.RegisterGoal("StayHealthy", t_attr_enum_map({{"hpLevel", "HIGH"}}));
+	planner.RegisterGoal("RefillAmmunition", t_attr_enum_map({ {"ammoLeftInBag", "FULL"} }));
 	
 	//3. Define start state of the world
-	WorldState start(	t_attr_enum_map({	{"pose", "STANDING"},
+	WorldState start(	t_attr_enum_map({	{"pose", "CROUCHING"},
 											{"atPoint", "ARBITRARY"},
-											{"coverStatus", "NOT_IN_COVER"},
-											{"isWeaponDrawn", "FALSE"},
-											{"isWeaponLoaded", "FALSE"},
-											{"isKnifeDrawn", "FALSE"},
-											{"isGrenadeDrawn", "FALSE"},
+											{"coverStatus", "IN_COVER"},
+											{"weaponDrawn", "KNIFE"},
+											{"ammoLeftInMagazine", "NO"},
 											{"enemyStatus", "NON_VISIBLE"},
-											{"ammoLeft", "NO"},
-											{"hasKnife", "FALSE"},
+											{"ammoLeftInBag", "NO"},
 											{"hasGrenades", "FALSE"},
 											{"hpLevel", "AVERAGE"}}));
 
@@ -176,24 +171,23 @@ inline int TestGoap()
 	SimpleAction standUp(standUpCnd, standUpEff, 2);
 	planner.RegisterAction("StandUp", standUp);
 	
-	WorldState drawWeaponCnd;
-	WorldState drawWeaponEff(t_attr_enum_map({{"isWeaponDrawn", "TRUE"}}));
-	SimpleAction drawWeapon(drawWeaponCnd, drawWeaponEff, 3);
-	planner.RegisterAction("DrawWeapon", drawWeapon);
+	WorldState drawRifleCnd;
+	WorldState drawRifleEff(t_attr_enum_map({ {"weaponDrawn", "RIFLE"} }));
+	SimpleAction drawRifle(drawRifleCnd, drawRifleEff, 3);
 	
 	WorldState drawKnifeCnd;
-	WorldState drawKnifeEff(t_attr_enum_map({{"isKnifeDrawn", "TRUE"}}));
+	WorldState drawKnifeEff(t_attr_enum_map({{"weaponDrawn", "KNIFE"}}));
 	SimpleAction drawKnife(drawKnifeCnd, drawKnifeEff, 1);
 	planner.RegisterAction("DrawKnife", drawKnife);
 	
 	WorldState drawGrenadeCnd(t_attr_enum_map({{"hasGrenades", "TRUE"}}));
-	WorldState drawGrenadeEff(t_attr_enum_map({{"isGrenadeDrawn", "TRUE"}}));
+	WorldState drawGrenadeEff(t_attr_enum_map({{"weaponDrawn", "GRENADE"}}));
 	SimpleAction drawGrenade(drawGrenadeCnd, drawGrenadeEff, 2);
 	planner.RegisterAction("DrawGrenade", drawGrenade);
 	
-	WorldState reloadCnd(t_attr_enums_map({	{"ammoLeft", {"AVERAGE", "FULL"}}, 
-											{"isWeaponDrawn", {"TRUE"}}}));
-	WorldState reloadEff(t_attr_enum_map({	{"isWeaponLoaded", "TRUE"}}));
+	WorldState reloadCnd(t_attr_enums_map({	{"ammoLeftInBag", {"AVERAGE", "FULL"}}, 
+											{"weaponDrawn", {"RIFLE"}}}));
+	WorldState reloadEff(t_attr_enum_map({	{"ammoLeftInMagazine", "FULL"}}));
 	SimpleAction reload(reloadCnd, reloadEff, 3);
 	planner.RegisterAction("Reload", reload);
 	
@@ -217,21 +211,20 @@ inline int TestGoap()
 	planner.RegisterAction("MoveAwayFromEnemy", moveAwayFromEnemy);
 	
 	WorldState attackGCnd(t_attr_enum_map({	{"enemyStatus", "VISIBLE"},
-											{"isGrenadeDrawn","TRUE"}}));
+											{"weaponDrawn","GRENADE"}}));
 	WorldState attackGEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
 	SimpleAction attackGrenade(attackGCnd, attackGEff, 4);
 	planner.RegisterAction("AttackGrenade", attackGrenade);
 	
-	WorldState attackWCnd(t_attr_enums_map({	{"enemyStatus", {"VISIBLE", "IN_CLOSE_COMBAT_RANGE"}},
-												{"isWeaponDrawn",{"TRUE"}},
-												{"isWeaponLoaded",{"TRUE"}}}));
-	WorldState attackWEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
-	SimpleAction attackWeapon(attackWCnd, attackWEff, 2);
-	planner.RegisterAction("AttackWeapon", attackWeapon);
+	WorldState attackRCnd(t_attr_enums_map({	{"enemyStatus", {"VISIBLE", "IN_CLOSE_COMBAT_RANGE"}},
+												{"weaponDrawn",{"RIFLE"}},
+												{"ammoLeftInMagazine",{"FULL"}}}));
+	WorldState attackREff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
+	SimpleAction attackRifle(attackRCnd, attackREff, 2);
+	planner.RegisterAction("AttackRifle", attackRifle);
 	
-	WorldState attackKCnd(t_attr_enum_map({	{"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
-											{"isKnifeDrawn","TRUE"},
-											{"hasKnife","TRUE"} }));
+	WorldState attackKCnd(t_attr_enum_map({ {"enemyStatus", "IN_CLOSE_COMBAT_RANGE"},
+											{"weaponDrawn","KNIFE"} }));
 	WorldState attackKEff(t_attr_enum_map({	{"enemyStatus", "DEAD"}}));
 	SimpleAction attackKnife(attackKCnd, attackKEff, 2);
 	planner.RegisterAction("AttackKnife", attackKnife);
@@ -242,7 +235,7 @@ inline int TestGoap()
 	planner.RegisterAction("Heal", heal);
 
 	WorldState refillAmmoAndGrenadesCnd(t_attr_enum_map({{"atPoint", "AMMO_BOX"}}));
-	WorldState refillAmmoAndGrenadesEff(t_attr_enum_map({{"ammoLeft", "FULL"},
+	WorldState refillAmmoAndGrenadesEff(t_attr_enum_map({{"ammoLeftInBag", "FULL"},
 														 {"hasGrenades", "TRUE"}}));
 	SimpleAction refillAmmoAndGrenades(refillAmmoAndGrenadesCnd, refillAmmoAndGrenadesEff, 5);
 	planner.RegisterAction("RefillAmmoAndGrenades", refillAmmoAndGrenades);

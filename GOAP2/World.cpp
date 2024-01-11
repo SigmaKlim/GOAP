@@ -96,29 +96,72 @@ WorldState& WorldState::operator=(const WorldState& other)
 WorldState::~WorldState()
 {
 }
-bool WorldState::SetAttributeValue(const std::string& name, u_char value)
+
+bool WorldState::SetAttributeValues(const std::string& name, const std::vector<std::string>& enumerators)
 {
 	auto attributeIndex = FindAttribute(name);
 	if (attributeIndex == _numAttributes)
 	{
 		std::cout << "Incorrect attribute name: " + name + "\n";
-		exit(-1);
+		return false;
 	}
-	return SetAttributeValue(attributeIndex, value);
+	ClearAttributeValue(attributeIndex);
+	for (auto& enumerator : enumerators)
+	{
+		AddAttributeValue(attributeIndex, _planner->GetAttribute(name).GetEnumValue(enumerator));
+	}
 }
 
-bool WorldState::SetAttributeValue(const std::string& name, const std::string& enumerator)
+bool WorldState::ClearAttributeValue(const std::string& name)
 {
-	return SetAttributeValue(name, _planner->GetAttribute(name).GetEnumValue(enumerator));
+	auto attributeIndex = FindAttribute(name);
+	if (attributeIndex == _numAttributes)
+	{
+		std::cout << "Incorrect attribute name: " + name + "\n";
+		return false;
+	}
+	return ClearAttributeValue(attributeIndex);
 }
 
-bool WorldState::SetAttributeValue(unsigned index, u_char value)
+bool WorldState::ClearAttributeValue(unsigned index)
 {
 	if (index > _numAttributes)
 	{
 		std::cout << "Index(" + std::to_string(index) + ") exceeds numAttributes(" +
 			std::to_string(_numAttributes) + ").\n";
-		exit(-1);
+		return false;
+	}
+	BitMask tmpMask = BitMask::MakeRightOnes(_valueMask.GetNumBits(), Attribute::MAX_VALUES);
+	tmpMask <<= index * Attribute::MAX_VALUES;
+	tmpMask.Invert();
+	_valueMask &= tmpMask;
+	_affectedAttributesMask &= tmpMask;
+	return true;
+}
+
+bool WorldState::AddAttributeValue(const std::string& name, u_char value)
+{
+	auto attributeIndex = FindAttribute(name);
+	if (attributeIndex == _numAttributes)
+	{
+		std::cout << "Incorrect attribute name: " + name + "\n";
+		return false;
+	}
+	return AddAttributeValue(attributeIndex, value);
+}
+
+bool WorldState::AddAttributeValue(const std::string& name, const std::string& enumerator)
+{
+	return AddAttributeValue(name, _planner->GetAttribute(name).GetEnumValue(enumerator));
+}
+
+bool WorldState::AddAttributeValue(unsigned index, u_char value)
+{
+	if (index > _numAttributes)
+	{
+		std::cout << "Index(" + std::to_string(index) + ") exceeds numAttributes(" +
+			std::to_string(_numAttributes) + ").\n";
+		return false;
 	}
 	_valueMask.SetBitValue(index * Attribute::MAX_VALUES + value, 1);
 	BitMask tmpAffectedAttributesMask = BitMask::MakeRightOnes(_valueMask.GetNumBits(), Attribute::MAX_VALUES);

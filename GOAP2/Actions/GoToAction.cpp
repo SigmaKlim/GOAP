@@ -13,7 +13,7 @@ WorldState GoToAction::GetCondition() const
 }
 
 
-WorldState GoToAction::GetEffect(const EvaluateActionEffectInputData* data) const
+WorldState GoToAction::GetEffect(EvaluateActionEffectInputBase* data) const
 {
    /* unsigned attributeIndex = WorldState::FindAttribute(atPointAttributeName);
     BitMask affectedAttributeMask = BitMask::MakeRightOnes(WorldState::GetAttributeNumber() * Attribute::MAX_VALUES, Attribute::MAX_VALUES);
@@ -24,14 +24,14 @@ WorldState GoToAction::GetEffect(const EvaluateActionEffectInputData* data) cons
     auto values = data->DesiredStateMask->GetAttributeValues(atPointAttributeName);
     if (values.size() != 0)
     {
-        effect.SetAttributeValue(atPointAttributeName, values[0]);
-        effect.SetAttributeValue(enemyStatusAttributeName, "NON_VISIBLE");
+        effect.AddAttributeValue(atPointAttributeName, values[0]);
+        effect.AddAttributeValue(enemyStatusAttributeName, "NON_VISIBLE");
     }
 
     return effect;
 }
 
-unsigned GoToAction::GetCost(const CalculateActionCostInputData* data) const
+unsigned GoToAction::GetCost(CalculateActionCostInputBase* data) const
 {
     auto enums = data->prevState->GetAttributeEnumerators(atPointAttributeName);
     assert(enums.size() == 1);

@@ -17,11 +17,11 @@ struct SimpleAction : IAction
     {
         return _condition;
     }
-    WorldState GetEffect(const EvaluateActionEffectInputData* data) const override
+    WorldState GetEffect(EvaluateActionEffectInputBase* data) const override
     {
         return _effect;
     }
-    unsigned GetCost(const CalculateActionCostInputData* data) const override
+    unsigned GetCost(CalculateActionCostInputBase* data) const override
     {
         return _cost;
     }

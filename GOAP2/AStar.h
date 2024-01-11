@@ -141,7 +141,7 @@ public:
 							neighborElement->getKey()._distFromStart > neighborNode._distFromStart)
 				{
 					discovered.decreaseKey(neighborElement, neighborNode);
-					assert(cameFrom.insert_or_assign(neighborId, currentNode._id).second == true);
+					cameFrom.insert_or_assign(neighborId, currentNode._id).second;
 				}
 			}
 			neighborVertices.clear();
