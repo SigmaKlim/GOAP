@@ -4,13 +4,13 @@
 #include <iostream>
 #include <cmath>
 #pragma optimize( "", off )
-void MathHelper::MakeEmptyMatrix(mtrx& result, u_int dim)
+void MathHelper::MakeEmptyMatrix(matrix& result, u_int dim)
 {
-	result = mtrx(dim);
+	result = matrix(dim);
 	for (size_t i = 0; i < dim; i++)
 		result[i] = std::vector<u_int>(dim);
 }
-void MathHelper::MakeRndMtrx(mtrx& result, u_int dim, u_int lower, u_int upper)
+void MathHelper::MakeRndMtrx(matrix& result, u_int dim, u_int lower, u_int upper)
 {
 	MakeEmptyMatrix(result, dim);
 	for (size_t i = 0; i < dim; i++)
@@ -20,18 +20,18 @@ void MathHelper::MakeRndMtrx(mtrx& result, u_int dim, u_int lower, u_int upper)
 	}
 }
 
-void MathHelper::MakeRndIncidenceMatrx(mtrx& result, u_int dim, float discChance)
+void MathHelper::MakeRndIncidenceMatrx(matrix& result, u_int dim, float discChance)
 {
 	MakeEmptyMatrix(result, dim);
 	int discValue = discChance * 100.0f;
 	for (size_t i = 0; i < dim; i++)
 	{
 		for (size_t j = 0; j < dim; j++)
-			result[i][j] = (rand() % 101 <= discValue || i == j) ? U_INFTY : 1 + u_int(rand() % 100);
+			result[i][j] = (rand() % 101 <= discValue || i == j) ? INFTY : 1 + u_int(rand() % 100);
 	}
 }
 
-int MathHelper::PrintMtrxToFile(const mtrx& toPrint,  std::ofstream& fout, unsigned char separator)
+int MathHelper::PrintMtrxToFile(const matrix& toPrint,  std::ofstream& fout, unsigned char separator)
 {
 	if (fout.is_open() == false)
 		return -1;
@@ -45,7 +45,7 @@ int MathHelper::PrintMtrxToFile(const mtrx& toPrint,  std::ofstream& fout, unsig
 	return 0;
 }
 
-int MathHelper::ReadMtrxFromFile(mtrx& result, std::ifstream& fin, /*int startingPos,*/ unsigned char separator)
+int MathHelper::ReadMtrxFromFile(matrix& result, std::ifstream& fin, /*int startingPos,*/ unsigned char separator)
 {
 	if (fin.is_open() == false)
 		return -1;
@@ -69,10 +69,10 @@ int MathHelper::ReadMtrxFromFile(mtrx& result, std::ifstream& fin, /*int startin
 	return 0;
 }
 
-void MathHelper::ToAdjacencyList(mtrx& incidence, mtrx& result)
+void MathHelper::ToAdjacencyList(matrix& incidence, matrix& result)
 {
 	auto dim = incidence.size();
-	result = mtrx(dim*dim, std::vector<u_int>(3)); //from, to, dist
+	result = matrix(dim*dim, std::vector<u_int>(3)); //from, to, dist
 	for (u_int i = 0; i < dim; i++)
 		for (u_int j = 0; j < dim; j++)
 			result[i * dim + j] = { i, j, incidence[i][j] };		

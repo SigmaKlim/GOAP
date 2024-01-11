@@ -4,7 +4,7 @@
 #include <iostream> 
 #include <fstream>
 #include "MathHelper.h"
-#include "Pathfind.hpp"
+#include "AStar.h"
 
 #include "Testing.h"
 #pragma optimize( "", off )

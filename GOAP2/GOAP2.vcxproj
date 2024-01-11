@@ -133,20 +133,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Action.cpp" />
+    <ClCompile Include="Actions\GoToAction.cpp" />
     <ClCompile Include="MathHelper.cpp" />
-    <ClCompile Include="Plan.cpp" />
+    <ClCompile Include="GPlanner.cpp" />
+    <ClCompile Include="NavPathfinder.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Action.h" />
+    <ClInclude Include="Actions\IAction.h" />
+    <ClInclude Include="Actions\InputData.h" />
+    <ClInclude Include="Actions\GoToAction.h" />
+    <ClInclude Include="Actions\SimpleAction.h" />
     <ClInclude Include="Attribute.h" />
     <ClInclude Include="FibonacciHeap.hpp" />
-    <ClInclude Include="NumPathfinder.h" />
-    <ClInclude Include="Pathfind.hpp" />
+    <ClInclude Include="AStar.h" />
     <ClInclude Include="MathHelper.h" />
-    <ClInclude Include="Plan.h" />
+    <ClInclude Include="GPlanner.h" />
+    <ClInclude Include="NavPathfinder.h" />
     <ClInclude Include="Testing.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>

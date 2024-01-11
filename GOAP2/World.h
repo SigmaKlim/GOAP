@@ -8,42 +8,69 @@
 #include "BitMask.h"
 #include <boost/functional/hash.hpp>
 typedef std::unordered_map<std::string,std::string> t_attr_enum_map;
+typedef std::unordered_map<std::string, std::vector<std::string>> t_attr_enums_map;
+typedef std::unordered_map<std::string, unsigned> t_attr_mask_map;
 
-struct Vertex;
+//struct Vertex;
 
 struct WorldState
 {
-	friend class Action;
+	friend class IAction;
 	friend class GPlanner;
+								WorldState(const BitMask& valueMask, const BitMask& affectedAttributesMask);
+								//a constructor for states where each attribute has a concrete single value, used for action effects and actual world states
 								WorldState				(const t_attr_enum_map& nameValuePairs);
+								//a constructor for states where each attribute has a set of values, used for conditions
+								WorldState				(const t_attr_enums_map& nameValuePairs);
+								//a constructor for states where each attribute has a set of values, used for conditions
+								WorldState				(const t_attr_mask_map& nameValuePairs);
 								WorldState				();
 								WorldState				(const WorldState& other);
 	WorldState&					operator=				(const WorldState& other);
 								~WorldState				();
-	bool						SetAttributeValue		(const std::string& name, u_char value);
-	bool						SetAttributeValue		(const unsigned index, u_char value);
-	std::vector<u_char>			GetAttributeValues(const unsigned index) const;
+	bool						SetAttributeValues		(const std::string& name, const std::vector<std::string>& enumerators);
+	bool						ClearAttributeValue		(const std::string& name);
+	bool						ClearAttributeValue		(unsigned index);
+	bool						AddAttributeValue		(const std::string& name, u_char value);
+	bool						AddAttributeValue		(const std::string& name, const std::string& enumerator);
+	bool						AddAttributeValue		(unsigned index, u_char value);
+	
+	std::vector<u_char>			GetAttributeValues		(unsigned index) const;
 	std::vector<u_char>			GetAttributeValues		(const std::string& name) const;
 	std::vector<std::string>	GetAttributeEnumerators	(const std::string& name) const;
-
+	unsigned					GetAttributeMask		(unsigned index) const;
+	const BitMask& GetValueMask() const;
+	const BitMask& GetAffectedAttributesMask() const;
+	
+	
 	static const std::set<std::string>& GetAttributeNamesSet();
-	static bool IsActionUseful	 (WorldState& modifiedConditionSet,  const WorldState& conditionSet, const Action& action);
+	//static bool IsActionUseful	 (WorldState& modifiedConditionSet, const WorldState& conditionSet, const Action& action, const void* userData);
 	//Returns the position of the attribute and numAttributes if the attribute was not found.
-	static unsigned		FindAttribute	 (const std::string& name); 
-private:
+	static unsigned		FindAttribute	 (const std::string& name);
 
+	static unsigned		GetAttributeNumber();
+private:
+	
+
+	
 	BitMask							_valueMask; //1s on position of all affected  values within an attribute, 00..0 blocks on positions of all unaffected attributes
 	BitMask							_affectedAttributesMask; // auxiliary mask; 11..1 blocks on positions of all affected attributes, 00..0 blocks on other positions
 	
+	//debug
+	static const bool _isInDebugMode = true;
+	std::unordered_map <std::string, std::vector <std::string>> _debugAttributeValueList;
+	void UpdateDebugAttributeValueList();
+	//
+
 	static std::set<std::string>	_attributeNames;
 	static unsigned					_numAttributes;
-	static GPlanner*				_planner;
+	static GPlanner*				_planner; //shitty design, rework!!!
 
 };
 
 inline std::size_t hash_value(const BitMask& mask)
 {
-	std::size_t hash;
+	std::size_t hash = 0;
 	boost::hash<unsigned> hasher;
 	for (unsigned i = 0; i < mask.GetNumCells(); i++)
 		boost::hash_combine(hash, hasher(mask[i]));
