@@ -10,17 +10,6 @@
     <list default="true" id="f2b96d9d-4464-4050-b1e3-f9237ac1656e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BitMask" beforeDir="false" afterPath="$PROJECT_DIR$/BitMask" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/AStar.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/AStar.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/IAction.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/IAction.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/InputData.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/InputData.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/SimpleAction.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/SimpleAction.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/GPlanner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GPlanner.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/GPlanner.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GPlanner.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Testing.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Testing.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/World.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/World.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,6 +141,8 @@
       <workItem from="1703748852555" duration="14157000" />
       <workItem from="1703836393791" duration="3571000" />
       <workItem from="1704020072819" duration="4127000" />
+      <workItem from="1704975961344" duration="2131000" />
+      <workItem from="1705045949156" duration="73000" />
     </task>
     <servers />
   </component>
