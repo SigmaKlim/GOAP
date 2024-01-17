@@ -156,10 +156,13 @@ bool GPlanner::ConstructPlan(Plan& plan, TelemetryData* telemetryData, void* use
     {
         unsigned index = path.Vertices.size() - i;
         plan._actionNames[i - 1] = path.Vertices[index].PrevActionName;
+        std::string postfix;
         if (index > 0)
-            plan._actionNames[i - 1] += " " + GetAction(plan._actionNames[i - 1]).GetPostfixName(path.Vertices[index - 1].ActiveConditionSet);
+            postfix = GetAction(plan._actionNames[i - 1]).GetPostfixName(path.Vertices[index - 1].ActiveConditionSet);
         else
-            plan._actionNames[i - 1] += " " + GetAction(plan._actionNames[i - 1]).GetPostfixName(plan.StartingWs);
+            postfix = GetAction(plan._actionNames[i - 1]).GetPostfixName(plan.StartingWs);
+        if (postfix != "")
+            plan._actionNames[i - 1] += " " + postfix;
     }
     plan._cost = path.Cost;
     return true;
