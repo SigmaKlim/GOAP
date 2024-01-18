@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream> 
 #include <fstream>
-#include "MathHelper.h"
+#include "Tools/MathHelper.h"
 
 #include "GPlanner.h"
 #include "BitMask.h"

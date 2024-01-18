@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include "AStar.h"
 #include "BitMask.h"
-
+#include "Tools\Catalogue.h"
 struct Vertex
 {
 	Vertex	()  = default;
@@ -65,7 +65,8 @@ private:
 	//Otherwise, returns false.
 	bool IsActionUseful	 (WorldState& modifiedConditionSet, const WorldState& conditionSet, const IAction& action) const;
 	std::unordered_map<std::string, WorldState> _goalCatalogue;
-	std::unordered_map<std::string, IAction&>	_actionCatalogue;
+	Catalogue<const IAction*> _actionCatalogue;
+	//std::unordered_map<std::string, IAction&>	_actionCatalogue;
 	std::unordered_map<std::string, Attribute> _attributeCatalogue;
 };
 

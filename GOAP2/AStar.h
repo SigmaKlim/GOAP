@@ -7,8 +7,8 @@
 #include <string>
 #include <iostream>
 
-#include "MathHelper.h"
-#include "FibonacciHeap.hpp"
+#include "Tools/MathHelper.h"
+#include "Tools/FibonacciHeap.hpp"
 #include <unordered_set>
 #include <unordered_map>
 #include <boost/functional/hash.hpp>

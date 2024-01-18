@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream> 
 #include <fstream>
-#include "MathHelper.h"
+#include "Tools/MathHelper.h"
 #include "AStar.h"
 
 #include "Testing.h"
