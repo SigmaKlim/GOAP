@@ -220,6 +220,7 @@
     <ClInclude Include="Actions\SimpleAction.h" />
     <ClInclude Include="Attribute.h" />
     <ClInclude Include="AStar.h" />
+    <ClInclude Include="Attributes\IAttribute.h" />
     <ClInclude Include="GPlanner.h" />
     <ClInclude Include="NavPathfinder.h" />
     <ClInclude Include="Testing.h" />

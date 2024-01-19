@@ -4,13 +4,41 @@
 template <typename t_obj>
 class Catalogue
 {
-    ~Catalogue();
 public:
+    Catalogue() : namesLoop(names), objectsLoop(objects) {};
+    ~Catalogue();
     bool                AddItem     (const std::string& name, const t_obj& object);
-    const t_obj*        GetItem     (size_t id);
-    const std::string*  GetName     (size_t id);
+    const t_obj*        GetItem     (size_t id) const;
+    const std::string*  GetName     (size_t id) const;
     size_t              GetId       (const std::string& name);
     bool                RemoveItem  (const std::string& name);
+    size_t              Size        () const;
+    struct NamesRangeLoop
+    {
+        NamesRangeLoop(const std::vector<const std::string*>& names) : Names(names) {}
+        auto begin() const
+        {
+            return Names.begin();
+        }
+        auto end() const
+        {
+            return Names.end;
+        }
+        const std::vector<const std::string*>& Names;
+    } namesLoop; // for range-loop by names
+    struct ObjectRangeLoop
+    {
+        ObjectRangeLoop(const std::vector<t_obj>& objects) : Objects(objects) {}
+        auto begin() const
+        {
+            return Objects.begin();
+        }
+        auto end() const
+        {
+            return Objects.end;
+        }
+        const std::vector<t_obj>& Objects;
+    } objectsLoop; // for range-loop by objects
 private:
     std::unordered_map<std::string, size_t> nameIdMap;
     std::vector<const std::string*> names;
@@ -40,19 +68,19 @@ bool Catalogue<t_obj>::AddItem(const std::string& name, const t_obj& object)
 }
 
 template <typename t_obj>
-const t_obj* Catalogue<t_obj>::GetItem(size_t id)
+const t_obj* Catalogue<t_obj>::GetItem(size_t id) const
 {
     if (id >= size)
         return nullptr;
-    return objects + id;
+    return &objects[id];
 }
 
 template <typename t_obj>
-const std::string* Catalogue<t_obj>::GetName(size_t id)
+const std::string* Catalogue<t_obj>::GetName(size_t id) const
 {
     if (id >= size)
         return nullptr;
-    return objects + id;
+    return names[id];
 }
 
 template <typename t_obj>
@@ -71,9 +99,15 @@ bool Catalogue<t_obj>::RemoveItem(const std::string& name)
     if (search == nameIdMap.end())
         return false;
     size_t id = search->second;
-    objects.erase(objects + id);
-    names.erase(names + id);
+    objects.erase(objects.begin() + id);
+    names.erase(names.begin() + id);
     nameIdMap.erase(search);
     
+}
+
+template <typename t_obj>
+size_t Catalogue<t_obj>::Size() const
+{
+    return size;
 }
 

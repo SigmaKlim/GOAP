@@ -9,12 +9,12 @@
 struct Vertex
 {
 	Vertex	()  = default;
-	Vertex	(const WorldState& state, const std::set <std::string>& availableActionNames, const std::string& prevActionName) :
-					AvailableActionNames(availableActionNames), ActiveConditionSet(state), PrevActionName(prevActionName){}
+	Vertex	(const WorldState& state, /*const std::set <std::size_t>& availableActionIds,*/ size_t prevActionId) :
+					/*AvailableActionIds(availableActionIds),*/ ActiveConditionSet(state), PrevActionId(prevActionId){}
 
-	std::set<std::string> AvailableActionNames;
+	//std::set<size_t> AvailableActionIds;
 	WorldState ActiveConditionSet; //A set of conditions required for all previously taken actions
-	std::string PrevActionName;
+	std::size_t PrevActionId;
 };
 
 struct Plan
@@ -40,11 +40,13 @@ public:
 						~GPlanner			() override = default;
 	bool				RegisterAttribute	(const std::string& name, const Attribute& attribute);
 	bool				RegisterAttribute	(const std::string& name, const std::vector<std::string>& enumerators);
-	bool				RegisterAction		(const std::string& name, IAction& action);
+	template<typename t_action>
+	bool				RegisterAction		(const std::string& name, const t_action& action);
+	//bool				RegisterAction		(const std::string& name, IAction& action);
 	bool				RegisterGoal		(const std::string& name, const WorldState& goal_);
 	bool				RegisterGoal		(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs);
 	const Attribute&	GetAttribute		(const std::string& name) const;
-	const IAction&		GetAction			(const std::string& name) const;
+						const IAction* GetAction(size_t id) const;
 	const WorldState&	GetGoal				(const std::string& name) const;
 	bool				ConstructPlan		(Plan& plan, TelemetryData* telemetryData = nullptr, void* userData = nullptr) const;
 	
@@ -70,8 +72,16 @@ private:
 	std::unordered_map<std::string, Attribute> _attributeCatalogue;
 };
 
-
-
-
-
-
+//Copy you action object to planner's memory. Object type must support IAction interface and have copy-constructor.
+template <typename t_action>
+bool GPlanner::RegisterAction(const std::string& name, const t_action& action)
+{
+	if (dynamic_cast<const IAction*>(&action) == nullptr)
+	{
+		std::cout << "Failed to register action " << name <<
+			". This type does not implement IAction interface.\n";
+		return false;	
+	}
+	IAction* iaction = new t_action(action);
+	return _actionCatalogue.AddItem(name, iaction);
+}
