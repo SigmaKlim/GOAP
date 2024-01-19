@@ -8,9 +8,11 @@ public:
     Catalogue() : namesLoop(names), objectsLoop(objects) {};
     ~Catalogue();
     bool                AddItem     (const std::string& name, const t_obj& object);
+    bool                Contains    (const std::string& name) const;
     const t_obj*        GetItem     (size_t id) const;
+    const t_obj*        GetItem     (const std::string& name) const;
     const std::string*  GetName     (size_t id) const;
-    size_t              GetId       (const std::string& name);
+    const size_t*       GetId       (const std::string& name) const;
     bool                RemoveItem  (const std::string& name);
     size_t              Size        () const;
     struct NamesRangeLoop
@@ -22,7 +24,7 @@ public:
         }
         auto end() const
         {
-            return Names.end;
+            return Names.end();
         }
         const std::vector<const std::string*>& Names;
     } namesLoop; // for range-loop by names
@@ -68,11 +70,26 @@ bool Catalogue<t_obj>::AddItem(const std::string& name, const t_obj& object)
 }
 
 template <typename t_obj>
+bool Catalogue<t_obj>::Contains(const std::string& name) const
+{
+    return nameIdMap.find(name) != nameIdMap.end();
+}
+
+template <typename t_obj>
 const t_obj* Catalogue<t_obj>::GetItem(size_t id) const
 {
     if (id >= size)
         return nullptr;
     return &objects[id];
+}
+
+template <typename t_obj>
+const t_obj* Catalogue<t_obj>::GetItem(const std::string& name) const
+{
+    auto* id = GetId(name);
+    if (id == nullptr)
+        return nullptr;
+    return GetItem(*id);
 }
 
 template <typename t_obj>
@@ -84,12 +101,12 @@ const std::string* Catalogue<t_obj>::GetName(size_t id) const
 }
 
 template <typename t_obj>
-size_t Catalogue<t_obj>::GetId(const std::string& name)
+const size_t* Catalogue<t_obj>::GetId(const std::string& name) const
 {
     auto search = nameIdMap.find(name);
     if (search == nameIdMap.end())
-        return size;
-    return search->second;
+        return nullptr;
+    return &search->second;
 }
 
 template <typename t_obj>
@@ -102,7 +119,7 @@ bool Catalogue<t_obj>::RemoveItem(const std::string& name)
     objects.erase(objects.begin() + id);
     names.erase(names.begin() + id);
     nameIdMap.erase(search);
-    
+    return true;
 }
 
 template <typename t_obj>

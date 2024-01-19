@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include "IAction.h"
+#include "Action.h"
 
-struct SimpleAction : IAction
+struct SimpleAction : public Action
 {
     WorldState  _condition;
     WorldState  _effect;

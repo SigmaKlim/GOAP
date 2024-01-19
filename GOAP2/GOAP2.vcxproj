@@ -214,13 +214,13 @@
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actions\IAction.h" />
+    <ClInclude Include="Actions\Action.h" />
     <ClInclude Include="Actions\InputData.h" />
     <ClInclude Include="Actions\GoToAction.h" />
     <ClInclude Include="Actions\SimpleAction.h" />
-    <ClInclude Include="Attribute.h" />
     <ClInclude Include="AStar.h" />
-    <ClInclude Include="Attributes\IAttribute.h" />
+    <ClInclude Include="Attributes\Attribute.h" />
+    <ClInclude Include="Attributes\SimpleAttribute.h" />
     <ClInclude Include="GPlanner.h" />
     <ClInclude Include="NavPathfinder.h" />
     <ClInclude Include="Testing.h" />

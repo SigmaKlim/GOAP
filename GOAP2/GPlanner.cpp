@@ -17,50 +17,50 @@ unsigned Plan::GetCost() const
 
 GPlanner::GPlanner()
 {
-    WorldState::_planner = this;
+    WorldState::_attributeCatalogue = &_attributeCatalogue;
 }
 
-bool GPlanner::RegisterAttribute(const std::string& name, const Attribute& attribute)
-{
-    bool contains =  (_attributeCatalogue.find(name) != _attributeCatalogue.end());
-    if (contains)
-    {
-        std::cout << "The Planner already contains attribute \"" + name + "\".\n";
-        return false;
-    }
-    bool isOutOfRange = (_attributeCatalogue.size() == MAX_ATTRIBUTES);
-    if (isOutOfRange == true)
-    {
-        std::cout << "Can't register attribute \"" + name + 
-            "\": number of attributes reached MAX_ATTRIBUTES(" + std::to_string(MAX_ATTRIBUTES) + ").\n";
-        return false;
-    }
-    _attributeCatalogue.insert(std::make_pair(std::string(name), attribute));
-    WorldState::_attributeNames.emplace(std::string(name));
-    WorldState::_numAttributes++;
-    return true;
-}
-
-bool GPlanner::RegisterAttribute(const std::string& name, const std::vector<std::string>& enumerators)
-{
-    bool contains = (_attributeCatalogue.find(name) != _attributeCatalogue.end());
-    if (contains)
-    {
-        std::cout << "The Planner already contains attribute \"" + name + "\".\n";
-        return false;
-    }
-    bool isOutOfRange = _attributeCatalogue.size() == MAX_ATTRIBUTES;
-    if (isOutOfRange == true)
-    {
-        std::cout << "Can't register attribute \"" + name +
-            "\": number of attributes reached MAX_ATTRIBUTES(" + std::to_string(MAX_ATTRIBUTES) + ").\n";
-        return false;
-    }
-    _attributeCatalogue.emplace(std::make_pair(std::string(name), Attribute(enumerators)));
-    WorldState::_attributeNames.emplace(std::string(name));
-    WorldState::_numAttributes++;
-    return true;
-}
+// bool GPlanner::RegisterAttribute(const std::string& name, const Attribute& attribute)
+// {
+//     bool contains =  (_attributeCatalogue.find(name) != _attributeCatalogue.end());
+//     if (contains)
+//     {
+//         std::cout << "The Planner already contains attribute \"" + name + "\".\n";
+//         return false;
+//     }
+//     bool isOutOfRange = (_attributeCatalogue.size() == MAX_ATTRIBUTES);
+//     if (isOutOfRange == true)
+//     {
+//         std::cout << "Can't register attribute \"" + name + 
+//             "\": number of attributes reached MAX_ATTRIBUTES(" + std::to_string(MAX_ATTRIBUTES) + ").\n";
+//         return false;
+//     }
+//     _attributeCatalogue.insert(std::make_pair(std::string(name), attribute));
+//     WorldState::_attributeNames.emplace(std::string(name));
+//     WorldState::_numAttributes++;
+//     return true;
+// }
+//
+// bool GPlanner::RegisterAttribute(const std::string& name, const std::vector<std::string>& enumerators)
+// {
+//     bool contains = (_attributeCatalogue.find(name) != _attributeCatalogue.end());
+//     if (contains)
+//     {
+//         std::cout << "The Planner already contains attribute \"" + name + "\".\n";
+//         return false;
+//     }
+//     bool isOutOfRange = _attributeCatalogue.size() == MAX_ATTRIBUTES;
+//     if (isOutOfRange == true)
+//     {
+//         std::cout << "Can't register attribute \"" + name +
+//             "\": number of attributes reached MAX_ATTRIBUTES(" + std::to_string(MAX_ATTRIBUTES) + ").\n";
+//         return false;
+//     }
+//     _attributeCatalogue.emplace(std::make_pair(std::string(name), Attribute(enumerators)));
+//     WorldState::_attributeNames.emplace(std::string(name));
+//     WorldState::_numAttributes++;
+//     return true;
+// }
 
 // bool GPlanner::RegisterAction(const std::string& name, IAction& action)
 // {
@@ -86,30 +86,20 @@ bool GPlanner::RegisterGoal	(const std::string& name, const WorldState& goal_)
     return true;
 }
 
-bool GPlanner::RegisterGoal(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs)
-{
-    bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
-    if (contains == true)
-    {
-        std::cout << "The Planner already contains goal \"" + name + "\".\n";
-        return false;
-    }
-    _goalCatalogue.insert(std::make_pair(std::string(name), WorldState(nameValuePairs)));
-    return true;
-}
+// bool GPlanner::RegisterGoal(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs)
+// {
+//     bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
+//     if (contains == true)
+//     {
+//         std::cout << "The Planner already contains goal \"" + name + "\".\n";
+//         return false;
+//     }
+//     _goalCatalogue.insert(std::make_pair(std::string(name), WorldState(nameValuePairs)));
+//     return true;
+// }
 
-const Attribute& GPlanner::GetAttribute(const std::string& name) const
-{
-    auto search = _attributeCatalogue.find(name);
-    if (search == _attributeCatalogue.end())
-    {
-        std::cout << "Attribute \"" + name + "\" is not in the catalogue\n";
-        return Attribute();
-    }
-    return search->second;
-}
 
-const IAction* GPlanner::GetAction(size_t id) const
+const Action* GPlanner::GetAction(size_t id) const
 {
     auto* action = _actionCatalogue.GetItem(id);
     if (action == nullptr)
@@ -167,10 +157,11 @@ bool GPlanner::ConstructPlan(Plan& plan, TelemetryData* telemetryData, void* use
     return true;
 }
 
-const std::unordered_map<std::string, Attribute>& GPlanner::GetAttributeCatalogue() const
+const Catalogue<const Attribute*>& GPlanner::GetAttributeCatalogue() const
 {
     return _attributeCatalogue;
 }
+
 
 void GPlanner::GetNeighbors(std::vector<Vertex>& neighbors, const Vertex& vertex, const Vertex& finish) const
 {
@@ -212,13 +203,13 @@ unsigned GPlanner::GetHeuristic(const Vertex& vertex, const Vertex& target, void
     {
         unsigned conditionAttribute = vertex.ActiveConditionSet.GetAttributeMask(i);
         unsigned targetAttribute = target.ActiveConditionSet.GetAttributeMask(i);
-        diff += (conditionAttribute != (targetAttribute & conditionAttribute));
+        auto attribute = *_attributeCatalogue.GetItem(i);
+        diff += attribute->GetDifference(conditionAttribute, targetAttribute);
     }
     return diff;
-    //return 0;
 }
 
-bool GPlanner::IsActionUseful(WorldState& modifiedConditionSet, const WorldState& conditionSet, const IAction& action) const
+bool GPlanner::IsActionUseful(WorldState& modifiedConditionSet, const WorldState& conditionSet, const Action& action) const
 {
     EvaluateActionEffectInputBase actionData;
     actionData.DesiredStateMask = &conditionSet;

@@ -15,11 +15,6 @@ WorldState GoToAction::GetCondition() const
 
 WorldState GoToAction::GetEffect(EvaluateActionEffectInputBase* data) const
 {
-   /* unsigned attributeIndex = WorldState::FindAttribute(atPointAttributeName);
-    BitMask affectedAttributeMask = BitMask::MakeRightOnes(WorldState::GetAttributeNumber() * Attribute::MAX_VALUES, Attribute::MAX_VALUES);
-    affectedAttributeMask <<= attributeIndex * Attribute::MAX_VALUES;
-    WorldState effect(data->DesiredStateMask->GetValueMask() & affectedAttributeMask, affectedAttributeMask);*/
-    //effect.SetAttributeValue(enemyStatusAttributeName, "NON_VISIBLE");
     WorldState effect;
     auto values = data->DesiredStateMask->GetAttributeValues(atPointAttributeName);
     if (values.size() != 0)

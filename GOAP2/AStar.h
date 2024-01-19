@@ -20,7 +20,7 @@ template <typename t_vertex>
 struct Path
 {
 	std::vector<t_vertex> Vertices;
-	int Cost = 0;
+	float Cost = 0;
 };
 
 //An internal class for constructing path in graph. The algorithm only uses ids to distinguish between nodes.

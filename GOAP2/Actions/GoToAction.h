@@ -1,8 +1,8 @@
 ﻿#pragma once
-#include "IAction.h"
+#include "Action.h"
 
 class NavPathfinder;
-struct GoToAction : IAction
+struct GoToAction : Action
 {
     //we assume that there are no complex conditions on 'atPoint' attribute!!!
     WorldState _condition;

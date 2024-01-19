@@ -8,11 +8,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2b96d9d-4464-4050-b1e3-f9237ac1656e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Attribute.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/SimpleAttribute.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/AStar.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/AStar.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/IAction.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/Action.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/SimpleAction.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/SimpleAction.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Attribute.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Attribute.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/IAttribute.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/GPlanner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GPlanner.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/GPlanner.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GPlanner.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Testing.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Testing.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Tools/Catalogue.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Tools/Catalogue.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/World.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/World.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +41,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/unordered_map" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/utility" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/vector" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/xmemory" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/utility" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/xhash" root0="SKIP_HIGHLIGHTING" />
@@ -146,7 +159,7 @@
       <workItem from="1704020072819" duration="4127000" />
       <workItem from="1704975961344" duration="2131000" />
       <workItem from="1705045949156" duration="73000" />
-      <workItem from="1705568882131" duration="9924000" />
+      <workItem from="1705568882131" duration="35152000" />
     </task>
     <servers />
   </component>
@@ -159,19 +172,9 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/GOAP2/Attribute.h</url>
-          <line>30</line>
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/GOAP2/Attribute.h</url>
-          <line>39</line>
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
         <line-breakpoint type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/GOAP2/GPlanner.h</url>
-          <line>68</line>
+          <line>74</line>
           <option name="timeStamp" value="30" />
         </line-breakpoint>
       </breakpoints>
