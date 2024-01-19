@@ -1,11 +1,11 @@
 #pragma once
 #include "../World.h"
 #include "InputData.h"
-class IAction
+class Action
 {
 public:
-						IAction() = default;
-	virtual 			~IAction() = default;
+						Action() = default;
+	virtual 			~Action() = default;
 
 	virtual WorldState	GetCondition() const = 0;
 	//Evaluates (if necessary) the effect of the action and returns it

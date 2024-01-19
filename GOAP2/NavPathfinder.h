@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "AStar.h"
-#include "MathHelper.h"
+#include "Tools/MathHelper.h"
 
 class NavPathfinder : public AStarSolver<unsigned, unsigned>
 {

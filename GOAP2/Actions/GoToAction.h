@@ -1,15 +1,15 @@
 ﻿#pragma once
-#include "IAction.h"
+#include "Action.h"
 
 class NavPathfinder;
-struct GoToAction : IAction
+struct GoToAction : Action
 {
-    //we assume that there are no complex conditions on 'atPoint' attribute!!!
+    //we assume that there are no complex conditions on 'location' attribute!!!
     WorldState _condition;
 private:
     NavPathfinder& _navPathfinder;
 public:
-    const std::string atPointAttributeName = "atPoint";
+    const std::string locationAttributeName = "location";
     const std::string enemyStatusAttributeName = "enemyStatus";
     
     GoToAction(NavPathfinder& navPathfinder, const WorldState& condition);

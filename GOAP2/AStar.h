@@ -7,8 +7,8 @@
 #include <string>
 #include <iostream>
 
-#include "MathHelper.h"
-#include "FibonacciHeap.hpp"
+#include "Tools/MathHelper.h"
+#include "Tools/FibonacciHeap.hpp"
 #include <unordered_set>
 #include <unordered_map>
 #include <boost/functional/hash.hpp>
@@ -20,7 +20,7 @@ template <typename t_vertex>
 struct Path
 {
 	std::vector<t_vertex> Vertices;
-	int Cost = 0;
+	float Cost = 0;
 };
 
 //An internal class for constructing path in graph. The algorithm only uses ids to distinguish between nodes.
