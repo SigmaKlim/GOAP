@@ -11,10 +11,12 @@
 #include "Actions/GoToAction.h"
 #include "Actions/SimpleAction.h"
 #include "NavPathfinder.h"
+#include "Attributes/LocationAttribute.h"
 #include "Attributes/SimpleAttribute.h"
+#include "Map/Navigator.h"
 #pragma optimize( "", off )
 
-typedef AttributeData ad;
+typedef std::vector<AttributeData> VectorAD;
 
 inline int TestNumeric()
 {
@@ -102,12 +104,20 @@ inline int TestGoap()
 	pointNameToVertexIds.insert({"AMMO_BOX", {2, 13, 19}});
 	pointNameToVertexIds.insert({"HEALING_STATION", {6, 14}});
 	NavPathfinder navPathfinder(distanceMatrix, pointNameToVertexIds);
+	//Create navigator
+	Navigator navigator;
+	navigator.AddPoint("COVER");
+	navigator.AddLocation("COVER", {1.0f, 2.0f, 0.0f});
+	navigator.AddPoint("AMMO_BOX");
+	navigator.AddLocation("AMMO_BOX", {4.0f, 2.0f, 0.0f});
+	navigator.AddPoint("HEALING_STATION");
+	navigator.AddLocation("HEALING_STATION", {5.0f, 2.0f, 0.0f});
 	
 	//0. Initialize planner
 	GPlanner planner;
 	//1. Register all attributes and enumerate their values
-	SimpleAttribute aAtPoint			({"ARBITRARY", "COVER", "HEALING_STATION", "AMMO_BOX"});
-	planner.RegisterAttribute				("atPoint", aAtPoint);
+	LocationAttribute aLocation(navigator, {"ARBITRARY", "COVER", "HEALING_STATION", "AMMO_BOX"});
+	planner.RegisterAttribute				("location", aLocation);
 	SimpleAttribute aPose				({"CROUCHING", "STANDING"});
 	planner.RegisterAttribute				("pose", aPose);
 	SimpleAttribute aCoverStatus		({"IN_COVER", "NOT_IN_COVER"});
@@ -126,146 +136,175 @@ inline int TestGoap()
 	planner.RegisterAttribute				("ammoLeftInBag", aAmmoLeftBag);
 
 	//2. Register all goals
-	WorldState gKill({ {"enemyStatus", {"DEAD"}} });
+	VectorAD gKillAD = {{"enemyStatus", {"DEAD"}}}; 
+	WorldState gKill(gKillAD);
 	planner.RegisterGoal("KillEnemy", gKill);
 	
 	//3. Define start state of the world
-	WorldState start({	{"pose",				{"CROUCHING"}},
-						{"atPoint",				{"ARBITRARY"}},
-						{"coverStatus",			{"IN_COVER"}},
-						{"weaponDrawn",			{"KNIFE"}},
-						{"ammoLeftInMagazine",	{"NO"}},
-						{"enemyStatus",			{"NON_VISIBLE"}},
-						{"ammoLeftInBag",		{"NO"}},
-						{"hasGrenades",			{"FALSE"}},
-						{"hpLevel",				{"AVERAGE"}}});
+	VectorAD startAD = {	{"pose",				{"CROUCHING"}},
+							{"location",				{"ARBITRARY"}},
+							{"coverStatus",			{"IN_COVER"}},
+							{"weaponDrawn",			{"KNIFE"}},
+							{"ammoLeftInMagazine",	{"NO"}},
+							{"enemyStatus",			{"NON_VISIBLE"}},
+							{"ammoLeftInBag",		{"NO"}},
+							{"hasGrenades",			{"FALSE"}},
+							{"hpLevel",				{"AVERAGE"}}};
+	WorldState start(startAD);
+	
+ 	//4. Register all available actions by defining their conditions and effects
+ 	WorldState crouchCnd;
+	VectorAD adv = {{"pose", {"CROUCHING"}}}; 
+ 	WorldState crouchEff(adv);
+ 	SimpleAction crouch(crouchCnd, crouchEff, 2);
+ 	planner.RegisterAction("Crouch", crouch);
 
-// 	//4. Register all available actions by defining their conditions and effects
-// 	WorldState crouchCnd;
-// 	WorldState crouchEff({"pose", {"CROUCHING"}});
-// 	SimpleAction crouch(crouchCnd, crouchEff, 2);
-// 	planner.RegisterAction("Crouch", crouch);
-// 	
-// 	WorldState goToCnd({"pose", {"STANDING"}});
-// 	GoToAction goTo(navPathfinder, goToCnd);
-// 	planner.RegisterAction("GoTo", goTo);
+	VectorAD goToCndAD = {{"pose",	{"STANDING"}}};
+  	WorldState goToCnd(goToCndAD);
+  	GoToAction goTo(navPathfinder, goToCnd);
+  	planner.RegisterAction("GoTo", goTo);
+	
+	adv = {	{"location",		{"COVER"}},
+			{"pose",		{"CROUCHING"}}};
+	WorldState takeCoverEff(adv);
+	adv = {{"coverStatus", {"IN_COVER"}}};
+	WorldState takeCoverCnd(adv);
+  	SimpleAction takeCover(takeCoverCnd, takeCoverEff, 2);
+  	planner.RegisterAction("TakeCover", takeCover);
+  	
+  	WorldState standUpCnd;
+	adv = {	{"pose",		{"STANDING"}},
+	 		{"coverStatus", {"NOT_IN_COVER"}}};
+  	WorldState standUpEff(adv);
+  	SimpleAction standUp(standUpCnd, standUpEff, 2);
+  	planner.RegisterAction("StandUp", standUp);
+ 	
+  	WorldState drawRifleCnd;
+	adv = { { "weaponDrawn", {"RIFLE"}} };
+  	WorldState drawRifleEff(adv);
+  	SimpleAction drawRifle(drawRifleCnd, drawRifleEff, 3);
+  	
+  	WorldState drawKnifeCnd;
+	adv = { { "weaponDrawn", {"KNIFE"} } };
+  	WorldState drawKnifeEff(adv);
+  	SimpleAction drawKnife(drawKnifeCnd, drawKnifeEff, 1);
+  	planner.RegisterAction("DrawKnife", drawKnife);
+  	
+	adv = { {"hasGrenades", {"TRUE"}} };
+  	WorldState drawGrenadeCnd(adv);
+	adv = { { "weaponDrawn", {"GRENADE"}} };
+  	WorldState drawGrenadeEff(adv);
+  	SimpleAction drawGrenade(drawGrenadeCnd, drawGrenadeEff, 2);
+  	planner.RegisterAction("DrawGrenade", drawGrenade);
+  	
+	adv = {	{"ammoLeftInBag",		{"AVERAGE", "FULL"}},
+			{"weaponDrawn",			{"RIFLE"}} };
+  	WorldState reloadCnd(adv);
+	adv = { { "ammoLeftInMagazine",	{"FULL"} } };
+  	WorldState reloadEff(adv);
+  	SimpleAction reload(reloadCnd, reloadEff, 3);
+  	planner.RegisterAction("Reload", reload);
+  	
+	adv = { {"pose",		{"STANDING"}},
+			{"enemyStatus", {"NON_VISIBLE"}} };
+  	WorldState searchCnd(adv);
+	adv = { {"enemyStatus", {"VISIBLE"}},
+							{"location",		{"ARBITRARY"}} };
+  	WorldState searchEff(adv);
+  	SimpleAction search(searchCnd, searchEff, 10);
+  	planner.RegisterAction("SearchEnemy", search);
+  	
+	adv = { { "enemyStatus",	{"VISIBLE"} } };
+  	WorldState approachCnd(adv);
+	adv = { {"enemyStatus",		{"IN_CLOSE_COMBAT_RANGE"}},
+			{"location",			{"ARBITRARY"}} };
+  	WorldState approachEff(adv);
+  	SimpleAction approachEnemy(approachCnd, approachEff, 7);
+  	planner.RegisterAction("ApproachEnemy", approachEnemy);
+  	
+	adv = { { "enemyStatus", {"IN_CLOSE_COMBAT_RANGE"} } };
+  	WorldState moveAwayFromEnemyCnd(adv);
+	adv = { {"enemyStatus", {"VISIBLE"}},
+			{"location",		{"ARBITRARY"}} };
+  	WorldState moveAwayFromEnemyEff(adv);
+  	SimpleAction moveAwayFromEnemy(moveAwayFromEnemyCnd, moveAwayFromEnemyEff, 7);
+  	planner.RegisterAction("MoveAwayFromEnemy", moveAwayFromEnemy);
+  	
+	adv = { {"enemyStatus", {"VISIBLE"}},
+			{"weaponDrawn",	{"GRENADE"}} };
+  	WorldState attackGCnd(adv);
+	adv = { {"enemyStatus", {"DEAD"}} };
+  	WorldState attackGEff(adv);
+  	SimpleAction attackGrenade(attackGCnd, attackGEff, 4);
+  	planner.RegisterAction("AttackGrenade", attackGrenade);
+  	
+	adv = { {"enemyStatus",			{"VISIBLE", "IN_CLOSE_COMBAT_RANGE"}},
+			{"weaponDrawn",			{"RIFLE"}},
+			{"ammoLeftInMagazine",	{"FULL"}} };
+  	WorldState attackRCnd(adv);
+	adv = { {"enemyStatus",	{"DEAD"}} };
+  	WorldState attackREff(adv);
+  	SimpleAction attackRifle(attackRCnd, attackREff, 2);
+  	planner.RegisterAction("AttackRifle", attackRifle);
+  	
+	adv = { {"enemyStatus", {"IN_CLOSE_COMBAT_RANGE"}},
+			{"weaponDrawn", {"KNIFE"}} };
+  	WorldState attackKCnd(adv);
+	adv = { { "enemyStatus",	{"DEAD"} } };
+  	WorldState attackKEff(adv);
+  	SimpleAction attackKnife(attackKCnd, attackKEff, 2);
+  	planner.RegisterAction("AttackKnife", attackKnife);
+	
+	adv = { {"location", {"HEALING_STATION"}} };
+  	WorldState healCnd(adv);
+	adv = { {"hpLevel", {"HIGH"}} };
+  	WorldState healEff(adv);
+  	SimpleAction heal(healCnd, healEff, 5);
+  	planner.RegisterAction("Heal", heal);
+	
+	adv = { {"location",			{"AMMO_BOX"}} };
+  	WorldState refillAmmoAndGrenadesCnd(adv);
+	adv = { {"ammoLeftInBag",	{"FULL"}},
+			{"hasGrenades",		{"TRUE"}} };
+  	WorldState refillAmmoAndGrenadesEff(adv);
+  	SimpleAction refillAmmoAndGrenades(refillAmmoAndGrenadesCnd, refillAmmoAndGrenadesEff, 5);
+  	planner.RegisterAction("RefillAmmoAndGrenades", refillAmmoAndGrenades);
+	 //5. Pack the in-out structure 
+	 Plan plan;
+	 plan.StartingWs = start;
+	 plan.GoalName = "KillEnemy";
+
+ 	//6.
+ 	
+ 	//6. Construct plan
+ 	TelemetryData telemetryData;
+ 	bool builtPlan = planner.ConstructPlan(plan, &telemetryData);
 //
-// 	WorldState takeCoverCnd({	{"atPoint",		{"COVER"}},
-// 								{"pose",		{"CROUCHING"}}});
-// 	WorldState takeCoverEff(	{"coverStatus", {"IN_COVER"}});
-// 	SimpleAction takeCover(takeCoverCnd, takeCoverEff, 2);
-// 	planner.RegisterAction("TakeCover", takeCover);
-// 	
-// 	WorldState standUpCnd;
-// 	WorldState standUpEff({		{"pose",		{"STANDING"}},
-// 								{"coverStatus", {"NOT_IN_COVER"}}});
-// 	SimpleAction standUp(standUpCnd, standUpEff, 2);
-// 	planner.RegisterAction("StandUp", standUp);
-// 	
-// 	WorldState drawRifleCnd;
-// 	WorldState drawRifleEff({"weaponDrawn", {"RIFLE"}});
-// 	SimpleAction drawRifle(drawRifleCnd, drawRifleEff, 3);
-// 	
-// 	WorldState drawKnifeCnd;
-// 	WorldState drawKnifeEff({"weaponDrawn", {"KNIFE"}});
-// 	SimpleAction drawKnife(drawKnifeCnd, drawKnifeEff, 1);
-// 	planner.RegisterAction("DrawKnife", drawKnife);
-// 	
-// 	WorldState drawGrenadeCnd({"hasGrenades", {"TRUE"}});
-// 	WorldState drawGrenadeEff({"weaponDrawn", {"GRENADE"}});
-// 	SimpleAction drawGrenade(drawGrenadeCnd, drawGrenadeEff, 2);
-// 	planner.RegisterAction("DrawGrenade", drawGrenade);
-// 	
-// 	WorldState reloadCnd({	{"ammoLeftInBag",	{"AVERAGE", "FULL"}},
-// 							{"weaponDrawn",		{"RIFLE"}}});
-// 	WorldState reloadEff(	{"ammoLeftInMagazine", "FULL"});
-// 	SimpleAction reload(reloadCnd, reloadEff, 3);
-// 	planner.RegisterAction("Reload", reload);
-// 	
-// 	WorldState searchCnd({	{"pose",		{"STANDING"}},
-// 											{"enemyStatus", {"NON_VISIBLE"}}});
-// 	WorldState searchEff({	{"enemyStatus", {"VISIBLE"}},
-// 							{"atPoint",		{"ARBITRARY"}}});
-// 	SimpleAction search(searchCnd, searchEff, 10);
-// 	planner.RegisterAction("SearchEnemy", search);
-// 	
-// 	WorldState approachCnd({"enemyStatus",	{"VISIBLE"}});
-// 	WorldState approachEff({{"enemyStatus", {"IN_CLOSE_COMBAT_RANGE"}},
-// 											{"atPoint", {"ARBITRARY"}}});
-// 	SimpleAction approachEnemy(approachCnd, approachEff, 7);
-// 	planner.RegisterAction("ApproachEnemy", approachEnemy);
-// 	
-// 	WorldState moveAwayFromEnemyCnd(	{"enemyStatus", {"IN_CLOSE_COMBAT_RANGE"}});
-// 	WorldState moveAwayFromEnemyEff({	{"enemyStatus", {"VISIBLE"}},
-// 										{"atPoint",{"ARBITRARY"}}});
-// 	SimpleAction moveAwayFromEnemy(moveAwayFromEnemyCnd, moveAwayFromEnemyEff, 7);
-// 	planner.RegisterAction("MoveAwayFromEnemy", moveAwayFromEnemy);
-// 	
-// 	WorldState attackGCnd({{	{"enemyStatus", "VISIBLE"},
-// 								{"weaponDrawn","GRENADE"}}});
-// 	WorldState attackGEff({"enemyStatus", "DEAD"});
-// 	SimpleAction attackGrenade(attackGCnd, attackGEff, 4);
-// 	planner.RegisterAction("AttackGrenade", attackGrenade);
-// 	
-// 	WorldState attackRCnd({	{"enemyStatus", {"VISIBLE", "IN_CLOSE_COMBAT_RANGE"}},
-// 												{"weaponDrawn",{"RIFLE"}},
-// 												{"ammoLeftInMagazine",{"FULL"}}});
-// 	WorldState attackREff({"enemyStatus", "DEAD"});
-// 	SimpleAction attackRifle(attackRCnd, attackREff, 2);
-// 	planner.RegisterAction("AttackRifle", attackRifle);
-// 	
-// 	WorldState attackKCnd({ {"enemyStatus", {"IN_CLOSE_COMBAT_RANGE"}},
-// 							{"weaponDrawn", {"KNIFE"}}});
-// 	WorldState attackKEff({"enemyStatus", "DEAD"});
-// 	SimpleAction attackKnife(attackKCnd, attackKEff, 2);
-// 	planner.RegisterAction("AttackKnife", attackKnife);
-//
-// 	WorldState healCnd({"atPoint", "HEALING_STATION"});
-// 	WorldState healEff({"hpLevel", "HIGH"});
-// 	SimpleAction heal(healCnd, healEff, 5);
-// 	planner.RegisterAction("Heal", heal);
-//
-// 	WorldState refillAmmoAndGrenadesCnd(	{"atPoint",			{"AMMO_BOX"}});
-// 	WorldState refillAmmoAndGrenadesEff({	{"ammoLeftInBag",	{"FULL"}},
-// 											{"hasGrenades",		{"TRUE"}}});
-// 	SimpleAction refillAmmoAndGrenades(refillAmmoAndGrenadesCnd, refillAmmoAndGrenadesEff, 5);
-// 	planner.RegisterAction("RefillAmmoAndGrenades", refillAmmoAndGrenades);
-// 	//5. Pack the in-out structure 
-// 	Plan plan;
-// 	plan.StartingWs = start;
-// 	plan.GoalName = "KillEnemy";
-//
-// 	//6.
-// 	
-// 	//6. Construct plan
-// 	TelemetryData telemetryData;
-// 	bool builtPlan = planner.ConstructPlan(plan, &telemetryData);
-//
-// 	//6. Fetch results
-// 	if (builtPlan == true)
-// 	{
-// 		std::cout << "Starting state:\n";
-// 		for (auto* attributeName : planner.GetAttributeCatalogue().namesLoop)
-// 		{
-// 			if (plan.StartingWs.GetAttributeEnumerators(*attributeName).size() != 1)
-// 				std::cout << "!";
-// 			std::cout << "\t" + *attributeName + ": " + plan.StartingWs.GetAttributeEnumerators(*attributeName)[0] + "\n";
-// 		}
-// 		std::cout << "Goal:\n";
-// 		std::cout << "\t" + plan.GoalName + "\n";
-// 		std::cout << "Plan started:\n";
-// 		for (auto i = 0; i < plan.GetActionSequence().size(); i++)
-// 			std::cout << "\t" << std::to_string(i + 1) << ". " << plan.GetActionSequence()[i] << "\n";
-// 		std::cout << "Plan completed\n";
-// 		std::cout << "Cost: " << std::to_string(plan.GetCost()) << "\n";
-// 		std::cout << "Memory used on stack: " << std::to_string(telemetryData.totalBytesUsed) << " bytes.\n";
-// 		std::cout << "Total vertices discovered: " << std::to_string(telemetryData.discoveredNum) << "\n";
-// 		std::cout << "Total vertices expanded: " << std::to_string(telemetryData.expandedNum) << "\n";
-// 	}
-// 	else
-// 		std::cout << "Could not construct a plan!";
-// 	return 0;
-// }
+ 	//6. Fetch results
+ 	if (builtPlan == true)
+ 	{
+ 		std::cout << "Starting state:\n";
+ 		for (auto* attributeName : planner.GetAttributeCatalogue().namesLoop)
+ 		{
+ 			if (plan.StartingWs.GetAttributeEnumerators(*attributeName).size() != 1)
+ 				std::cout << "!";
+ 			std::cout << "\t" + *attributeName + ": " + plan.StartingWs.GetAttributeEnumerators(*attributeName)[0] + "\n";
+ 		}
+ 		std::cout << "Goal:\n";
+ 		std::cout << "\t" + plan.GoalName + "\n";
+ 		std::cout << "Plan started:\n";
+ 		for (auto i = 0; i < plan.GetActionSequence().size(); i++)
+ 			std::cout << "\t" << std::to_string(i + 1) << ". " << plan.GetActionSequence()[i] << "\n";
+ 		std::cout << "Plan completed\n";
+ 		std::cout << "Cost: " << std::to_string(plan.GetCost()) << "\n";
+ 		std::cout << "Memory used on stack: " << std::to_string(telemetryData.totalBytesUsed) << " bytes.\n";
+ 		std::cout << "Total vertices discovered: " << std::to_string(telemetryData.discoveredNum) << "\n";
+ 		std::cout << "Total vertices expanded: " << std::to_string(telemetryData.expandedNum) << "\n";
+ 	}
+ 	else
+ 		std::cout << "Could not construct a plan!";
+ 	return 0;
+ }
 // inline int TestMask()
 // {
 // 	BitMask m1 = BitMask::MakeOne(100); //00..01
@@ -287,6 +326,6 @@ inline int TestGoap()
 // 	BitMask m8 = m7;
 // 	m7.SetBitValue(0, 0);
 // 	bool is7LargerThan8 = (m7 > m8); //false
-
-	return 0;
-}
+//
+//	return 0;
+//}

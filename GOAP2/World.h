@@ -25,7 +25,7 @@ struct WorldState
 								//WorldState(const BitMask& valueMask, const BitMask& affectedAttributesMask);
 								//a constructor for states where each attribute has a concrete single value, used for action effects and actual world states
 								//WorldState(const std)
-								WorldState(const std::initializer_list<AttributeData>& attributeEnumsPairs);
+								explicit WorldState(const std::vector<AttributeData>& attributeEnumsPairs);
 								//WorldState(const std::vector<AttributeTo1Enumerator>& attributeEnumPairs);	
 								//WorldState				(const t_attr_enum_map& nameValuePairs);
 								//a constructor for states where each attribute has a set of values, used for conditions
@@ -43,13 +43,16 @@ struct WorldState
 	//Sets attribute value for this state
 	bool						AddAttributeValue		(const std::string& attributeName, const std::string& enumeratorName);
 	bool						AddAttributeValue		(const std::string& attributeName, unsigned char value);
+
+	bool						AreAllAttributesSet		() const;
 	
-	std::vector<unsigned char>			GetAttributeValues		(unsigned index) const;
-	std::vector<unsigned char>			GetAttributeValues		(const std::string& name) const;
+	std::vector<unsigned char>	GetAttributeValues		(unsigned index) const;
+	std::vector<unsigned char>	GetAttributeValues		(const std::string& name) const;
 	std::vector<std::string>	GetAttributeEnumerators	(const std::string& name) const;
 	unsigned					GetAttributeMask		(unsigned index) const;
-	const BitMask& GetValueMask() const;
-	const BitMask& GetAffectedAttributesMask() const;
+
+	//const BitMask& GetValueMask() const;
+	//const BitMask& GetAffectedAttributesMask() const;
 	
 	
 	static const std::set<std::string>& GetAttributeNamesSet();

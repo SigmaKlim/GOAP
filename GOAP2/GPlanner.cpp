@@ -123,8 +123,7 @@ const WorldState& GPlanner::GetGoal(const std::string& name) const
 
 bool GPlanner::ConstructPlan(Plan& plan, TelemetryData* telemetryData, void* userData) const
 {
-    if (plan.StartingWs.GetAffectedAttributesMask() !=
-        BitMask::MakeAllOnes(plan.StartingWs.GetAffectedAttributesMask().GetNumBits()))
+    if (plan.StartingWs.AreAllAttributesSet() != true)
     {
         std::cout << "Failed to construct plan: You didn't set all attributes in starting state.\n";
         return false;

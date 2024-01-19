@@ -76,8 +76,10 @@ unsigned WorldState::_numAttributes = 0;
 // 	UpdateDebugAttributeValueList();
 // }
 
-WorldState::WorldState(const std::initializer_list<AttributeData>& attributeEnumsPairs)
+WorldState::WorldState(const std::vector<AttributeData>& attributeEnumsPairs)
 {
+	_valueMask = BitMask::MakeAllZeros(_numAttributes * MAX_NUM_ENUMERATORS);
+	_affectedAttributesMask = BitMask::MakeAllZeros(_numAttributes * MAX_NUM_ENUMERATORS);
 	for (auto& attributeEnumsPair : attributeEnumsPairs)
 	{
 		auto& attributeName = attributeEnumsPair.attributeName;
@@ -234,9 +236,14 @@ bool WorldState::AddAttributeValue(const std::string& attributeName, unsigned ch
 	return AddAttributeValue(*attributeIdPtr, value);
 }
 
+bool WorldState::AreAllAttributesSet() const
+{
+	 return _affectedAttributesMask == BitMask::MakeAllOnes(_affectedAttributesMask.GetNumBits());
+}
+
 bool WorldState::AddAttributeValue(size_t index, unsigned char value)
 {
-	if (index > _numAttributes)
+	if (index >= _numAttributes)
 	{
 		std::cout << "Index(" + std::to_string(index) + ") exceeds numAttributes(" +
 			std::to_string(_numAttributes) + ").\n";
@@ -305,15 +312,15 @@ unsigned WorldState::GetAttributeMask(unsigned index) const
 	
 }
 
-const BitMask& WorldState::GetValueMask() const
-{
-	return _valueMask;
-}
-
-const BitMask& WorldState::GetAffectedAttributesMask() const
-{
-	return _affectedAttributesMask;
-}
+// const BitMask& WorldState::GetValueMask() const
+// {
+// 	return _valueMask;
+// }
+//
+// const BitMask& WorldState::GetAffectedAttributesMask() const
+// {
+// 	return _affectedAttributesMask;
+// }
 
 unsigned WorldState::FindAttribute(const std::string& name)
 {
