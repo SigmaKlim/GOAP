@@ -8,15 +8,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2b96d9d-4464-4050-b1e3-f9237ac1656e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/LocationAttribute.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Map/Navigator.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/Attribute.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Attributes/Attribute.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/InputData.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/InputData.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Attribute.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/LocationAttribute.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Attributes/LocationAttribute.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/SimpleAttribute.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Attributes/SimpleAttribute.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/GPlanner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GPlanner.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Map/Navigator.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Navigation/Navigator.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/NavPathfinder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Navigation/NavPathfinder.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/NavPathfinder.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Navigation/NavPathfinder.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Testing.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Testing.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/World.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/World.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/World.h" afterDir="false" />

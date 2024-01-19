@@ -279,7 +279,7 @@ std::vector<unsigned char> WorldState::GetAttributeValues(const std::string& nam
 	return GetAttributeValues(index);
 }
 
-std::vector<std::string> WorldState::GetAttributeEnumerators(const std::string& name) const
+std::vector<std::string> WorldState::GetAttributeEnumeratorNames(const std::string& name) const
 {
 	auto index = FindAttribute(name);
 	if (index == _numAttributes)

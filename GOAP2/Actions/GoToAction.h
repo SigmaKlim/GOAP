@@ -1,18 +1,18 @@
 ﻿#pragma once
 #include "Action.h"
 
-class NavPathfinder;
+class Navigator;
 struct GoToAction : Action
 {
     //we assume that there are no complex conditions on 'location' attribute!!!
     WorldState _condition;
 private:
-    NavPathfinder& _navPathfinder;
+    Navigator& _navigator;
 public:
     const std::string locationAttributeName = "location";
     const std::string enemyStatusAttributeName = "enemyStatus";
     
-    GoToAction(NavPathfinder& navPathfinder, const WorldState& condition);
+    GoToAction(Navigator& navigator, const WorldState& condition);
 
     WorldState  GetCondition()                                          const override;
     WorldState  GetEffect(EvaluateActionEffectInputBase* data)    const override;

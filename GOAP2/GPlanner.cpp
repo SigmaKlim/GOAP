@@ -1,7 +1,7 @@
 #include "GPlanner.h"
 #include <iostream>
 #include "Actions/SimpleAction.h"
-#include "NavPathfinder.h"
+#include "Navigation/NavPathfinder.h"
 
 
 const std::vector<std::string>& Plan::GetActionSequence() const
@@ -149,7 +149,7 @@ bool GPlanner::ConstructPlan(Plan& plan, TelemetryData* telemetryData, void* use
             postfix = GetAction(actionIds[i - 1])->GetPostfixName(path.Vertices[index - 1].ActiveConditionSet);
         else
             postfix = GetAction(actionIds[i - 1])->GetPostfixName(plan.StartingWs);
-        if (postfix.empty())
+        if (!postfix.empty())
             plan._actionNames[i - 1] += " " + postfix;
     }
     plan._cost = path.Cost;
@@ -191,7 +191,7 @@ unsigned GPlanner::GetDistance(const Vertex& from, const Vertex& to) const
 {
     auto* action = *_actionCatalogue.GetItem(to.PrevActionId);
     CalculateActionCostInputBase actionData;
-    actionData.prevState = &from.ActiveConditionSet;
+    actionData.postState = &from.ActiveConditionSet;
     return action->GetCost(&actionData);
 }
 

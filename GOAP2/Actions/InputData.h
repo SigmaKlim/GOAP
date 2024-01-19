@@ -7,5 +7,5 @@ struct EvaluateActionEffectInputBase
 
 struct CalculateActionCostInputBase
 {
-    const WorldState* prevState = nullptr;
+    const WorldState* postState = nullptr; // the state after the action has been taken
 };

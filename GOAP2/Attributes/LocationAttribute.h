@@ -1,8 +1,6 @@
 ﻿#pragma once
 #include <assert.h>
-
-#include "Attribute.h"
-#include "../Map/Navigator.h"
+#include "../Navigation/Navigator.h"
 
 class LocationAttribute : public Attribute
 {
@@ -20,9 +18,9 @@ public:
         for (auto& value : conditionValues)
         {
             //random location for debug!!!
-            Location currentLocation = {(float)rand()/ RAND_MAX * 100.0f,
-                                        (float)rand()/ RAND_MAX * 100.0f,
-                                        (float)rand()/ RAND_MAX * 100.0f};
+            Location currentLocation = {(float)rand()/ RAND_MAX * 8.0f,
+                                        (float)rand()/ RAND_MAX * 8.0f,
+                                        (float)rand()/ RAND_MAX * 8.0f};
             float distance =_navigator.GetMinEuclideanDistance( currentLocation,
                                                                 *GetEnumeratorName(value),
                                                                 *GetEnumeratorName(targetValue));

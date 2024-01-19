@@ -2,7 +2,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "Attribute.h"
+
 
 //attribute as a simple unordered set of values
 class SimpleAttribute : public Attribute

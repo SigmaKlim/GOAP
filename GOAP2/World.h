@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include <limits>
-#include "Attribute.h"
+
 #include "BitMask.h"
 #include <boost/functional/hash.hpp>
 
@@ -48,7 +48,7 @@ struct WorldState
 	
 	std::vector<unsigned char>	GetAttributeValues		(unsigned index) const;
 	std::vector<unsigned char>	GetAttributeValues		(const std::string& name) const;
-	std::vector<std::string>	GetAttributeEnumerators	(const std::string& name) const;
+	std::vector<std::string>	GetAttributeEnumeratorNames	(const std::string& name) const;
 	unsigned					GetAttributeMask		(unsigned index) const;
 
 	//const BitMask& GetValueMask() const;

@@ -10,10 +10,10 @@
 #include "BitMask.h"
 #include "Actions/GoToAction.h"
 #include "Actions/SimpleAction.h"
-#include "NavPathfinder.h"
+#include "Navigation/NavPathfinder.h"
 #include "Attributes/LocationAttribute.h"
 #include "Attributes/SimpleAttribute.h"
-#include "Map/Navigator.h"
+#include "Navigation/Navigator.h"
 #pragma optimize( "", off )
 
 typedef std::vector<AttributeData> VectorAD;
@@ -161,7 +161,7 @@ inline int TestGoap()
 
 	VectorAD goToCndAD = {{"pose",	{"STANDING"}}};
   	WorldState goToCnd(goToCndAD);
-  	GoToAction goTo(navPathfinder, goToCnd);
+  	GoToAction goTo(navigator, goToCnd);
   	planner.RegisterAction("GoTo", goTo);
 	
 	adv = {	{"location",		{"COVER"}},
@@ -183,7 +183,8 @@ inline int TestGoap()
 	adv = { { "weaponDrawn", {"RIFLE"}} };
   	WorldState drawRifleEff(adv);
   	SimpleAction drawRifle(drawRifleCnd, drawRifleEff, 3);
-  	
+	planner.RegisterAction("DrawRifle", drawRifle);
+
   	WorldState drawKnifeCnd;
 	adv = { { "weaponDrawn", {"KNIFE"} } };
   	WorldState drawKnifeEff(adv);
@@ -235,7 +236,7 @@ inline int TestGoap()
   	WorldState attackGCnd(adv);
 	adv = { {"enemyStatus", {"DEAD"}} };
   	WorldState attackGEff(adv);
-  	SimpleAction attackGrenade(attackGCnd, attackGEff, 4);
+  	SimpleAction attackGrenade(attackGCnd, attackGEff, 400);
   	planner.RegisterAction("AttackGrenade", attackGrenade);
   	
 	adv = { {"enemyStatus",			{"VISIBLE", "IN_CLOSE_COMBAT_RANGE"}},
@@ -252,7 +253,7 @@ inline int TestGoap()
   	WorldState attackKCnd(adv);
 	adv = { { "enemyStatus",	{"DEAD"} } };
   	WorldState attackKEff(adv);
-  	SimpleAction attackKnife(attackKCnd, attackKEff, 2);
+  	SimpleAction attackKnife(attackKCnd, attackKEff, 200);
   	planner.RegisterAction("AttackKnife", attackKnife);
 	
 	adv = { {"location", {"HEALING_STATION"}} };
@@ -286,9 +287,9 @@ inline int TestGoap()
  		std::cout << "Starting state:\n";
  		for (auto* attributeName : planner.GetAttributeCatalogue().namesLoop)
  		{
- 			if (plan.StartingWs.GetAttributeEnumerators(*attributeName).size() != 1)
+ 			if (plan.StartingWs.GetAttributeEnumeratorNames(*attributeName).size() != 1)
  				std::cout << "!";
- 			std::cout << "\t" + *attributeName + ": " + plan.StartingWs.GetAttributeEnumerators(*attributeName)[0] + "\n";
+ 			std::cout << "\t" + *attributeName + ": " + plan.StartingWs.GetAttributeEnumeratorNames(*attributeName)[0] + "\n";
  		}
  		std::cout << "Goal:\n";
  		std::cout << "\t" + plan.GoalName + "\n";
