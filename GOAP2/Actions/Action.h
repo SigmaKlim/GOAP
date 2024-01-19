@@ -13,7 +13,7 @@ public:
 	//Calculates (if necessary) the cost of the action and returns it.
 	virtual unsigned	GetCost(CalculateActionCostInputBase* data = nullptr) const = 0;
 	//Returns calculated string. Useful for actions with customised effect/cost evaluation.
-	virtual std::string GetPostfixName(const WorldState& desiredState) const
+	virtual std::string GetEffectPostfix(const WorldState& desiredState) const
 	{
 		return "";
 	}

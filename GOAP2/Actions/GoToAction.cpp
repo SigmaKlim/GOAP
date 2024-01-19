@@ -44,7 +44,7 @@ unsigned GoToAction::GetCost(CalculateActionCostInputBase* data) const
     //return 0;
 }
 
-std::string GoToAction::GetPostfixName(const WorldState& desiredState) const
+std::string GoToAction::GetEffectPostfix(const WorldState& desiredState) const
 {
     auto enums = desiredState.GetAttributeEnumeratorNames(locationAttributeName);
     assert(enums.size() == 1);

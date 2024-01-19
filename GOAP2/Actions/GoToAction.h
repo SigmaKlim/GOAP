@@ -17,5 +17,5 @@ public:
     WorldState  GetCondition()                                          const override;
     WorldState  GetEffect(EvaluateActionEffectInputBase* data)    const override;
     unsigned    GetCost(CalculateActionCostInputBase* data)       const override;
-    std::string GetPostfixName(const WorldState& desiredState)          const override;
+    std::string GetEffectPostfix(const WorldState& desiredState)          const override;
 };

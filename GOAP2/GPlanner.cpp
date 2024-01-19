@@ -20,60 +20,6 @@ GPlanner::GPlanner()
     WorldState::_attributeCatalogue = &_attributeCatalogue;
 }
 
-// bool GPlanner::RegisterAttribute(const std::string& name, const Attribute& attribute)
-// {
-//     bool contains =  (_attributeCatalogue.find(name) != _attributeCatalogue.end());
-//     if (contains)
-//     {
-//         std::cout << "The Planner already contains attribute \"" + name + "\".\n";
-//         return false;
-//     }
-//     bool isOutOfRange = (_attributeCatalogue.size() == MAX_ATTRIBUTES);
-//     if (isOutOfRange == true)
-//     {
-//         std::cout << "Can't register attribute \"" + name + 
-//             "\": number of attributes reached MAX_ATTRIBUTES(" + std::to_string(MAX_ATTRIBUTES) + ").\n";
-//         return false;
-//     }
-//     _attributeCatalogue.insert(std::make_pair(std::string(name), attribute));
-//     WorldState::_attributeNames.emplace(std::string(name));
-//     WorldState::_numAttributes++;
-//     return true;
-// }
-//
-// bool GPlanner::RegisterAttribute(const std::string& name, const std::vector<std::string>& enumerators)
-// {
-//     bool contains = (_attributeCatalogue.find(name) != _attributeCatalogue.end());
-//     if (contains)
-//     {
-//         std::cout << "The Planner already contains attribute \"" + name + "\".\n";
-//         return false;
-//     }
-//     bool isOutOfRange = _attributeCatalogue.size() == MAX_ATTRIBUTES;
-//     if (isOutOfRange == true)
-//     {
-//         std::cout << "Can't register attribute \"" + name +
-//             "\": number of attributes reached MAX_ATTRIBUTES(" + std::to_string(MAX_ATTRIBUTES) + ").\n";
-//         return false;
-//     }
-//     _attributeCatalogue.emplace(std::make_pair(std::string(name), Attribute(enumerators)));
-//     WorldState::_attributeNames.emplace(std::string(name));
-//     WorldState::_numAttributes++;
-//     return true;
-// }
-
-// bool GPlanner::RegisterAction(const std::string& name, IAction& action)
-// {
-//     bool contains =  (_actionCatalogue.find(name) != _actionCatalogue.end());
-//     if (contains == true)
-//     {
-//         std::cout << "The Planner already contains action \"" + name + "\".\n";
-//         return false;
-//     }
-//     _actionCatalogue.insert({std::string(name), action});
-//     return true;
-// }
-
 bool GPlanner::RegisterGoal	(const std::string& name, const WorldState& goal_)
 {
     bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
@@ -85,19 +31,6 @@ bool GPlanner::RegisterGoal	(const std::string& name, const WorldState& goal_)
     _goalCatalogue.insert(std::make_pair(std::string(name), goal_ ));
     return true;
 }
-
-// bool GPlanner::RegisterGoal(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs)
-// {
-//     bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
-//     if (contains == true)
-//     {
-//         std::cout << "The Planner already contains goal \"" + name + "\".\n";
-//         return false;
-//     }
-//     _goalCatalogue.insert(std::make_pair(std::string(name), WorldState(nameValuePairs)));
-//     return true;
-// }
-
 
 const Action* GPlanner::GetAction(size_t id) const
 {
@@ -146,9 +79,9 @@ bool GPlanner::ConstructPlan(Plan& plan, TelemetryData* telemetryData, void* use
         actionIds[i - 1] = path.Vertices[index].PrevActionId;
         std::string postfix;
         if (index > 0)
-            postfix = GetAction(actionIds[i - 1])->GetPostfixName(path.Vertices[index - 1].ActiveConditionSet);
+            postfix = GetAction(actionIds[i - 1])->GetEffectPostfix(path.Vertices[index - 1].ActiveConditionSet);
         else
-            postfix = GetAction(actionIds[i - 1])->GetPostfixName(plan.StartingWs);
+            postfix = GetAction(actionIds[i - 1])->GetEffectPostfix(plan.StartingWs);
         if (!postfix.empty())
             plan._actionNames[i - 1] += " " + postfix;
     }

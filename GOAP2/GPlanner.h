@@ -41,17 +41,16 @@ public:
 						~GPlanner			() override = default;
 
 	template <typename t_attribute>
-	bool RegisterAttribute(const std::string& name, const t_attribute& attribute); 
-	// bool				RegisterAttribute	(const std::string& name, const Attribute& attribute);
-	// bool				RegisterAttribute	(const std::string& name, const std::vector<std::string>& enumerators);
+	bool RegisterAttribute(const std::string& name, const t_attribute& attribute);
+
 	template<typename t_action>
 	bool				RegisterAction		(const std::string& name, const t_action& action);
-	//bool				RegisterAction		(const std::string& name, IAction& action);
+
 	bool				RegisterGoal		(const std::string& name, const WorldState& goal_);
-//	bool				RegisterGoal		(const std::string& name, const std::unordered_map<std::string, std::string>& nameValuePairs);
-//	const Attribute&	GetAttribute		(const std::string& name) const;
+
 	const Action*		GetAction(size_t id) const;
 	const WorldState&	GetGoal				(const std::string& name) const;
+
 	bool				ConstructPlan		(Plan& plan, TelemetryData* telemetryData = nullptr, void* userData = nullptr) const;
 
 	const Catalogue<const Attribute*>&			GetAttributeCatalogue() const;
