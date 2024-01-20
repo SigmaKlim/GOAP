@@ -23,10 +23,10 @@ struct Plan
 	WorldState StartingWs;
 	std::string GoalName;
 	const std::vector<std::string>& GetActionSequence() const;
-	unsigned GetCost() const;
+	float GetCost() const;
 private:
 	std::vector <std::string> _actionNames;
-	unsigned _cost = 0;
+	float _cost = 0;
 
 
 	friend class GPlanner;
@@ -57,14 +57,17 @@ public:
 	
 	const unsigned	MAX_ATTRIBUTES = std::numeric_limits<unsigned>::digits;
 
+	float GetDistanceDenominator()		const override;
+	float GetHeuristicsDenominator()	const override;
 private:
 	
 	void				GetNeighbors (std::vector<Vertex>&	neighbors, const Vertex& vertex, const Vertex& finish = Vertex()) const override;
 	bool				Satisfies (const Vertex& vertex, const Vertex& targetVertex = Vertex()) const override;
 	BitMask				GetId (const Vertex& vertex) const override;
-	unsigned			GetDistance (const Vertex& from, const Vertex& to) const override;
+	float				GetDistance(const Vertex& from, const Vertex& to) const override;
 	//A simple heuristic of how many attributes from initial state do not satisfy conditions from the inspected vertex
-	unsigned			GetHeuristic(const Vertex& vertex, const Vertex& target, void* userData = nullptr) const override;
+	float				GetHeuristic(const Vertex& vertex, const Vertex& target, void* userData = nullptr) const override;
+
 
 	//The function checks if the action satisfies any conditions from the set and does not violate any specific rules. If so, returns
 	//true, evaluates resulted condition set after the action has been included in the plan and sets modifiedConditionSet to it.
@@ -74,6 +77,8 @@ private:
 	std::unordered_map<std::string, WorldState> _goalCatalogue;
 	Catalogue<const Action*>					_actionCatalogue;
 	Catalogue<const Attribute*>					_attributeCatalogue;
+	float _totalActionMaxCost = 0.0f;			// sum of all action max costs
+	float _totalAttributeMaxDistance = 0.0f;	//sum of all attribute max distances
 };
 
 template <typename t_attribute>
@@ -85,9 +90,12 @@ bool GPlanner::RegisterAttribute(const std::string& name, const t_attribute& att
 			". This type is not derived from Attribute class.\n";
 		return false;	
 	}
-	Attribute* attributeCopyPtr = new t_attribute(attribute);
 	WorldState::_numAttributes++;
-	return _attributeCatalogue.AddItem(name, attributeCopyPtr);
+	bool result = _attributeCatalogue.AddItem(name, new t_attribute(attribute));
+	if (result == false)
+		return false;
+	_totalAttributeMaxDistance += dynamic_cast<const Attribute*>(&attribute)->GetMaxDifference();
+	return true;
 }
 
 //Copy you action object to planner's memory. Object type must support IAction interface and have copy-constructor.
@@ -100,6 +108,9 @@ bool GPlanner::RegisterAction(const std::string& name, const t_action& action)
 			". This type is not derived from Attribute class.\n";
 		return false;	
 	}
-	Action* iaction = new t_action(action);
-	return _actionCatalogue.AddItem(name, iaction);
+	bool result = _actionCatalogue.AddItem(name, new t_action(action));
+	if (result == false)
+		return false;
+	_totalActionMaxCost += dynamic_cast<const Action*>(&action)->GetHighestPossibleCost();
+	return true;
 }

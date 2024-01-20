@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Action.h"
 
-class Navigator;
+struct Navigator;
 struct GoToAction : Action
 {
     //we assume that there are no complex conditions on 'location' attribute!!!
@@ -14,8 +14,9 @@ public:
     
     GoToAction(Navigator& navigator, const WorldState& condition);
 
-    WorldState  GetCondition()                                          const override;
+    WorldState  GetCondition()                                    const override;
     WorldState  GetEffect(EvaluateActionEffectInputBase* data)    const override;
-    unsigned    GetCost(CalculateActionCostInputBase* data)       const override;
-    std::string GetEffectPostfix(const WorldState& desiredState)          const override;
+    float GetCost(CalculateActionCostInputBase* data) const override;
+    std::string GetEffectPostfix(const WorldState& desiredState)  const override;
+    float GetHighestPossibleCost() const override;
 };

@@ -26,7 +26,7 @@ WorldState GoToAction::GetEffect(EvaluateActionEffectInputBase* data) const
     return effect;
 }
 
-unsigned GoToAction::GetCost(CalculateActionCostInputBase* data) const
+float GoToAction::GetCost(CalculateActionCostInputBase* data) const
 {
     auto enums = data->postState->GetAttributeEnumeratorNames(locationAttributeName);
     assert(enums.size() == 1);
@@ -34,14 +34,7 @@ unsigned GoToAction::GetCost(CalculateActionCostInputBase* data) const
     Location currentLocation = {(float)rand()/ RAND_MAX  * 8.0f,
                                 (float)rand()/ RAND_MAX  * 8.0f,
                                 (float)rand()/ RAND_MAX  * 8.0f};
-    return _navigator.GetMinEuclidianDistance(currentLocation, attributeEffectValueEnumerator);
-    // unsigned currentVertex = _navPathfinder.EmulateGetCurrentVertex();
-    // auto it = _navPathfinder.calculatedPaths.find({currentVertex, destinationVertex});
-    // if (it != _navPathfinder.calculatedPaths.end())
-    //     return it->second.Cost;
-    //Path<unsigned> path;
-    //_navPathfinder.Pathfind(path, currentVertex, destinationVertex);
-    //return 0;
+    return _navigator.GetMinEuclideanDistance(currentLocation, attributeEffectValueEnumerator);
 }
 
 std::string GoToAction::GetEffectPostfix(const WorldState& desiredState) const
@@ -49,4 +42,9 @@ std::string GoToAction::GetEffectPostfix(const WorldState& desiredState) const
     auto enums = desiredState.GetAttributeEnumeratorNames(locationAttributeName);
     assert(enums.size() == 1);
     return enums[0];
+}
+
+float GoToAction::GetHighestPossibleCost() const
+{
+    return _navigator.GetMaxEuclideanDistance();
 }

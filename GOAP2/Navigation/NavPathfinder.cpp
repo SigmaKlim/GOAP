@@ -26,7 +26,7 @@ unsigned NavPathfinder::GetId(const unsigned& vertex) const
     return vertex;
 }
 
-unsigned NavPathfinder::GetDistance(const unsigned& from, const unsigned& to) const
+float NavPathfinder::GetDistance(const unsigned& from, const unsigned& to) const
 {
     return _distanceMatrix[from][to];
 }

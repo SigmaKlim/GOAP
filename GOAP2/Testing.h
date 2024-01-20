@@ -96,14 +96,14 @@ inline int TestNumeric()
 inline int TestGoap()
 {
 	//Create navigation pathfinder
-	std::ifstream fin("ata/test_matrix_set_30_0.txt");
-	matrix distanceMatrix(30, std::vector<u_int>(30));
-	MathHelper::ReadMtrxFromFile(distanceMatrix, fin);
-	std::map<std::string, std::vector<unsigned>> pointNameToVertexIds;
-	pointNameToVertexIds.insert({"COVER", {1, 5, 9, 17}});
-	pointNameToVertexIds.insert({"AMMO_BOX", {2, 13, 19}});
-	pointNameToVertexIds.insert({"HEALING_STATION", {6, 14}});
-	NavPathfinder navPathfinder(distanceMatrix, pointNameToVertexIds);
+	// std::ifstream fin("ata/test_matrix_set_30_0.txt");
+	// matrix distanceMatrix(30, std::vector<u_int>(30));
+	// MathHelper::ReadMtrxFromFile(distanceMatrix, fin);
+	// std::map<std::string, std::vector<unsigned>> pointNameToVertexIds;
+	// pointNameToVertexIds.insert({"COVER", {1, 5, 9, 17}});
+	// pointNameToVertexIds.insert({"AMMO_BOX", {2, 13, 19}});
+	// pointNameToVertexIds.insert({"HEALING_STATION", {6, 14}});
+	// NavPathfinder navPathfinder(distanceMatrix, pointNameToVertexIds);
 	//Create navigator
 	Navigator navigator;
 	navigator.AddPoint("COVER");
@@ -156,7 +156,7 @@ inline int TestGoap()
  	WorldState crouchCnd;
 	VectorAD adv = {{"pose", {"CROUCHING"}}}; 
  	WorldState crouchEff(adv);
- 	SimpleAction crouch(crouchCnd, crouchEff, 2);
+ 	SimpleAction crouch(crouchCnd, crouchEff, 2.0f);
  	planner.RegisterAction("Crouch", crouch);
 
 	VectorAD goToCndAD = {{"pose",	{"STANDING"}}};
@@ -169,33 +169,33 @@ inline int TestGoap()
 	WorldState takeCoverEff(adv);
 	adv = {{"coverStatus", {"IN_COVER"}}};
 	WorldState takeCoverCnd(adv);
-  	SimpleAction takeCover(takeCoverCnd, takeCoverEff, 2);
+  	SimpleAction takeCover(takeCoverCnd, takeCoverEff, 2.0f);
   	planner.RegisterAction("TakeCover", takeCover);
   	
   	WorldState standUpCnd;
 	adv = {	{"pose",		{"STANDING"}},
 	 		{"coverStatus", {"NOT_IN_COVER"}}};
   	WorldState standUpEff(adv);
-  	SimpleAction standUp(standUpCnd, standUpEff, 2);
+  	SimpleAction standUp(standUpCnd, standUpEff, 2.0f);
   	planner.RegisterAction("StandUp", standUp);
  	
   	WorldState drawRifleCnd;
 	adv = { { "weaponDrawn", {"RIFLE"}} };
   	WorldState drawRifleEff(adv);
-  	SimpleAction drawRifle(drawRifleCnd, drawRifleEff, 3);
+  	SimpleAction drawRifle(drawRifleCnd, drawRifleEff, 3.0f);
 	planner.RegisterAction("DrawRifle", drawRifle);
 
   	WorldState drawKnifeCnd;
 	adv = { { "weaponDrawn", {"KNIFE"} } };
   	WorldState drawKnifeEff(adv);
-  	SimpleAction drawKnife(drawKnifeCnd, drawKnifeEff, 1);
+  	SimpleAction drawKnife(drawKnifeCnd, drawKnifeEff, 1.0f);
   	planner.RegisterAction("DrawKnife", drawKnife);
   	
 	adv = { {"hasGrenades", {"TRUE"}} };
   	WorldState drawGrenadeCnd(adv);
 	adv = { { "weaponDrawn", {"GRENADE"}} };
   	WorldState drawGrenadeEff(adv);
-  	SimpleAction drawGrenade(drawGrenadeCnd, drawGrenadeEff, 2);
+  	SimpleAction drawGrenade(drawGrenadeCnd, drawGrenadeEff, 2.0f);
   	planner.RegisterAction("DrawGrenade", drawGrenade);
   	
 	adv = {	{"ammoLeftInBag",		{"AVERAGE", "FULL"}},
@@ -203,16 +203,16 @@ inline int TestGoap()
   	WorldState reloadCnd(adv);
 	adv = { { "ammoLeftInMagazine",	{"FULL"} } };
   	WorldState reloadEff(adv);
-  	SimpleAction reload(reloadCnd, reloadEff, 3);
+  	SimpleAction reload(reloadCnd, reloadEff, 3.0f);
   	planner.RegisterAction("Reload", reload);
   	
 	adv = { {"pose",		{"STANDING"}},
 			{"enemyStatus", {"NON_VISIBLE"}} };
   	WorldState searchCnd(adv);
 	adv = { {"enemyStatus", {"VISIBLE"}},
-							{"location",		{"ARBITRARY"}} };
+			{"location",	{"ARBITRARY"}} };
   	WorldState searchEff(adv);
-  	SimpleAction search(searchCnd, searchEff, 10);
+  	SimpleAction search(searchCnd, searchEff, 10.0f);
   	planner.RegisterAction("SearchEnemy", search);
   	
 	adv = { { "enemyStatus",	{"VISIBLE"} } };
@@ -220,7 +220,7 @@ inline int TestGoap()
 	adv = { {"enemyStatus",		{"IN_CLOSE_COMBAT_RANGE"}},
 			{"location",			{"ARBITRARY"}} };
   	WorldState approachEff(adv);
-  	SimpleAction approachEnemy(approachCnd, approachEff, 7);
+  	SimpleAction approachEnemy(approachCnd, approachEff, 7.0f);
   	planner.RegisterAction("ApproachEnemy", approachEnemy);
   	
 	adv = { { "enemyStatus", {"IN_CLOSE_COMBAT_RANGE"} } };
@@ -228,7 +228,7 @@ inline int TestGoap()
 	adv = { {"enemyStatus", {"VISIBLE"}},
 			{"location",		{"ARBITRARY"}} };
   	WorldState moveAwayFromEnemyEff(adv);
-  	SimpleAction moveAwayFromEnemy(moveAwayFromEnemyCnd, moveAwayFromEnemyEff, 7);
+  	SimpleAction moveAwayFromEnemy(moveAwayFromEnemyCnd, moveAwayFromEnemyEff, 7.0f);
   	planner.RegisterAction("MoveAwayFromEnemy", moveAwayFromEnemy);
   	
 	adv = { {"enemyStatus", {"VISIBLE"}},
@@ -236,7 +236,7 @@ inline int TestGoap()
   	WorldState attackGCnd(adv);
 	adv = { {"enemyStatus", {"DEAD"}} };
   	WorldState attackGEff(adv);
-  	SimpleAction attackGrenade(attackGCnd, attackGEff, 400);
+  	SimpleAction attackGrenade(attackGCnd, attackGEff, 4.0f);
   	planner.RegisterAction("AttackGrenade", attackGrenade);
   	
 	adv = { {"enemyStatus",			{"VISIBLE", "IN_CLOSE_COMBAT_RANGE"}},
@@ -245,7 +245,7 @@ inline int TestGoap()
   	WorldState attackRCnd(adv);
 	adv = { {"enemyStatus",	{"DEAD"}} };
   	WorldState attackREff(adv);
-  	SimpleAction attackRifle(attackRCnd, attackREff, 2);
+  	SimpleAction attackRifle(attackRCnd, attackREff, 2.0f);
   	planner.RegisterAction("AttackRifle", attackRifle);
   	
 	adv = { {"enemyStatus", {"IN_CLOSE_COMBAT_RANGE"}},
@@ -253,14 +253,14 @@ inline int TestGoap()
   	WorldState attackKCnd(adv);
 	adv = { { "enemyStatus",	{"DEAD"} } };
   	WorldState attackKEff(adv);
-  	SimpleAction attackKnife(attackKCnd, attackKEff, 200);
+  	SimpleAction attackKnife(attackKCnd, attackKEff, 2.0f);
   	planner.RegisterAction("AttackKnife", attackKnife);
 	
 	adv = { {"location", {"HEALING_STATION"}} };
   	WorldState healCnd(adv);
 	adv = { {"hpLevel", {"HIGH"}} };
   	WorldState healEff(adv);
-  	SimpleAction heal(healCnd, healEff, 5);
+  	SimpleAction heal(healCnd, healEff, 5.0f);
   	planner.RegisterAction("Heal", heal);
 	
 	adv = { {"location",			{"AMMO_BOX"}} };
@@ -268,7 +268,7 @@ inline int TestGoap()
 	adv = { {"ammoLeftInBag",	{"FULL"}},
 			{"hasGrenades",		{"TRUE"}} };
   	WorldState refillAmmoAndGrenadesEff(adv);
-  	SimpleAction refillAmmoAndGrenades(refillAmmoAndGrenadesCnd, refillAmmoAndGrenadesEff, 5);
+  	SimpleAction refillAmmoAndGrenades(refillAmmoAndGrenadesCnd, refillAmmoAndGrenadesEff, 5.0f);
   	planner.RegisterAction("RefillAmmoAndGrenades", refillAmmoAndGrenades);
 	 //5. Pack the in-out structure 
 	 Plan plan;
@@ -297,7 +297,7 @@ inline int TestGoap()
  		for (auto i = 0; i < plan.GetActionSequence().size(); i++)
  			std::cout << "\t" << std::to_string(i + 1) << ". " << plan.GetActionSequence()[i] << "\n";
  		std::cout << "Plan completed\n";
- 		std::cout << "Cost: " << std::to_string(plan.GetCost()) << "\n";
+ 		std::cout << "Cost: " << std::to_string(plan.GetCost() * planner.GetDistanceDenominator()) << "\n";
  		std::cout << "Memory used on stack: " << std::to_string(telemetryData.totalBytesUsed) << " bytes.\n";
  		std::cout << "Total vertices discovered: " << std::to_string(telemetryData.discoveredNum) << "\n";
  		std::cout << "Total vertices expanded: " << std::to_string(telemetryData.expandedNum) << "\n";
@@ -306,27 +306,3 @@ inline int TestGoap()
  		std::cout << "Could not construct a plan!";
  	return 0;
  }
-// inline int TestMask()
-// {
-// 	BitMask m1 = BitMask::MakeOne(100); //00..01
-// 	BitMask m2(m1);
-// 	bool areSame = (m1 == m2); //true
-//
-// 	BitMask m3 = m1 << 30;
-// 	BitMask m4 = BitMask::MakeAllZeros(100); //00..0
-// 	m4.SetBitValue(30, 1);
-// 	areSame = (m3 == m4); //true
-//
-// 	BitMask m5 = BitMask::MakeAllOnes(50); //11..1
-// 	m5.SetBitValue(25, 0);
-// 	BitMask m6 = ~m5;
-// 	areSame = (m6 == (BitMask::MakeOne(50) << 25)); //true
-//
-// 	BitMask m7 = BitMask::MakeAllZeros(1000);
-// 	m7.Invert();
-// 	BitMask m8 = m7;
-// 	m7.SetBitValue(0, 0);
-// 	bool is7LargerThan8 = (m7 > m8); //false
-//
-//	return 0;
-//}

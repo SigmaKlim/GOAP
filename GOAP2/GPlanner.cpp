@@ -9,7 +9,7 @@ const std::vector<std::string>& Plan::GetActionSequence() const
     return _actionNames;
 }
 
-unsigned Plan::GetCost() const
+float Plan::GetCost() const
 {
     return _cost;
 }
@@ -120,7 +120,7 @@ BitMask GPlanner::GetId(const Vertex& vertex) const
     return vertex.ActiveConditionSet._valueMask;
 }
 
-unsigned GPlanner::GetDistance(const Vertex& from, const Vertex& to) const
+float GPlanner::GetDistance(const Vertex& from, const Vertex& to) const
 {
     auto* action = *_actionCatalogue.GetItem(to.PrevActionId);
     CalculateActionCostInputBase actionData;
@@ -128,9 +128,9 @@ unsigned GPlanner::GetDistance(const Vertex& from, const Vertex& to) const
     return action->GetCost(&actionData);
 }
 
-unsigned GPlanner::GetHeuristic(const Vertex& vertex, const Vertex& target, void* userData) const
+float GPlanner::GetHeuristic(const Vertex& vertex, const Vertex& target, void* userData) const
 {
-    unsigned diff = 0;
+    float diff = 0;
     for (unsigned i = 0; i < WorldState::_numAttributes; i++)
     {
         unsigned conditionAttribute = vertex.ActiveConditionSet.GetAttributeMask(i);
@@ -139,6 +139,16 @@ unsigned GPlanner::GetHeuristic(const Vertex& vertex, const Vertex& target, void
         diff += attribute->GetDifference(conditionAttribute, targetAttribute);
     }
     return diff;
+}
+
+float GPlanner::GetDistanceDenominator() const
+{
+    return _totalActionMaxCost;
+}
+
+float GPlanner::GetHeuristicsDenominator() const
+{
+    return _totalAttributeMaxDistance;
 }
 
 bool GPlanner::IsActionUseful(WorldState& modifiedConditionSet, const WorldState& conditionSet, const Action& action) const

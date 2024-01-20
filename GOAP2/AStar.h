@@ -13,6 +13,9 @@
 #include <unordered_map>
 #include <boost/functional/hash.hpp>
 
+#define CHECK_DISTANCE_NORMALIZED(value) if (value > 1.0f) std::cout << "WARNING: Normalized distance value (" << std::to_string(value) << ") is greater than 1.0f.\n"; \
+	
+#define CHECK_HEURISTICS_NORMALIZED(value) if (value > 1.0f) std::cout << "WARNING: Normalized heuristics value (" << std::to_string(value) << ") is greater than 1.0f.\n"; \
 
 typedef unsigned long long ull;
 
@@ -30,8 +33,8 @@ struct Node
 {
 	Node(t_id		 id,
 		 t_id		prevNodeId,
-		 unsigned	distFromStart,
-		 unsigned	heuristic)
+		 float		distFromStart,
+		 float		heuristic)
 		 : _id(id), _prevNodeId(prevNodeId), _distFromStart(distFromStart), _heuristic(heuristic) {};
 	bool operator<(const Node& right) const
 	{
@@ -43,8 +46,8 @@ struct Node
 	}
 	t_id	  _id = t_id();
 	t_id _prevNodeId = 0;
-	unsigned _distFromStart = 0;
-	unsigned _heuristic = 0;
+	float _distFromStart = 0.0f;
+	float _heuristic = 0.0f;
 
 
 };
@@ -62,7 +65,8 @@ template <typename t_vertex, typename t_id>
 class AStarSolver
 {
 protected:
-	virtual unsigned GetHeuristic(const t_vertex& vertex, const t_vertex& finish = t_vertex(), void* userData = nullptr) const
+	virtual float GetHeuristic(const t_vertex& vertex, const t_vertex& finish = t_vertex(),
+	                           void* userData = nullptr) const
 	{
 		return 0;
 	}
@@ -71,8 +75,12 @@ protected:
 	//Checks whether this node satisfies conditions of the target node.
 	virtual		bool		Satisfies		(const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
 	virtual		t_id		GetId			(const t_vertex& vertex) const = 0;
-	virtual		unsigned	GetDistance		(const t_vertex& from, const t_vertex& to) const = 0;
+	virtual		float		GetDistance		(const t_vertex& from, const t_vertex& to) const = 0;
 
+	//Returns dDen, so that it is guaranteed that distFromStart / dDen <= 1. Used for normalizing distance.
+	virtual float GetDistanceDenominator() const = 0;
+	//Returns hDen, so that it is guaranteed that heuristics / hDen <= 1. Used for normalizing heuristics.
+	virtual float GetHeuristicsDenominator() const = 0;
 public:
 							AStarSolver	() {}
 	virtual					~AStarSolver	() {}
@@ -88,7 +96,10 @@ public:
 
 		unsigned discoveredHeapSize = 0;
 		auto startId = GetId(start);
-		Node<t_id> currentNode(startId, t_id(), 0, GetHeuristic(start, finish, userData));
+		float normalizedDistance = 0.0f;
+		float normalizedHeuristics = GetHeuristic(start, finish, userData) / GetHeuristicsDenominator();
+		CHECK_HEURISTICS_NORMALIZED(normalizedHeuristics);
+		Node<t_id> currentNode(startId, t_id(), normalizedDistance, normalizedHeuristics);
 		vertices.insert({ startId, start });
 		cameFrom.insert({ startId, t_id() });
 		Element<Node<t_id>>* currentElement = discovered.insert(currentNode);
@@ -123,10 +134,14 @@ public:
 				bool wasDiscovered = (tempIt != discMap.end());
 				Element<Node<t_id>>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
 				bool wasExpanded = expanded.find(neighborId) != expanded.end();
+				normalizedDistance = GetDistance(currentVertex, neighborVertices[i]) / GetDistanceDenominator();
+				CHECK_DISTANCE_NORMALIZED(normalizedDistance);
+				normalizedHeuristics = GetHeuristic(neighborVertices[i], finish, userData) / GetHeuristicsDenominator();
+				CHECK_HEURISTICS_NORMALIZED(normalizedHeuristics);
 				Node<t_id> neighborNode(	neighborId, 
 											currentNode._id, 
-											currentNode._distFromStart + GetDistance(currentVertex, neighborVertices[i]), 
-											GetHeuristic(neighborVertices[i], finish, userData));
+											currentNode._distFromStart + normalizedDistance, 
+											normalizedHeuristics);
 				if (wasDiscovered == false && wasExpanded == false)
 				{
 					neighborElement = discovered.insert({ neighborNode });

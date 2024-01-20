@@ -9,9 +9,14 @@ class SimpleAttribute : public Attribute
 {
 public:
     SimpleAttribute(const std::vector<std::string>& enumeratorNames) : Attribute(enumeratorNames) {};
-    unsigned GetDifference(unsigned attributeConditionMask, unsigned attributeTargetMask) const override
+    
+    float GetDifference(unsigned attributeConditionMask, unsigned attributeTargetMask) const override
     {
-        return (attributeConditionMask & attributeTargetMask) == attributeTargetMask; //simple check if masked condition is similar to target value, return 1 if so, otherwise - 0
+        return attributeConditionMask != 0 &&                                       //simple check if there is no masked condition
+            (attributeConditionMask & attributeTargetMask) != attributeTargetMask;  //or it is similar to target value, return 0 if so, otherwise - 1
     }
-
+    float GetMaxDifference() const override
+    {
+        return 1.0f;
+    }
 };

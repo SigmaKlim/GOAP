@@ -18,7 +18,7 @@ private:
     void GetNeighbors(std::vector<unsigned>& neighbors, const unsigned& vertex, const unsigned& finish = 0) const override;
     bool Satisfies(const unsigned& vertex, const unsigned& finish = 0) const override;
     unsigned GetId(const unsigned& vertex) const override;
-    unsigned GetDistance(const unsigned& from, const unsigned& to) const override;
+    float GetDistance(const unsigned& from, const unsigned& to) const override;
 
 
 

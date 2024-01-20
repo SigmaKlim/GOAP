@@ -32,12 +32,15 @@ public:
     {
         std::vector<unsigned char> ids;
         for (unsigned char i = 0; i < _size; i++)
-            if ((mask << i & 1) == 1)
+            if ((mask >> i & 1) == 1)
                 ids.push_back(i);
         return ids;
     }
-    
-    virtual unsigned GetDifference (unsigned attributeConditionMask, unsigned attributeTargetMask) const = 0;
+
+    //Returns implementation-defined difference between two attribute masks
+    virtual float GetDifference(unsigned attributeConditionMask, unsigned attributeTargetMask) const = 0;
+    //Returns implementation defined maximal difference, so that diff/max_diff <= 1
+    virtual float GetMaxDifference() const = 0;
 protected:
     unsigned char _size = 0;
     std::unordered_map<std::string, unsigned char> _enumeratorNameIdPairs; //name <-> id function

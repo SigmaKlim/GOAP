@@ -27,13 +27,20 @@ struct Navigator
             return false;
         }
         search->second.push_back(location);
+        for (auto& pointLocationsPair : _pointCatalogue)
+            for (auto& l : pointLocationsPair.second)
+            {
+                auto newDistance = GetEuclideanDistance(location, l);
+                if (newDistance > _maxDistance)
+                    _maxDistance = newDistance; 
+            }
         return true;
     }
     float   GetEuclideanDistance(const Location& from, const Location& to) const
     {
         return sqrtf(pow(to.X - from.X, 2.0f) + pow(to.Y - from.Y, 2.0f) + pow(to.Z - from.Z, 2.0f)); 
     }
-    float   GetMinEuclidianDistance(const Location& currentLocation, const std::string& arrivalPointName)
+    float   GetMinEuclideanDistance(const Location& currentLocation, const std::string& arrivalPointName)
     {
         float minResultDistance = std::numeric_limits<float>::max();
         auto arrSearch = _pointCatalogue.find(arrivalPointName);
@@ -84,6 +91,12 @@ struct Navigator
         }
         return minResultDistance;
     }
+    //Returns maximal distance between some two locations
+    float   GetMaxEuclideanDistance() const
+    {
+        return _maxDistance;
+    }
 private:
-    std::unordered_map<std::string, std::vector<Location>> _pointCatalogue;  
+    std::unordered_map<std::string, std::vector<Location>> _pointCatalogue;
+    float _maxDistance = 0.0f;
 };
