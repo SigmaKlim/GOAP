@@ -125,9 +125,7 @@ BitMask GPlanner::GetId(const Vertex& vertex) const
 float GPlanner::GetDistance(const Vertex& from, const Vertex& to) const
 {
     auto* action = *_actionCatalogue.GetItem(to.PrevActionId);
-    CalculateActionCostInputBase actionData;
-    actionData.postState = &from.ActiveConditionSet;
-    return action->GetCost(&actionData);
+    return action->GetCost(from.ActiveConditionSet);
 }
 
 float GPlanner::GetHeuristic(const Vertex& vertex, const Vertex& target, void* userData) const

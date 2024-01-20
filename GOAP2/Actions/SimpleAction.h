@@ -19,7 +19,7 @@ struct SimpleAction : public Action
         return _effect;
     }
 
-    float GetCost(CalculateActionCostInputBase* data) const override
+    float GetCost(const WorldState& preState) const override
     {
         return _cost;
     }

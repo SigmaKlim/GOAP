@@ -14,9 +14,10 @@ public:
     
     GoToAction(Navigator& navigator, const WorldState& condition);
 
+    
     WorldState  GetCondition            (const WorldState& preState)            const override;
     WorldState  GetEffect               (const WorldState& preState)            const override;
-    float       GetCost                 (CalculateActionCostInputBase* data)    const override;
+    float       GetCost                 (const WorldState& preState)            const override;
     std::string GetEffectPostfix        (const WorldState& desiredState)        const override;
     float       GetHighestPossibleCost  ()                                      const override;
     WsUserData* ModifyUserData(const WorldState& preState) const override;

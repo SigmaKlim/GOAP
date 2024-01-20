@@ -13,7 +13,7 @@ public:
 	//Evaluates (if necessary) the effect of the action and returns it
 	virtual WorldState	GetEffect(const WorldState& preState) const = 0;
 	//Calculates (if necessary) the cost of the action and returns it.
-	virtual float GetCost(CalculateActionCostInputBase* data = nullptr) const = 0;
+	virtual float GetCost(const WorldState& preState) const = 0;
 	//Returns calculated string. Useful for actions with customised effect/cost evaluation.
 	virtual std::string GetEffectPostfix(const WorldState& desiredState) const
 	{

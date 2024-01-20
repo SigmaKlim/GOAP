@@ -27,14 +27,15 @@ WorldState GoToAction::GetEffect(const WorldState& preState) const
     return effect;
 }
 
-float GoToAction::GetCost(CalculateActionCostInputBase* data) const
+float GoToAction::GetCost(const WorldState& preState) const
 {
-    auto enums = data->postState->GetAttributeEnumeratorNames(locationAttributeName);
+    auto enums = preState.GetAttributeEnumeratorNames(locationAttributeName);
     assert(enums.size() == 1);
     auto attributeEffectValueEnumerator = enums[0];
-    Location currentLocation = {(float)rand()/ RAND_MAX  * 8.0f,
-                                (float)rand()/ RAND_MAX  * 8.0f,
-                                (float)rand()/ RAND_MAX  * 8.0f};
+    auto ud = std::dynamic_pointer_cast<MyWsData>(preState.UserData);
+    if (ud->isLocationValid == false)
+        return 0.0f;
+    Location currentLocation = std::dynamic_pointer_cast<MyWsData>(preState.UserData)->location;
     return _navigator.GetClosestPoint(currentLocation, attributeEffectValueEnumerator).second;
 }
 
@@ -66,3 +67,7 @@ WsUserData* GoToAction::ModifyUserData(const WorldState& preState) const
     newData->isLocationValid = true;
     return newData;
 }
+
+//ДУРАК
+//Нужно location в условия действий переносить, например, в RefillAmmunition, мы ведь при построении плана идем из будущего в прошлое
+//
