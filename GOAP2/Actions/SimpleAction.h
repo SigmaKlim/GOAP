@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Action.h"
+#include "../World/MyWsData.h"
 
 struct SimpleAction : public Action
 {
@@ -9,11 +10,11 @@ struct SimpleAction : public Action
     //SimpleAction() = default;
     SimpleAction(const WorldState& condition, const WorldState& effect, float cost) : _condition(condition), _effect(effect), _cost(cost) {}
     
-    WorldState GetCondition() const override
+    WorldState GetCondition(const WorldState& preState) const override
     {
         return _condition;
     }
-    WorldState GetEffect(EvaluateActionEffectInputBase* data) const override
+    WorldState GetEffect(const WorldState& preState) const override
     {
         return _effect;
     }
@@ -28,5 +29,16 @@ struct SimpleAction : public Action
         return _cost;
     }
     
-    
+    WsUserData* ModifyUserData(const WorldState& preState) const override
+    {
+        if (preState.UserData == nullptr)
+        {
+            std::cout << "UserData was nullptr. Perhaps, you have not set it when creating the start state\n";
+            assert(false);
+        }
+        auto d = dynamic_cast<MyWsData*>(preState.UserData.get());
+        if (d == nullptr)
+            return new MyWsData;
+        return new MyWsData(*d);
+    }
 };

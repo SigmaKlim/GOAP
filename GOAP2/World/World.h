@@ -8,8 +8,8 @@
 #include "BitMask.h"
 #include <boost/functional/hash.hpp>
 
-#include "Attributes/Attribute.h"
-#include "Tools/Catalogue.h"
+#include "../Attributes/Attribute.h"
+#include "../Tools/Catalogue.h"
 
 
 struct AttributeData
@@ -18,25 +18,29 @@ struct AttributeData
 	std::vector<std::string> enumeratorNames;
 };
 
+struct WsUserData
+{
+	WsUserData() = default;
+	WsUserData(const WsUserData& other) = default;
+	virtual ~WsUserData() = default;
+	
+	//overload in similar fashion if you use custom world state user data struct
+	virtual WsUserData* PassUserData() const
+	{
+		return new WsUserData(*this);
+	}
+};
+
 struct WorldState
 {
 	friend class Action;
 	friend class GPlanner;
-								//WorldState(const BitMask& valueMask, const BitMask& affectedAttributesMask);
-								//a constructor for states where each attribute has a concrete single value, used for action effects and actual world states
-								//WorldState(const std)
-								explicit WorldState(const std::vector<AttributeData>& attributeEnumsPairs);
-								//WorldState(const std::vector<AttributeTo1Enumerator>& attributeEnumPairs);	
-								//WorldState				(const t_attr_enum_map& nameValuePairs);
-								//a constructor for states where each attribute has a set of values, used for conditions
-								//WorldState				(const t_attr_enums_map& nameValuePairs);
-								//a constructor for states where each attribute has a set of values, used for conditions
-								//WorldState				(const t_attr_mask_map& nameValuePairs);
+								WorldState				(const std::vector<AttributeData>& attributeEnumsPairs);
 								WorldState				();
 								WorldState				(const WorldState& other);
 	WorldState&					operator=				(const WorldState& other);
 								~WorldState				();
-	// bool						ClearAttributeValue		(const std::string& name);
+	
 	bool						ClearAttributeValue		(unsigned index);
 	//Sets attribute value for this state
 	bool						AddAttributeValue		(size_t index, unsigned char value);
@@ -50,25 +54,21 @@ struct WorldState
 	std::vector<unsigned char>	GetAttributeValues		(const std::string& name) const;
 	std::vector<std::string>	GetAttributeEnumeratorNames	(const std::string& name) const;
 	unsigned					GetAttributeMask		(unsigned index) const;
-
-	//const BitMask& GetValueMask() const;
-	//const BitMask& GetAffectedAttributesMask() const;
 	
-	
-	static const std::set<std::string>& GetAttributeNamesSet();
-	static unsigned		FindAttribute	 (const std::string& name);
+	static unsigned				FindAttribute	 (const std::string& name);
 
-	static unsigned		GetAttributeNumber();
+	static unsigned				GetAttributeNumber();
+	std::shared_ptr<WsUserData>	UserData = nullptr;		//used in user-defined GPlanner methods
 private:
 	
-	BitMask							_valueMask; //1s on position of all affected  values within an attribute, 00..0 blocks on positions of all unaffected attributes
-	BitMask							_affectedAttributesMask; // auxiliary mask; 11..1 blocks on positions of all affected attributes, 00..0 blocks on other positions
+	BitMask							_valueMask;					//1s on position of all affected  values within an attribute, 00..0 blocks on positions of all unaffected attributes
+	BitMask							_affectedAttributesMask;	// auxiliary mask; 11..1 blocks on positions of all affected attributes, 00..0 blocks on other positions
 	
-	//debug
+#pragma region Debug stuff
 	static const bool _isInDebugMode = true;
 	std::vector<AttributeData> _debugAttributeValueList;
 	void UpdateDebugAttributeValueList();
-	//
+#pragma endregion
 
 	static Catalogue<const Attribute*>* _attributeCatalogue;
 	static unsigned						_numAttributes;

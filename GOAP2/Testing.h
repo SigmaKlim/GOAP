@@ -142,7 +142,7 @@ inline int TestGoap()
 	
 	//3. Define start state of the world
 	VectorAD startAD = {	{"pose",				{"CROUCHING"}},
-							{"location",				{"ARBITRARY"}},
+							{"location",			{"ARBITRARY"}},
 							{"coverStatus",			{"IN_COVER"}},
 							{"weaponDrawn",			{"KNIFE"}},
 							{"ammoLeftInMagazine",	{"NO"}},
@@ -151,7 +151,6 @@ inline int TestGoap()
 							{"hasGrenades",			{"FALSE"}},
 							{"hpLevel",				{"AVERAGE"}}};
 	WorldState start(startAD);
-	
  	//4. Register all available actions by defining their conditions and effects
  	WorldState crouchCnd;
 	VectorAD adv = {{"pose", {"CROUCHING"}}}; 
@@ -270,17 +269,16 @@ inline int TestGoap()
   	WorldState refillAmmoAndGrenadesEff(adv);
   	SimpleAction refillAmmoAndGrenades(refillAmmoAndGrenadesCnd, refillAmmoAndGrenadesEff, 5.0f);
   	planner.RegisterAction("RefillAmmoAndGrenades", refillAmmoAndGrenades);
-	 //5. Pack the in-out structure 
-	 Plan plan;
-	 plan.StartingWs = start;
-	 plan.GoalName = "KillEnemy";
+	//5. Pack the in-out structure 
+	Plan plan;
+	plan.StartingWs = start;
+	plan.GoalName = "KillEnemy";
 
  	//6.
  	
  	//6. Construct plan
  	TelemetryData telemetryData;
  	bool builtPlan = planner.ConstructPlan(plan, &telemetryData);
-//
  	//6. Fetch results
  	if (builtPlan == true)
  	{

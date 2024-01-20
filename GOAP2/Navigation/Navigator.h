@@ -40,22 +40,27 @@ struct Navigator
     {
         return sqrtf(pow(to.X - from.X, 2.0f) + pow(to.Y - from.Y, 2.0f) + pow(to.Z - from.Z, 2.0f)); 
     }
-    float   GetMinEuclideanDistance(const Location& currentLocation, const std::string& arrivalPointName)
+
+    std::pair<Location, float> GetClosestPoint(const Location& currentLocation, const std::string& arrivalPointName)
     {
         float minResultDistance = std::numeric_limits<float>::max();
         auto arrSearch = _pointCatalogue.find(arrivalPointName);
         if (arrSearch == _pointCatalogue.end())
         {
             std::cout << "Wrong point name \"" << arrivalPointName << "\".\n";
-            return std::numeric_limits<float>::max();
+            return {{0.0f, 0.0f, 0.0f}, std::numeric_limits<float>::max()};
         }
+        Location closestPointLocation = {0.0f, 0.0f, 0.0f};
         for (auto& location : arrSearch->second)
         {
             float distance = GetEuclideanDistance(currentLocation, location); 
             if (distance < minResultDistance)
+            {
                 minResultDistance = distance;
+                closestPointLocation = location;
+            }
         }
-        return minResultDistance;
+        return {closestPointLocation, minResultDistance};
     }
     float   GetMinEuclideanDistance(const Location& currentLocation, const std::string& departurePointName, const std::string& arrivalPointName)
     {

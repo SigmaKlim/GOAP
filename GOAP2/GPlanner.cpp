@@ -20,7 +20,7 @@ GPlanner::GPlanner()
     WorldState::_attributeCatalogue = &_attributeCatalogue;
 }
 
-bool GPlanner::RegisterGoal	(const std::string& name, const WorldState& goal_)
+bool GPlanner::RegisterGoal	(const std::string& name, const WorldState& goal)
 {
     bool contains = (_goalCatalogue.find(name) != _goalCatalogue.end());
     if (contains == true)
@@ -28,7 +28,7 @@ bool GPlanner::RegisterGoal	(const std::string& name, const WorldState& goal_)
         std::cout << "The Planner already contains goal \"" + name + "\".\n";
         return false;
     }
-    _goalCatalogue.insert(std::make_pair(std::string(name), goal_ ));
+    _goalCatalogue.insert({ std::string(name), goal });
     return true;
 }
 
@@ -64,7 +64,9 @@ bool GPlanner::ConstructPlan(Plan& plan, TelemetryData* telemetryData, void* use
         
     Path<Vertex> path;
     const auto& goal = GetGoal(plan.GoalName);
-    Vertex start(goal, std::numeric_limits<size_t>::max()); // we build the path from goal state to current state
+    auto repairedGoal = goal;
+    repairedGoal.UserData.reset(new WsUserData);
+    Vertex start(repairedGoal, std::numeric_limits<size_t>::max()); // we build the path from goal state to current state
     Vertex finish(plan.StartingWs, std::numeric_limits<size_t>::max());
     bool foundPath = Pathfind(path, start, finish, telemetryData, userData);
     if (foundPath == false)
@@ -153,22 +155,21 @@ float GPlanner::GetHeuristicsDenominator() const
 
 bool GPlanner::IsActionUseful(WorldState& modifiedConditionSet, const WorldState& conditionSet, const Action& action) const
 {
-    EvaluateActionEffectInputBase actionData;
-    actionData.DesiredStateMask = &conditionSet;
-    BitMask significantConditionSet = conditionSet._valueMask & action.GetEffect(&actionData)._affectedAttributesMask; //leave only conditions affected by effects of the action
-    BitMask significantActionEffects = conditionSet._affectedAttributesMask & action.GetEffect(&actionData)._valueMask; //leave only effects that influence conditions from the condition set
+    BitMask significantConditionSet = conditionSet._valueMask & action.GetEffect(conditionSet)._affectedAttributesMask; //leave only conditions affected by effects of the action
+    BitMask significantActionEffects = conditionSet._affectedAttributesMask & action.GetEffect(conditionSet)._valueMask; //leave only effects that influence conditions from the condition set
     if ((significantActionEffects & significantConditionSet) != significantActionEffects 
         || significantConditionSet == BitMask::MakeAllZeros(significantConditionSet.GetNumBits())) // check if the action effects don't violate conditions from the set and if there are any affected conditions at all 
             return false;
     //modifiedConditionSet._valueMask = conditionSet._valueMask & ~action._effect._valueMask;
-    modifiedConditionSet._valueMask = conditionSet._valueMask & ~action.GetEffect(&actionData)._affectedAttributesMask; //remove fulfilled conditions from the set
-    modifiedConditionSet._affectedAttributesMask = conditionSet._affectedAttributesMask & ~action.GetEffect(&actionData)._affectedAttributesMask; //remove fulfilled conditions from the set
-    BitMask significantActionConditions = modifiedConditionSet._affectedAttributesMask & action.GetCondition()._valueMask; //leave only conditions on attributes shared between action conditions and conditions set
-    significantConditionSet = conditionSet._valueMask & action.GetCondition()._affectedAttributesMask;
+    modifiedConditionSet._valueMask = conditionSet._valueMask & ~action.GetEffect(conditionSet)._affectedAttributesMask; //remove fulfilled conditions from the set
+    modifiedConditionSet._affectedAttributesMask = conditionSet._affectedAttributesMask & ~action.GetEffect(conditionSet)._affectedAttributesMask; //remove fulfilled conditions from the set
+    BitMask significantActionConditions = modifiedConditionSet._affectedAttributesMask & action.GetCondition(conditionSet)._valueMask; //leave only conditions on attributes shared between action conditions and conditions set
+    significantConditionSet = conditionSet._valueMask & action.GetCondition(conditionSet)._affectedAttributesMask;
     if ((significantActionConditions & significantConditionSet) != significantActionConditions) // check if the action conditions don't violate conditions from the set 
         return false;
-    modifiedConditionSet._valueMask |= action.GetCondition()._valueMask;
-    modifiedConditionSet._affectedAttributesMask |= action.GetCondition()._affectedAttributesMask;
+    modifiedConditionSet._valueMask |= action.GetCondition(conditionSet)._valueMask;
+    modifiedConditionSet._affectedAttributesMask |= action.GetCondition(conditionSet)._affectedAttributesMask;
+    modifiedConditionSet.UserData.reset(action.ModifyUserData(conditionSet));
     return true;
 }
 
