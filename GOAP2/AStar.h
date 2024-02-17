@@ -80,7 +80,10 @@ protected:
 	//Returns dDen, so that it is guaranteed that distFromStart / dDen <= 1. Used for normalizing distance.
 	virtual float GetDistanceDenominator() const = 0;
 	//Returns hDen, so that it is guaranteed that heuristics / hDen <= 1. Used for normalizing heuristics.
-	virtual float GetHeuristicsDenominator() const = 0;
+	virtual float GetHeuristicsDenominator() const
+	{
+		return 1;
+	}
 public:
 							AStarSolver	() {}
 	virtual					~AStarSolver	() {}
@@ -163,7 +166,7 @@ public:
 			if (discoveredHeapSizeDelta > 0)
 				discoveredHeapSize += discoveredHeapSizeDelta;
 		}
-		path.Cost = currentNode._distFromStart;
+		path.Cost = currentNode._distFromStart * GetDistanceDenominator();
 		t_id anotherId = currentNode._id;
 		while (anotherId != t_id())
 		{

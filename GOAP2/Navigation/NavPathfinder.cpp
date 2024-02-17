@@ -1,18 +1,29 @@
 ﻿#include "NavPathfinder.h"
 #include <random>
 
-NavPathfinder::NavPathfinder(const matrix& distanceMatrix,
-    const std::map<std::string, std::vector<unsigned>>& pointNameToVertexId)
+NavPathfinder::NavPathfinder(const Matrix& distanceMatrix)
 {
     _distanceMatrix = distanceMatrix;
     _numVertices = _distanceMatrix.size();
-    _pointNameToVertexIds = pointNameToVertexId;
+    _accumDist = 0;
+    std::vector<unsigned> longRoads(_distanceMatrix.size());
+    for (auto& line : _distanceMatrix)
+        for (auto d : line)
+            if (d < MathHelper::INFTY / 2)
+                for (auto& longRoad : longRoads)
+                    if (d > longRoad)
+                    {
+                        longRoad = d;
+                        break;
+                    }
+    for (auto& longRoad : longRoads)
+        _accumDist +=longRoad;
 }
 
 void NavPathfinder::GetNeighbors(std::vector<unsigned>& neighbors, const unsigned& vertex, const unsigned& finish) const
 {
     for (unsigned i = 0; i < _numVertices; i++)
-        if (_distanceMatrix[vertex][i] < MathHelper::INFTY)
+        if (_distanceMatrix[vertex][i] < MathHelper::INFTY / 2)
             neighbors.push_back(i);
 }
 
@@ -28,24 +39,11 @@ unsigned NavPathfinder::GetId(const unsigned& vertex) const
 
 float NavPathfinder::GetDistance(const unsigned& from, const unsigned& to) const
 {
-    return _distanceMatrix[from][to];
+    return static_cast<float>(_distanceMatrix[from][to]);
 }
 
-unsigned NavPathfinder::EmulateGetCurrentVertex() const
+float NavPathfinder::GetDistanceDenominator() const
 {
-    return std::rand() % _numVertices;
-}
-
-unsigned NavPathfinder::EmulateGetDestinationVertexByName(const std::string& name) const
-{
-    const auto& it = _pointNameToVertexIds.find(name);
-    if (it == _pointNameToVertexIds.end())
-    {
-        std::cout << "No point was found under the name " << name <<". Aborting.\n";
-        exit(-1);
-    }
-    auto& vertices = it->second;
-    unsigned randomIndex = std::rand() % vertices.size();
-    return vertices[randomIndex];
+    return static_cast<float>(_accumDist);
 }
 

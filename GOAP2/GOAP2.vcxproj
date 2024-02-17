@@ -109,6 +109,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,8 +134,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Actions\GoToAction.cpp" />
-    <ClCompile Include="GPlanner.cpp" />
+    <ClCompile Include="Condition\ConsitionSet.cpp" />
+    <ClCompile Include="Condition\SimpleConditions.cpp" />
     <ClCompile Include="Navigation\NavPathfinder.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -285,24 +286,27 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="World.cpp" />
+    <ClCompile Include="WorldMask.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actions\Action.h" />
-    <ClInclude Include="Actions\InputData.h" />
-    <ClInclude Include="Actions\GoToAction.h" />
-    <ClInclude Include="Actions\SimpleAction.h" />
+    <ClInclude Include="Action.h" />
     <ClInclude Include="AStar.h" />
-    <ClInclude Include="Attributes\Attribute.h" />
-    <ClInclude Include="Attributes\LocationAttribute.h" />
-    <ClInclude Include="Attributes\SimpleAttribute.h" />
-    <ClInclude Include="GPlanner.h" />
+    <ClInclude Include="Condition\Condition.h" />
+    <ClInclude Include="Condition\ConditionSet.h" />
+    <ClInclude Include="Condition\SimpleConditions.h" />
     <ClInclude Include="Navigation\Navigator.h" />
     <ClInclude Include="Navigation\NavPathfinder.h" />
+    <ClInclude Include="Planner.h" />
     <ClInclude Include="Testing.h" />
     <ClInclude Include="Tools\Catalogue.h" />
     <ClInclude Include="Tools\FibonacciHeap.hpp" />
     <ClInclude Include="Tools\MathHelper.h" />
     <ClInclude Include="World.h" />
+    <ClInclude Include="WorldMask.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Actions\" />
+    <Folder Include="Attributes\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
