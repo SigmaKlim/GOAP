@@ -2,33 +2,25 @@
 #include <memory>
 #include <vector>
 
-#include "Condition.h"
-#include "../WorldMask.h"
+#include "BCondition.h"
+#include "PropertyList.h"
+class WorldMask;
 
 
-class ConditionSet
+class ConditionSet : public PropertyList<std::shared_ptr<BCondition>>
 {
 public:
-    ConditionSet() : _conditions(_valueTypes->size(), nullptr), _mask(_valueTypes->size(), false), _affectedAttributesMask(0) {}
-    template <typename t_cond>
-    void SetCondition(unsigned index, const t_cond& condition);
-    void ClearCondition(unsigned index);
-    bool Satisfies(const WorldMask& world);
+    ConditionSet(unsigned size) : PropertyList<std::shared_ptr<BCondition>>(size) {}
+    template <typename T_Condition>
+    void SetCondition(unsigned index, const T_Condition& condition)
+    {
+        assert(dynamic_cast<const BCondition*>(condition));
+        SetProperty(index, std::make_shared<T_Condition>(condition));
+    }
+    //remove all conditions satisfied in world, if there are no such conditions, return false
+    bool Reduce(const WorldMask& world, ConditionSet reducedConditionSet) const;
+    
+
 private:
-    std::vector<std::shared_ptr<Condition>> _conditions;
-    std::vector<bool> _mask;
-    unsigned _affectedAttributesMask;
 
-    static std::vector<EValueType>* _valueTypes;
 };
-
-
-template <typename t_cond>
-void ConditionSet::SetCondition(unsigned index, const t_cond& condition)
-{
-    assert(index < _valueTypes->size());
-    _conditions[index] = dynamic_cast<Condition*>(new t_cond(condition));
-    assert(_conditions[index] != nullptr);
-    _mask[index] = true;
-    _affectedAttributesMask++;
-}

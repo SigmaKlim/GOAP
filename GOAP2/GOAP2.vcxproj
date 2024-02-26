@@ -135,7 +135,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Condition\ConsitionSet.cpp" />
-    <ClCompile Include="Condition\SimpleConditions.cpp" />
     <ClCompile Include="Navigation\NavPathfinder.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -210,6 +209,7 @@
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Planner.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Tools\MathHelper.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -285,15 +285,16 @@
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
-    <ClCompile Include="World.cpp" />
-    <ClCompile Include="WorldMask.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Action.h" />
+    <ClInclude Include="Actions\ActionImpl\SimpleAction.h" />
+    <ClInclude Include="Actions\BAction.h" />
     <ClInclude Include="AStar.h" />
-    <ClInclude Include="Condition\Condition.h" />
+    <ClInclude Include="Attributes\BAttribute.h" />
+    <ClInclude Include="Condition\BCondition.h" />
+    <ClInclude Include="Condition\ConditionImpl\Equals.h" />
     <ClInclude Include="Condition\ConditionSet.h" />
-    <ClInclude Include="Condition\SimpleConditions.h" />
+    <ClInclude Include="Condition\PropertyList.h" />
     <ClInclude Include="Navigation\Navigator.h" />
     <ClInclude Include="Navigation\NavPathfinder.h" />
     <ClInclude Include="Planner.h" />
@@ -301,12 +302,7 @@
     <ClInclude Include="Tools\Catalogue.h" />
     <ClInclude Include="Tools\FibonacciHeap.hpp" />
     <ClInclude Include="Tools\MathHelper.h" />
-    <ClInclude Include="World.h" />
     <ClInclude Include="WorldMask.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Actions\" />
-    <Folder Include="Attributes\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

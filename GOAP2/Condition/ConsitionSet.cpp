@@ -1,24 +1,22 @@
 ﻿#include "ConditionSet.h"
-std::vector<EValueType>* ConditionSet::_valueTypes = nullptr;
+#include "../WorldMask.h"
 
-
-void ConditionSet::ClearCondition(unsigned index)
+bool ConditionSet::Reduce(const WorldMask& world, ConditionSet reducedConditionSet) const
 {
-    assert(index < _valueTypes->size());
-    _conditions[index].reset();
-    _mask[index] = false;
-    _affectedAttributesMask--;
-}
-
-bool ConditionSet::Satisfies(const WorldMask& world)
-{
-    for (unsigned i = 0; i < _valueTypes->size(); i++)
+    reducedConditionSet = *this;
+    bool result = false;
+    for (unsigned i = 0; i < Size(); i++)
     {
-        if (_mask[i] == true && world._mask[i] == true)
+        if (IsAffected(i) == true && world.IsAffected(i) == true)
         {
-            if(_conditions[i]->Result(world._values[i], world._valueTypes->at(i)) == false)
-                return false;
+            if(_properties[i]->Result(std::dynamic_pointer_cast<Equals>(world._properties[i])->GetAttribute()) == true)
+            {
+                reducedConditionSet.ClearValue(i);
+                result = true;
+            }
         }
     }
-    return true;
+    return result;
 }
+
+

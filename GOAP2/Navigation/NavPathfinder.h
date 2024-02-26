@@ -2,7 +2,7 @@
 #include "../AStar.h"
 #include "../Tools/MathHelper.h"
 
-class NavPathfinder : public AStarSolver<unsigned, unsigned>
+class NavPathfinder : public AStarSolver<unsigned>
 {
 public:    
     NavPathfinder(const Matrix& distanceMatrix);
@@ -10,7 +10,7 @@ public:
 private:
     void GetNeighbors(std::vector<unsigned>& neighbors, const unsigned& vertex, const unsigned& finish = 0) const override;
     bool Satisfies(const unsigned& vertex, const unsigned& finish = 0) const override;
-    unsigned GetId(const unsigned& vertex) const override;
+    //unsigned GetId(const unsigned& vertex) const override;
     float GetDistance(const unsigned& from, const unsigned& to) const override;
     float GetDistanceDenominator() const override;
     

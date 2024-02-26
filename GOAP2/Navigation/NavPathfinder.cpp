@@ -32,10 +32,10 @@ bool NavPathfinder::Satisfies(const unsigned& vertex, const unsigned& finish) co
     return vertex == finish;
 }
 
-unsigned NavPathfinder::GetId(const unsigned& vertex) const
-{
-    return vertex;
-}
+// unsigned NavPathfinder::GetId(const unsigned& vertex) const
+// {
+//     return vertex;
+// }
 
 float NavPathfinder::GetDistance(const unsigned& from, const unsigned& to) const
 {

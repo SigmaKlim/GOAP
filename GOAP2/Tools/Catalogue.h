@@ -5,7 +5,7 @@ template <typename t_obj>
 class Catalogue
 {
 public:
-    Catalogue() : namesLoop(names), objectsLoop(objects) {};
+    Catalogue() : NameIterator(names), ObjectIterator(objects) {};
     ~Catalogue();
     bool                AddItem     (const std::string& name, const t_obj& object);
     bool                Contains    (const std::string& name) const;
@@ -27,7 +27,7 @@ public:
             return Names.end();
         }
         const std::vector<const std::string*>& Names;
-    } namesLoop; // for range-loop by names
+    } NameIterator; // for range-loop by names
     struct ObjectRangeLoop
     {
         ObjectRangeLoop(const std::vector<t_obj>& objects) : Objects(objects) {}
@@ -40,7 +40,7 @@ public:
             return Objects.end;
         }
         const std::vector<t_obj>& Objects;
-    } objectsLoop; // for range-loop by objects
+    } ObjectIterator; // for range-loop by objects
 private:
     std::unordered_map<std::string, size_t> nameIdMap;
     std::vector<const std::string*> names;

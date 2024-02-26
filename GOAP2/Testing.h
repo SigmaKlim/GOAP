@@ -6,17 +6,10 @@
 #include <fstream>
 #include "Tools/MathHelper.h"
 
-#include "GPlanner.h"
-#include "BitMask.h"
-#include "Actions/GoToAction.h"
-#include "Actions/SimpleAction.h"
 #include "Navigation/NavPathfinder.h"
-#include "Attributes/LocationAttribute.h"
-#include "Attributes/SimpleAttribute.h"
 #include "Navigation/Navigator.h"
 #pragma optimize( "", off )
 
-typedef std::vector<AttributeData> VectorAD;
 
 inline int TestNumeric()
 {
