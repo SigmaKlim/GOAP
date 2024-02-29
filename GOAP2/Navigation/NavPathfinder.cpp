@@ -20,11 +20,14 @@ NavPathfinder::NavPathfinder(const Matrix& distanceMatrix)
         _accumDist +=longRoad;
 }
 
-void NavPathfinder::GetNeighbors(std::vector<unsigned>& neighbors, const unsigned& vertex, const unsigned& finish) const
+void NavPathfinder::GetNeighbors(std::vector<unsigned>& neighbors, std::vector<float>& distances, const unsigned& vertex, const unsigned& finish) const
 {
     for (unsigned i = 0; i < _numVertices; i++)
         if (_distanceMatrix[vertex][i] < MathHelper::INFTY / 2)
+        {
             neighbors.push_back(i);
+            distances.push_back((float)_distanceMatrix[vertex][i]);
+        }
 }
 
 bool NavPathfinder::Satisfies(const unsigned& vertex, const unsigned& finish) const
@@ -36,11 +39,6 @@ bool NavPathfinder::Satisfies(const unsigned& vertex, const unsigned& finish) co
 // {
 //     return vertex;
 // }
-
-float NavPathfinder::GetDistance(const unsigned& from, const unsigned& to) const
-{
-    return static_cast<float>(_distanceMatrix[from][to]);
-}
 
 float NavPathfinder::GetDistanceDenominator() const
 {

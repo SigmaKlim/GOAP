@@ -5,10 +5,11 @@ template <typename t_obj>
 class Catalogue
 {
 public:
-    Catalogue() : NameIterator(names), ObjectIterator(objects) {};
+    Catalogue() : NameIterator(names), ObjectIterator(objects) {}
     ~Catalogue();
     bool                AddItem     (const std::string& name, const t_obj& object);
     bool                Contains    (const std::string& name) const;
+    //It is guaranteed that id is similar to element index in simple array
     const t_obj*        GetItem     (size_t id) const;
     const t_obj*        GetItem     (const std::string& name) const;
     const std::string*  GetName     (size_t id) const;
@@ -37,7 +38,7 @@ public:
         }
         auto end() const
         {
-            return Objects.end;
+            return Objects.end();
         }
         const std::vector<t_obj>& Objects;
     } ObjectIterator; // for range-loop by objects
@@ -52,9 +53,6 @@ private:
 template <typename t_obj>
 Catalogue<t_obj>::~Catalogue()
 {
-    if (std::is_pointer_v<t_obj> == true)
-        for (auto& object : objects)
-                delete object;
 }
 
 template <typename t_obj>

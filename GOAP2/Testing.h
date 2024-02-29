@@ -4,10 +4,14 @@
 #include <string>
 #include <iostream> 
 #include <fstream>
+
+#include "Planner.h"
+#include "Actions/ACSimple.h"
+#include "Attributes/AEnum.h"
+#include "Condition/ConditionImpl.h"
 #include "Tools/MathHelper.h"
 
 #include "Navigation/NavPathfinder.h"
-#include "Navigation/Navigator.h"
 #pragma optimize( "", off )
 
 
@@ -41,7 +45,51 @@ inline int TestNumeric()
 			std::cout << "\ncost = " << p.Cost << "\n\n";
 		}
 	
-#pragma endregion
+	return 0;
+}
+
+enum EAtValCOVER_STATUS
+{
+	eInCover,
+	eNotInCover
+};
+enum EAtValIS_CROUCHING
+{
+	eTRUE,
+	eFALSE
+};
+
+inline int TestGoap()
+{
+	Planner planner;
+	planner.RegisterAttribute<AEnum>("COVER_STATUS");
+	planner.RegisterAttribute<AEnum>("IS_CROUCHING");
+
+	ConditionSet cHide(planner.GetNumAttributes());
+	cHide.SetCondition(planner.GetAttributeId("COVER_STATUS"), new Equal(EAtValCOVER_STATUS::eInCover));
+	ValueSet eHide(planner.GetNumAttributes());
+	eHide.SetProperty(planner.GetAttributeId("IS_CROUCHING"), EAtValIS_CROUCHING::eTRUE);
+	ACSimple aHide(cHide, eHide, 3);
+	planner.RegisterActionConstructor("Hide", aHide);
+
+	
+	ValueSet eGoToCover(planner.GetNumAttributes());
+	eGoToCover.SetProperty(planner.GetAttributeId("COVER_STATUS"), EAtValCOVER_STATUS::eInCover);
+	ACSimple aGoToCover(ConditionSet(planner.GetNumAttributes()), eGoToCover, 3);
+	planner.RegisterActionConstructor("GoToCover", aGoToCover);
+
+	ConditionSet gHidden(planner.GetNumAttributes());
+	gHidden.SetCondition(planner.GetAttributeId("COVER_STATUS"), new Equal(EAtValCOVER_STATUS::eInCover));
+	gHidden.SetCondition(planner.GetAttributeId("IS_CROUCHING"), new Equal(EAtValIS_CROUCHING::eTRUE));
+	planner.RegisterGoal("StayHidden", gHidden);
+
+	ValueSet init(planner.GetNumAttributes());
+	init.SetProperty(planner.GetAttributeId("COVER_STATUS"), EAtValCOVER_STATUS::eNotInCover);
+	init.SetProperty(planner.GetAttributeId("IS_CROUCHING"), EAtValIS_CROUCHING::eFALSE);
+	
+	auto plan = planner.ConstructPlan(init, "StayHidden", ActionData());
+	for (auto& actionName : plan.ActionNames)
+		std::cout << actionName << "\n";
 	return 0;
 }
 

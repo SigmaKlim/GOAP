@@ -13,9 +13,9 @@
 #include <unordered_map>
 #include <boost/functional/hash.hpp>
 
-#define CHECK_DISTANCE_NORMALIZED(value) if (value > 1.0f) std::cout << "WARNING: Normalized distance value (" << std::to_string(value) << ") is greater than 1.0f.\n"; \
+#define CHECK_DISTANCE_NORMALIZED(value) if ((value) > 1.0f) std::cout << "WARNING: Normalized distance value (" << std::to_string(value) << ") is greater than 1.0f.\n" \
 	
-#define CHECK_HEURISTICS_NORMALIZED(value) if (value > 1.0f) std::cout << "WARNING: Normalized heuristics value (" << std::to_string(value) << ") is greater than 1.0f.\n"; \
+#define CHECK_HEURISTICS_NORMALIZED(value) if ((value) > 1.0f) std::cout << "WARNING: Normalized heuristics value (" << std::to_string(value) << ") is greater than 1.0f.\n" \
 
 typedef unsigned long long ull;
 
@@ -46,14 +46,31 @@ struct Node
 	unsigned	  VertexId;
 	float DistFromStart = 0.0f;
 	float Heuristic = 0.0f;
-
-
 };
+
 struct TelemetryData
 {
 	ull totalBytesUsed = 0;		//total amount of memory used
 	unsigned expandedNum = 0;	//number of expanded vertices
 	unsigned discoveredNum = 0;	//number of discovered vertices
+};
+
+template <typename t_vertex>
+struct VertexKey
+{
+	std::size_t operator()(const t_vertex& k) const
+	{
+		return boost::hash<t_vertex>()(k);
+	}
+};
+
+template <typename t_vertex>
+struct VertexEqual
+{
+	bool operator()(const t_vertex& lhs, const t_vertex& rhs) const
+	{
+		return false; //we assume that two vertices, returned by GetNeighbors are always different
+	}
 };
 
 
@@ -67,12 +84,13 @@ protected:
 	{
 		return 0;
 	}
-	//Fills the array with newly created node's neighbors
-	virtual		void		GetNeighbors	(std::vector<t_vertex>&	neighbors, const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
+	//Returns accessible from 'vertex' neighbors as well as distances to them 
+	virtual		void		GetNeighbors	(	std::vector<t_vertex>&	neighbors, std::vector<float>& distances,
+												const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
 	//Checks whether this node satisfies conditions of the target node.
 	virtual		bool		Satisfies		(const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
 	//virtual		t_id		GetId			(const t_vertex& vertex) const = 0;
-	virtual		float		GetDistance		(const t_vertex& from, const t_vertex& to) const = 0;
+	//virtual		float		GetDistance		(const t_vertex& from, const t_vertex& to) const = 0;
 
 	//Returns dDen, so that it is guaranteed that distFromStart / dDen <= 1. Used for normalizing distance.
 	virtual float GetDistanceDenominator() const = 0;
@@ -84,7 +102,7 @@ protected:
 public:
 							AStarSolver	() {}
 	virtual					~AStarSolver	() {}
-				bool		Pathfind		(Path<t_vertex>& path, t_vertex start, t_vertex finish = t_vertex(),
+	bool		Pathfind		(Path<t_vertex>& path, t_vertex start, t_vertex finish = t_vertex(),
 				                             TelemetryData* telemetryData = nullptr) const
 	{
 
@@ -93,7 +111,8 @@ public:
 								
 		std::unordered_set<unsigned>					expanded;	//A set of expanded nodes, used to check if a node had been expanded
 
-		std::unordered_map<t_vertex, unsigned>			vid;	//Used to map vertex object to id							
+		std::unordered_map<t_vertex, unsigned,
+								VertexKey<t_vertex>, VertexEqual<t_vertex>>			vid;	//Used to map vertex object to id							
 		std::vector<const t_vertex*>					idv;	//Used to map node id to vertex object ptr
 								
 		std::unordered_map <unsigned, unsigned>			cameFrom;	//Used to map node to its preceding node
@@ -112,6 +131,7 @@ public:
 			++telemetryData->discoveredNum;
 				
 		std::vector <t_vertex> neighborVertices;
+		std::vector<float> distances;
 		while (true)
 		{
 			int discoveredHeapSizeDelta = 0;
@@ -130,10 +150,10 @@ public:
 			expanded.insert(currentVertexId);
 			if (telemetryData != nullptr)
 				++telemetryData->expandedNum;
-			GetNeighbors(neighborVertices, currentVertex, finish);
+			GetNeighbors(neighborVertices, distances, currentVertex, finish);
 			for (int i = 0; i < neighborVertices.size(); i++)
 			{
-				normalizedDistance = GetDistance(currentVertex, neighborVertices[i]) / GetDistanceDenominator();
+				normalizedDistance = distances[i] / GetDistanceDenominator();
 				CHECK_DISTANCE_NORMALIZED(normalizedDistance);
 				normalizedHeuristics = GetHeuristic(neighborVertices[i], finish) / GetHeuristicsDenominator();
 				CHECK_HEURISTICS_NORMALIZED(normalizedHeuristics);
@@ -170,6 +190,7 @@ public:
 				}
 			}
 			neighborVertices.clear();
+			distances.clear();
 			if (discoveredHeapSizeDelta > 0)
 				discoveredHeapSize += discoveredHeapSizeDelta;
 		}

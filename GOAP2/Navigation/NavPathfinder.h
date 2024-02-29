@@ -8,10 +8,8 @@ public:
     NavPathfinder(const Matrix& distanceMatrix);
     
 private:
-    void GetNeighbors(std::vector<unsigned>& neighbors, const unsigned& vertex, const unsigned& finish = 0) const override;
+    void GetNeighbors(std::vector<unsigned>& neighbors, std::vector<float>& distances, const unsigned& vertex, const unsigned& finish = 0) const override;
     bool Satisfies(const unsigned& vertex, const unsigned& finish = 0) const override;
-    //unsigned GetId(const unsigned& vertex) const override;
-    float GetDistance(const unsigned& from, const unsigned& to) const override;
     float GetDistanceDenominator() const override;
     
     unsigned _numVertices;

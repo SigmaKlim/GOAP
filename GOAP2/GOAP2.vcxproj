@@ -134,7 +134,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Condition\ConsitionSet.cpp" />
+    <ClCompile Include="Condition\ConditionImpl.cpp" />
+    <ClCompile Include="Condition\ConditionSet.cpp" />
     <ClCompile Include="Navigation\NavPathfinder.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -287,14 +288,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actions\ActionImpl\SimpleAction.h" />
-    <ClInclude Include="Actions\BAction.h" />
+    <ClInclude Include="Actions\ActionData.h" />
+    <ClInclude Include="Actions\IActionConstructor.h" />
+    <ClInclude Include="Actions\ACSimple.h" />
     <ClInclude Include="AStar.h" />
-    <ClInclude Include="Attributes\BAttribute.h" />
-    <ClInclude Include="Condition\BCondition.h" />
-    <ClInclude Include="Condition\ConditionImpl\Equals.h" />
+    <ClInclude Include="Attributes\IAttribute.h" />
+    <ClInclude Include="Attributes\AEnum.h" />
+    <ClInclude Include="Condition\ConditionImpl.h" />
+    <ClInclude Include="Condition\ICondition.h" />
     <ClInclude Include="Condition\ConditionSet.h" />
-    <ClInclude Include="Condition\PropertyList.h" />
     <ClInclude Include="Navigation\Navigator.h" />
     <ClInclude Include="Navigation\NavPathfinder.h" />
     <ClInclude Include="Planner.h" />
@@ -302,7 +304,8 @@
     <ClInclude Include="Tools\Catalogue.h" />
     <ClInclude Include="Tools\FibonacciHeap.hpp" />
     <ClInclude Include="Tools\MathHelper.h" />
-    <ClInclude Include="WorldMask.h" />
+    <ClInclude Include="Tools\PropertyList.h" />
+    <ClInclude Include="ValueSet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
