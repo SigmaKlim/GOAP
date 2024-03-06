@@ -6,7 +6,7 @@
 class AEnum : public IAttribute
 {
 public:
-    float GetDifference(t_value value1, t_value value2) const override
+    float GetDifference(t_value value1, t_value value2, const SupplementalData& userData) const override
     {
         return (float)(value1 != value2); 
     }

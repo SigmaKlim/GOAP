@@ -2,8 +2,8 @@
 #include "../Basic/ICondition.h"
 struct CLarger :  public ICondition
 {
-    CLarger(t_value value, IAttribute* attributePtr = nullptr);
-    float Evaluate(t_value value) const override;
+    CLarger(t_value value);
+    float Evaluate(t_value value, const IAttribute* attributePtr, const SupplementalData& userData) const override;
 
     //Condition resolution
     

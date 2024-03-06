@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <memory>
-#include <vector>
 
 #include "ICondition.h"
 #include "../../Tools/PropertyList.h"
@@ -16,11 +15,13 @@ public:
     //Check if this CS conflicts the other
     bool HasConflicts(const ConditionSet& other) const;
     //Remove all conditions satisfied in 'world', if there are no such conditions, return false
-    bool Reduce(const ValueSet& world, ConditionSet& reducedConditionSet) const;
+    bool Reduce(const ValueSet& world, ConditionSet& reducedConditionSet, SupplementalData userData) const;
     //Resolve all colliding conditions, if there is a pair of conflicting conditions, return false
     bool Merge(const ConditionSet& other, ConditionSet& mergedConditionSet) const;
 
-
+private:
+    static const Catalogue<IAttribute*>* _attributeCataloguePtr;
+    friend class Planner;
 };
 
 template <typename T_Condition>

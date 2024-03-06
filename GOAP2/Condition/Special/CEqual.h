@@ -3,8 +3,8 @@
 
 struct CEqual : public ICondition
 {
-    CEqual(t_value value, IAttribute* attributePtr = nullptr);
-    float Evaluate(t_value value) const override;
+    CEqual(t_value value);
+    float Evaluate(t_value value, const IAttribute* attributePtr, const SupplementalData& userData) const override;
 
     //Condition resolution
     

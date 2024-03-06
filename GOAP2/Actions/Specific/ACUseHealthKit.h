@@ -8,7 +8,7 @@ public:
     ACUseHealthKit(size_t numDepletablesAttributeIndex, size_t affectedAttributeIndex, t_value delta) :
     _numHKitsIndex(numDepletablesAttributeIndex), _hpLeftIndex(affectedAttributeIndex),
     _delta(delta) {}
-    void ConstructActions(std::vector<Action>& actions, const ConditionSet& requiredConditions, const ActionData& userData) override;
+    void ConstructActions(std::vector<Action>& actions, const ConditionSet& requiredConditions, const SupplementalData& userData) override;
     float GetMaxCost() const override;
     
 private:
@@ -18,7 +18,7 @@ private:
 };
 
 inline void ACUseHealthKit::ConstructActions(std::vector<Action>& actions, const ConditionSet& requiredConditions,
-    const ActionData& userData)
+    const SupplementalData& userData)
 {
     int minNumDepletables = 1;
     if (requiredConditions.IsAffected(_numHKitsIndex) == true)

@@ -5,7 +5,7 @@
 class AAtNode : public IAttribute
 {
 public:
-    float GetDifference(t_value value1, t_value value2) const override
+    float GetDifference(t_value value1, t_value value2, const SupplementalData& userData) const override
     {
         if (value1 == -1 || value2 == -1) // we reserve -1 value for cases when current node is unknown (like after action Patrol)
             return GetMaxDifference() / 2; //in such case we return the same value for any argument

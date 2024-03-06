@@ -22,15 +22,20 @@ std::size_t hash_value(const Vertex& vertex)
     return hash;
 }
 
+Planner::Planner()
+{
+    ConditionSet::_attributeCataloguePtr = &this->_attributeCatalogue;
+}
 
-Plan Planner::ConstructPlan(const ValueSet& startState, std::string goalName, ActionData initData) const
+
+Plan Planner::ConstructPlan(const ValueSet& startState, std::string goalName, SupplementalData initData) const
 {
     Plan plan(*this, startState, goalName);
     assert(startState.NumAffected() == startState.Size());
     //We convert startState to a condition set made of Equal conditions
     ConditionSet targetConditionSet(_attributeCatalogue.Size());
     for (unsigned i = 0; i < _attributeCatalogue.Size(); i++)
-        targetConditionSet.SetCondition(i, new CEqual(plan.StartState.GetProperty(i), *_attributeCatalogue.GetItem(i)));
+        targetConditionSet.SetCondition(i, new CEqual(plan.StartState.GetProperty(i)));
     Vertex targetVertex(targetConditionSet);
     
     Vertex departureVertex( plan.Goal,
@@ -61,7 +66,7 @@ void Planner::GetNeighbors(std::vector<Vertex>& neighbors, std::vector<float>& d
         for (auto& action : actions)
         {
             ConditionSet reducedConditionSet(vertex.ActiveConditionSet.Size());
-            bool isActionUseful = vertex.ActiveConditionSet.Reduce(action.Effects, reducedConditionSet);
+            bool isActionUseful = vertex.ActiveConditionSet.Reduce(action.Effects, reducedConditionSet, action.UserData);
             ConditionSet mergedConditionSet(vertex.ActiveConditionSet.Size());
             bool isActionLegit = reducedConditionSet.Merge(action.Conditions, mergedConditionSet);
             if (isActionUseful == true && isActionLegit == true)

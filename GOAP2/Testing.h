@@ -141,7 +141,7 @@ inline int TestGoap()
 	planner.RegisterActionConstructor("Reload weapon", ACSimple(cReload, eReload, 2));
 
 	ConditionSet cShoot = helper.MakeConditionSet	({  {"enemyStatus", new CEqual(EAtValenemyStatus::eInRangedCombatRadius)},
-														{"isWeaponLoaded", new CEqual(EAtValBoolean::eTRUE)}});
+		{"isWeaponLoaded", new CEqual(EAtValBoolean::eTRUE)}});
 	ValueSet	eShoot	= helper.MakeValueSet		({	{"enemyStatus", EAtValenemyStatus::eAttacking}});
 	planner.RegisterActionConstructor("Shoot enemy", ACSimple(cShoot, eShoot, 3));
 
@@ -150,7 +150,7 @@ inline int TestGoap()
 
 	
 	ConditionSet gHidden = helper.MakeConditionSet({{"coverStatus", new CEqual(EAtValcoverStatus::eInCover)},
-													{"isCrouching", new CEqual(EAtValBoolean::eTRUE)}});
+		{"isCrouching", new CEqual(EAtValBoolean::eTRUE)}});
 	planner.RegisterGoal("Stay hidden", gHidden);
 
 	ConditionSet gAttack = helper.MakeConditionSet({{"enemyStatus", new CEqual(EAtValenemyStatus::eAttacking)}});
@@ -163,24 +163,24 @@ inline int TestGoap()
 	planner.RegisterGoal("Go to ammo box", gGoToAmmoBox);
 	
 	ValueSet init = helper.MakeValueSet({	{"coverStatus", EAtValcoverStatus::eNotInCover},
-											{"isCrouching", EAtValBoolean::eFALSE},
-											{"enemyStatus", EAtValenemyStatus::eNonVisible},
-											{"isWeaponLoaded", EAtValBoolean::eFALSE},
-											{"hpLeft", 100},
-											{"hKitsLeft", 3},
-											{"ammoInMagLeft", 30},
-											{"magsLeft", 3},
-											{"atNode", 3}});
+		{"isCrouching", EAtValBoolean::eFALSE},
+		{"enemyStatus", EAtValenemyStatus::eNonVisible},
+		{"isWeaponLoaded", EAtValBoolean::eFALSE},
+		{"hpLeft", 100},
+		{"hKitsLeft", 3},
+		{"ammoInMagLeft", 30},
+		{"magsLeft", 3},
+		{"atNode", 3}});
 
 	auto& currentGoal = gGoToAmmoBox;
 	
-	ActionData initData;
+	SupplementalData initData;
 	initData.initNode = init.GetProperty(planner.GetAttributeId("atNode"));
 	initData.futureGoToDestinationNode = -1;
 	initData.minimalNumHKits = (currentGoal.IsAffected(planner.GetAttributeId("hKitsLeft")) == true) ?
 		Helper::CastAssert<const CLarger>(currentGoal.GetProperty(planner.GetAttributeId("hKitsLeft")).get())->Value + 1 : 0;
 	
-	auto plan = planner.ConstructPlan(init, "Go to ammo box", initData);
+	auto plan = planner.ConstructPlan(init, "Attack enemy", initData);
 	if (plan.success == true)
 	{
 		for (size_t i = 0; i < plan.ActionNames.size(); i++)

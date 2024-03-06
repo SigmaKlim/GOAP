@@ -23,24 +23,23 @@ struct CEqual;
 
 struct ICondition
 {
-    ICondition(IAttribute* attributePtr) : _attributePtr(attributePtr) {}
+    ICondition() = default;
     virtual ~ICondition() = default;
     virtual ICondition* Duplicate() const = 0;
     //Evaluate the result of the condition with 'value' as input. If the condition is satisfied, returns 0.0, otherwise the distance (calculated from IAttribute::GetDifference implementation) 
-    virtual float Evaluate(t_value value) const = 0;
+    virtual float Evaluate(t_value value, const IAttribute* attributePtr, const SupplementalData& userData) const = 0;
     
     //Condition resolution
 
     //A series of methods for combining two conditions into a single 1.
     //Returns a pointer to allocated memory keeping a new condition. Do not override manually!
-    virtual ICondition* Resolve(const ICondition* c) const = 0;
+    virtual ICondition* Resolve(const ICondition* conditionPtr) const = 0;
     
     RESOLVE_I(CEqual)
     RESOLVE_I(CLarger)
     RESOLVE_I(CInSet)
 
 protected:
-    IAttribute* _attributePtr = nullptr;
 
     friend class Helper;
 };

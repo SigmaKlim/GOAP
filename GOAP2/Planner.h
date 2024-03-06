@@ -27,7 +27,7 @@ struct Vertex
     ConditionSet ActiveConditionSet; //A set of conditions required for all previously taken actions
     std::size_t PrevActionId;
     
-    ActionData UserData;
+    SupplementalData UserData;
     //debug
     std::string PrevActionName;
     std::string PrevActionStringData;
@@ -39,7 +39,7 @@ std::size_t hash_value(const Vertex& vertex);
 class Planner : public AStarSolver<Vertex>
 {
 public:
-    Planner() = default;
+    Planner();
     
     void GetNeighbors(std::vector<Vertex>& neighbors, std::vector<float>& distances, const Vertex& vertex, const Vertex& finish) const override;
     bool Satisfies(const Vertex& vertex, const Vertex& finish) const override;
@@ -54,7 +54,7 @@ public:
     void RegisterGoal(const std::string& name, const ConditionSet& goalState);
 
     //For convenient use
-    Plan ConstructPlan(const ValueSet& startState, std::string goalName, ActionData initData) const;
+    Plan ConstructPlan(const ValueSet& startState, std::string goalName, SupplementalData initData) const;
     size_t GetNumAttributes() const;
     size_t GetAttributeId(const std::string& name) const;
 private:

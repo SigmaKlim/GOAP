@@ -8,7 +8,7 @@ class ACGoTo : public IActionConstructor
 {
 public:
     ACGoTo(size_t atNodeIndex, size_t isCrouchingIndex) : _atNodeIndex(atNodeIndex), _isCrouchingIndex(isCrouchingIndex){}  
-    void ConstructActions(std::vector<Action>& actions, const ConditionSet& requiredConditions, const ActionData& userData) override;
+    void ConstructActions(std::vector<Action>& actions, const ConditionSet& requiredConditions, const SupplementalData& userData) override;
 
     float GetMaxCost() const override;
 
@@ -18,7 +18,7 @@ private:
 };
 
 inline void ACGoTo::ConstructActions(std::vector<Action>& actions, const ConditionSet& requiredConditions,
-    const ActionData& userData)
+    const SupplementalData& userData)
 {
     if (requiredConditions.IsAffected(_atNodeIndex) == true)
     {
@@ -44,7 +44,7 @@ inline void ACGoTo::ConstructActions(std::vector<Action>& actions, const Conditi
                 newCost +=  AAtNode::navigator.GetDistance(destinationNode, userData.futureGoToDestinationNode) -
                             AAtNode::navigator.GetDistance(userData.futureGoToDestinationNode, userData.initNode); //compensate our previous lack of knowledge of future GoTo departure point
             }
-            ActionData newData(userData);
+            SupplementalData newData(userData);
             newData.futureGoToDestinationNode = destinationNode;
             std::string stringData = "-> " + std::to_string(destinationNode);
             Action action(cs, vs, newCost, newData, stringData);//calculate cost of movement via navigator

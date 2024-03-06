@@ -367,7 +367,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actions\ActionData.h" />
     <ClInclude Include="Actions\Basic\ACSimple.h" />
     <ClInclude Include="Actions\Basic\IActionConstructor.h" />
     <ClInclude Include="Actions\Specific\ACGoTo.h" />
@@ -391,6 +390,7 @@
     <ClInclude Include="Navigation\Navigator.h" />
     <ClInclude Include="Navigation\NavPathfinder.h" />
     <ClInclude Include="Planner.h" />
+    <ClInclude Include="SupplementalData.h" />
     <ClInclude Include="Testing.h" />
     <ClInclude Include="Tools\Catalogue.h" />
     <ClInclude Include="Tools\FibonacciHeap.hpp" />

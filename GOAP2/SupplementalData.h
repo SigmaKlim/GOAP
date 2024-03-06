@@ -1,6 +1,8 @@
 ﻿#pragma once
+#include <boost/container_hash/hash.hpp>
 
-struct ActionData
+//Extra parameters passed to user overloads
+struct SupplementalData
 {
     int initNode = -1;                      //The value mast be equal to 'atNode' value from init state. 
     int futureGoToDestinationNode = -1;     //Default value is 'atNode' goal value if set, otherwise -1. Check ActionData.h for details.
@@ -23,7 +25,12 @@ struct ActionData
                             //parameter of the agent, it was moved from world state to action data.
 };
 
-inline std::size_t hash_value(const ActionData& aData)
+inline std::size_t hash_value(const SupplementalData& aData)
 {
-    return 0;
+    size_t hash;
+    boost::hash_combine(hash, aData.initNode);
+    boost::hash_combine(hash, aData.futureGoToDestinationNode);
+    boost::hash_combine(hash, aData.minimalNumHKits);
+    
+    return hash;
 }
