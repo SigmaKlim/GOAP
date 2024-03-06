@@ -1,9 +1,11 @@
 ﻿#pragma once
 #include <memory>
 
-#include "../Attributes/IAttribute.h"
+#include "../../Attributes/Basic/IAttribute.h"
 
-#define RESOLVE_I(newCondition) virtual ICondition* Resolve##newCondition(const struct newCondition* p_##newCondition) const = 0;	\
+#pragma region Macro
+
+#define RESOLVE_I(newCondition) virtual ICondition* Resolve##newCondition(const struct newCondition* c##newCondition) const = 0;	\
     
 #define RESOLVE_D(derivedCondition) \
 ICondition* Duplicate()  const\
@@ -15,26 +17,36 @@ ICondition* Resolve(const ICondition* c) const override \
     return c->Resolve##derivedCondition(this);  \
 }   \
 
+#pragma endregion 
+
+struct CEqual;
+
 struct ICondition
 {
+    ICondition(IAttribute* attributePtr) : _attributePtr(attributePtr) {}
     virtual ~ICondition() = default;
     virtual ICondition* Duplicate() const = 0;
     //Evaluate the result of the condition with 'value' as input. If the condition is satisfied, returns 0.0, otherwise the distance (calculated from IAttribute::GetDifference implementation) 
-    virtual float Evaluate(t_value value, const IAttribute* iAttributePtr) const = 0;
+    virtual float Evaluate(t_value value) const = 0;
     
     //Condition resolution
 
     //A series of methods for combining two conditions into a single 1.
     //Returns a pointer to allocated memory keeping a new condition. Do not override manually!
     virtual ICondition* Resolve(const ICondition* c) const = 0;
-
-    RESOLVE_I(Equal)
-    RESOLVE_I(LargerOrEqual)
     
+    RESOLVE_I(CEqual)
+    RESOLVE_I(CLarger)
+    RESOLVE_I(CInSet)
+
+protected:
+    IAttribute* _attributePtr = nullptr;
+
+    friend class Helper;
 };
 
 //How to add a new condition:
-//1. Make new class derived from ICondition
+//1. Make new class derived from ICondition, provide proper constructor
 //2. Implement Evaluate method based on your needs
 //3. Add macros RESOLVE_I(name_of_your_new_condition_class) to ICondition class body
 //4. Add macros RESOLVE_D(name_of_your_new_condition_class) to your new class body

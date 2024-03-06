@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 typedef int t_value;
+struct ICondition;
 
 class IAttribute
 {
@@ -12,5 +13,10 @@ public:
     virtual float GetDifference(t_value value1, t_value value2) const = 0;
     //Returns maximal possible difference between any two values of this attribute. Used to normalize difference.
     virtual float GetMaxDifference() const = 0;
-    
+
+    // //Used to check if a condition can be applied to the attribute via dynamic_cast
+    // virtual bool CheckAllowedConditions(const ICondition* cPtr)
+    // {
+    //     return true;
+    // }
 };

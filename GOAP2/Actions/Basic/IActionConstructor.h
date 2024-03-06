@@ -1,7 +1,8 @@
 ﻿#pragma once
-#include "../Condition/ConditionSet.h"
-#include "../ValueSet.h"
-#include "ActionData.h"
+#include "../../Condition/Basic/ConditionSet.h"
+#include "../../ValueSet.h"
+#include "../ActionData.h"
+
 //A class for evaluated instances of action
 struct Action
 {
@@ -10,6 +11,9 @@ struct Action
     float Cost;
 
     ActionData UserData; //used for constructing new vertices
+
+    //Debug
+    std::string StringData; //some info about action this action instance
 };
 
 //An interface with methods for constructing action instances from required conditions and user data
@@ -22,5 +26,7 @@ public:
 
     //Returns maximal possible cost for this action
     virtual float GetMaxCost() const = 0;
+    
+    static size_t numAttributes;
 };
 

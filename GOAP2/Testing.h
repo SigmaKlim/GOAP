@@ -6,9 +6,22 @@
 #include <fstream>
 
 #include "Planner.h"
-#include "Actions/ACSimple.h"
-#include "Attributes/AEnum.h"
-#include "Condition/ConditionImpl.h"
+#include "Helper.h"
+#include "Actions/Basic/ACSimple.h"
+#include "Actions/Specific/ACGoTo.h"
+
+#include "Attributes/Basic/AEnum.h"
+#include "Attributes/Special/AHealth.h"
+#include "Attributes/Special/AHKitsLeft.h"
+#include "Attributes/Special/AAmmoInMag.h"
+#include "Attributes/Special/AAtNode.h"
+#include "Attributes/Special/AMagsLeft.h"
+
+#include "Condition/Special/CEqual.h"
+#include "Condition/Special/CLarger.h"
+#include "Condition/Special/CInSet.h"
+#include "Navigation/Navigator.h"
+
 #include "Tools/MathHelper.h"
 
 #include "Navigation/NavPathfinder.h"
@@ -48,48 +61,135 @@ inline int TestNumeric()
 	return 0;
 }
 
-enum EAtValCOVER_STATUS
+//test function to assign ids and distances to navigator
+inline Navigator SetUpNavigator()
+{
+	Navigator navigator;
+	navigator.AddNodes("AmmoBox", {1, 4});
+	navigator.AddNodes("MedStation", {2, 3});
+	navigator.IsSymmetric = true;
+	navigator.SetDistance(1, 2, 3.0f);
+	navigator.SetDistance(1, 3, 1.5f);
+	navigator.SetDistance(1, 4, 2.5f);
+	navigator.SetDistance(2, 3, 3.0f);
+	navigator.SetDistance(2, 4, 2.0f);
+	navigator.SetDistance(3, 4, 1.5f);
+	return navigator;
+}
+
+enum EAtValcoverStatus
 {
 	eInCover,
 	eNotInCover
 };
-enum EAtValIS_CROUCHING
+enum EAtValBoolean
 {
 	eTRUE,
 	eFALSE
+};
+enum EAtValenemyStatus
+{
+	eNonVisible,
+	eVisible,
+	eInRangedCombatRadius,
+	eInCloseCombatRadius,
+	eAttacking
 };
 
 inline int TestGoap()
 {
 	Planner planner;
-	planner.RegisterAttribute<AEnum>("COVER_STATUS");
-	planner.RegisterAttribute<AEnum>("IS_CROUCHING");
+	planner.RegisterAttribute<AEnum>("coverStatus");
+	planner.RegisterAttribute<AEnum>("isCrouching");
+	planner.RegisterAttribute<AEnum>("enemyStatus");
+	planner.RegisterAttribute<AEnum>("isWeaponLoaded");
+	planner.RegisterAttribute<AHealth>("hpLeft");
+	planner.RegisterAttribute<AHKitsLeft>("hKitsLeft");
+	planner.RegisterAttribute<AAmmoInMag>("ammoInMagLeft");
+	planner.RegisterAttribute<AMagsLeft>("magsLeft");
+	planner.RegisterAttribute<AAtNode>("atNode");
 
-	ConditionSet cHide(planner.GetNumAttributes());
-	cHide.SetCondition(planner.GetAttributeId("COVER_STATUS"), new Equal(EAtValCOVER_STATUS::eInCover));
-	ValueSet eHide(planner.GetNumAttributes());
-	eHide.SetProperty(planner.GetAttributeId("IS_CROUCHING"), EAtValIS_CROUCHING::eTRUE);
-	ACSimple aHide(cHide, eHide, 3);
-	planner.RegisterActionConstructor("Hide", aHide);
+	Navigator navigator = SetUpNavigator(); 
+	AAtNode::navigator = navigator;
+	
+	IActionConstructor::numAttributes = planner.GetNumAttributes(); //!!!
+	
+	Helper helper(&planner);
+	
+	ConditionSet	cHide = helper.MakeConditionSet	({{"coverStatus", new CEqual(EAtValcoverStatus::eInCover)}});
+	ValueSet		eHide = helper.MakeValueSet		({{"isCrouching", EAtValBoolean::eTRUE}});
+	planner.RegisterActionConstructor("Hide", ACSimple(cHide, eHide, 3));
+
+	ConditionSet	cGoToCover = helper.MakeConditionSet	({});
+	ValueSet		eGoToCover = helper.MakeValueSet		({{"coverStatus", EAtValcoverStatus::eInCover}});
+	planner.RegisterActionConstructor("Go to cover", ACSimple(cGoToCover, eGoToCover, 3));
+
+	ConditionSet	cSearch = helper.MakeConditionSet	({{"enemyStatus", new CEqual(EAtValenemyStatus::eNonVisible)}});
+	ValueSet		eSearch = helper.MakeValueSet		({{"enemyStatus", EAtValenemyStatus::eVisible}});
+	planner.RegisterActionConstructor("Search enemy", ACSimple(cSearch, eSearch, 10));
+
+	ConditionSet	cEngage	= helper.MakeConditionSet	({{"enemyStatus", new CEqual(EAtValenemyStatus::eVisible)}});
+	ValueSet		eEngage	= helper.MakeValueSet		({{"enemyStatus", EAtValenemyStatus::eInRangedCombatRadius}});
+	planner.RegisterActionConstructor("Engage enemy", ACSimple(cEngage, eEngage, 4));
+
+	ConditionSet	cApproach = helper.MakeConditionSet	({{"enemyStatus", new CEqual(EAtValenemyStatus::eInRangedCombatRadius)}});
+	ValueSet		eApproach = helper.MakeValueSet		({{"enemyStatus", EAtValenemyStatus::eInCloseCombatRadius}});
+	planner.RegisterActionConstructor("Approach enemy", ACSimple(cApproach, eApproach, 3));
+
+	ConditionSet	cReload	= helper.MakeConditionSet	({{"ammoInMagLeft", new CLarger(5)}});
+	ValueSet		eReload	= helper.MakeValueSet		({{"isWeaponLoaded", EAtValBoolean::eTRUE}});
+	planner.RegisterActionConstructor("Reload weapon", ACSimple(cReload, eReload, 2));
+
+	ConditionSet cShoot = helper.MakeConditionSet	({  {"enemyStatus", new CEqual(EAtValenemyStatus::eInRangedCombatRadius)},
+														{"isWeaponLoaded", new CEqual(EAtValBoolean::eTRUE)}});
+	ValueSet	eShoot	= helper.MakeValueSet		({	{"enemyStatus", EAtValenemyStatus::eAttacking}});
+	planner.RegisterActionConstructor("Shoot enemy", ACSimple(cShoot, eShoot, 3));
+
+	planner.RegisterActionConstructor("Go to", ACGoTo(	planner.GetAttributeId("atNode"),
+																planner.GetAttributeId("isCrouching")));
 
 	
-	ValueSet eGoToCover(planner.GetNumAttributes());
-	eGoToCover.SetProperty(planner.GetAttributeId("COVER_STATUS"), EAtValCOVER_STATUS::eInCover);
-	ACSimple aGoToCover(ConditionSet(planner.GetNumAttributes()), eGoToCover, 3);
-	planner.RegisterActionConstructor("GoToCover", aGoToCover);
+	ConditionSet gHidden = helper.MakeConditionSet({{"coverStatus", new CEqual(EAtValcoverStatus::eInCover)},
+													{"isCrouching", new CEqual(EAtValBoolean::eTRUE)}});
+	planner.RegisterGoal("Stay hidden", gHidden);
 
-	ConditionSet gHidden(planner.GetNumAttributes());
-	gHidden.SetCondition(planner.GetAttributeId("COVER_STATUS"), new Equal(EAtValCOVER_STATUS::eInCover));
-	gHidden.SetCondition(planner.GetAttributeId("IS_CROUCHING"), new Equal(EAtValIS_CROUCHING::eTRUE));
-	planner.RegisterGoal("StayHidden", gHidden);
+	ConditionSet gAttack = helper.MakeConditionSet({{"enemyStatus", new CEqual(EAtValenemyStatus::eAttacking)}});
+	planner.RegisterGoal("Attack enemy", gAttack);
 
-	ValueSet init(planner.GetNumAttributes());
-	init.SetProperty(planner.GetAttributeId("COVER_STATUS"), EAtValCOVER_STATUS::eNotInCover);
-	init.SetProperty(planner.GetAttributeId("IS_CROUCHING"), EAtValIS_CROUCHING::eFALSE);
+	ConditionSet gHeal = helper.MakeConditionSet({{"hpLeft", new CLarger(75)}});
+	planner.RegisterGoal("Heal", gHeal);
+
+	ConditionSet gGoToAmmoBox = helper.MakeConditionSet({{"atNode", new CInSet(navigator.GetNodesByName("AmmoBox"))}});
+	planner.RegisterGoal("Go to ammo box", gGoToAmmoBox);
 	
-	auto plan = planner.ConstructPlan(init, "StayHidden", ActionData());
-	for (auto& actionName : plan.ActionNames)
-		std::cout << actionName << "\n";
+	ValueSet init = helper.MakeValueSet({	{"coverStatus", EAtValcoverStatus::eNotInCover},
+											{"isCrouching", EAtValBoolean::eFALSE},
+											{"enemyStatus", EAtValenemyStatus::eNonVisible},
+											{"isWeaponLoaded", EAtValBoolean::eFALSE},
+											{"hpLeft", 100},
+											{"hKitsLeft", 3},
+											{"ammoInMagLeft", 30},
+											{"magsLeft", 3},
+											{"atNode", 3}});
+
+	auto& currentGoal = gGoToAmmoBox;
+	
+	ActionData initData;
+	initData.initNode = init.GetProperty(planner.GetAttributeId("atNode"));
+	initData.futureGoToDestinationNode = -1;
+	initData.minimalNumHKits = (currentGoal.IsAffected(planner.GetAttributeId("hKitsLeft")) == true) ?
+		Helper::CastAssert<const CLarger>(currentGoal.GetProperty(planner.GetAttributeId("hKitsLeft")).get())->Value + 1 : 0;
+	
+	auto plan = planner.ConstructPlan(init, "Go to ammo box", initData);
+	if (plan.success == true)
+	{
+		for (size_t i = 0; i < plan.ActionNames.size(); i++)
+			std::cout << i + 1 << ". " << plan.ActionNames[i] << " " << plan.ActionStrings[i] << "\n";
+	}
+	else
+	{
+		std::cout << "Failed to build plan\n";
+	}
 	return 0;
 }
 

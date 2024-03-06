@@ -8,41 +8,43 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2b96d9d-4464-4050-b1e3-f9237ac1656e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/ActionImpl/SimpleAction.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/BAction.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/BAttribute.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Condition/BCondition.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Condition/ConditionImpl/Equals.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Condition/PropertyList.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Planner.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/Basic/IActionConstructor.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACGoTo.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACUseHealthKit.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Basic/AAccum.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Basic/AInt.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Special/AAmmoInMag.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Special/AAtNode.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Special/AAtNode.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Special/AHKitsLeft.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Special/AHealth.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Special/AMagsLeft.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Condition/Special/CEqual.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Condition/Special/CEqual.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Condition/Special/CInSet.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Condition/Special/CInSet.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Condition/Special/CLarger.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Condition/Special/CLarger.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Helper.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Helper.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GOAP2/Navigation/Navigator.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/AStar.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/AStar.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Action.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/Action.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/GoToAction.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/InputData.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/SimpleAction.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/Attribute.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/LocationAttribute.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/SimpleAttribute.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/Condition.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/ConditionSet.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Condition/ConditionSet.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/ConsitionSet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Condition/ConsitionSet.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/SimpleConditions.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/SimpleConditions.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/ACSimple.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/Basic/ACSimple.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/ActionData.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/ActionData.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/IActionConstructor.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/Basic/IActionConstructor.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/AEnum.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Attributes/Basic/AEnum.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/IAttribute.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Attributes/Basic/IAttribute.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/ConditionImpl.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/ConditionImpl.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/ConditionSet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Condition/Basic/ConditionSet.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/ConditionSet.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Condition/Basic/ConditionSet.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/ICondition.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Condition/Basic/ICondition.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/GPlanner.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/GPlanner.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Navigation/NavPathfinder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Navigation/NavPathfinder.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Navigation/NavPathfinder.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Navigation/NavPathfinder.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Navigation/Navigator.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Navigation/Navigator.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Planner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Planner.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Planner.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Planner.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Testing.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Testing.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Tools/Catalogue.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Tools/Catalogue.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/World.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/World.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/WorldMask.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/WorldMask.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/WorldMask.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/ValueSet.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/ValueSet.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +63,7 @@
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/unordered_map" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/utility" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/vector" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/xhash" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/include/xmemory" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/utility" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/include/xhash" root0="SKIP_HIGHLIGHTING" />
@@ -189,7 +192,15 @@
       <workItem from="1708178580883" duration="1469000" />
       <workItem from="1708508159118" duration="16229000" />
       <workItem from="1708595568566" duration="5668000" />
-      <workItem from="1708939023517" duration="1687000" />
+      <workItem from="1708939023517" duration="11920000" />
+      <workItem from="1709022112919" duration="9632000" />
+      <workItem from="1709111118701" duration="6952000" />
+      <workItem from="1709197327191" duration="9837000" />
+      <workItem from="1709287947990" duration="5538000" />
+      <workItem from="1709372931693" duration="8375000" />
+      <workItem from="1709544499782" duration="11122000" />
+      <workItem from="1709567160070" duration="3978000" />
+      <workItem from="1709626416774" duration="11870000" />
     </task>
     <servers />
   </component>

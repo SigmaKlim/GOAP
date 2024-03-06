@@ -21,8 +21,7 @@ bool ConditionSet::Reduce(const ValueSet& world, ConditionSet& reducedConditionS
     {
         if (IsAffected(i) == true && world.IsAffected(i) == true)
         {
-            if(_properties[i]->Evaluate(world.GetProperty(i),
-                *ValueSet::AttributeCataloguePtr->GetItem(i)) != 0.0f)
+            if(_properties[i]->Evaluate(world.GetProperty(i)) != 0.0f)
                     return false;
             reducedConditionSet.ClearValue(i);
             wasAtLeast1ConditionSatisfied = true;
