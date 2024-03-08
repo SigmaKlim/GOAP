@@ -8,25 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f2b96d9d-4464-4050-b1e3-f9237ac1656e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACPickupDepletable.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACSearchEnemy.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACUseDepletable.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Special/AGrenadesLeft.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Special/Enums/EAVCoverStatus.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GOAP2/Attributes/Special/Enums/EAVEnemyStatus.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACGoTo.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACGoTo.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACUseHealthKit.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/Basic/IAttribute.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Attributes/Basic/IAttribute.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Attributes/Special/AAtNode.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Attributes/Special/AAtNode.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/Special/CInSet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Condition/Special/CInSet.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/GOAP2.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Navigation/Navigator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Navigation/Navigator.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Navigation/Navigator.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Navigation/Navigator.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Planner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Planner.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Planner.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Planner.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/SupplementalData.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/SupplementalData.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Testing.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Testing.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -185,7 +167,7 @@
       <workItem from="1709626416774" duration="11870000" />
       <workItem from="1709713572071" duration="14945000" />
       <workItem from="1709800956004" duration="8246000" />
-      <workItem from="1709888425729" duration="1527000" />
+      <workItem from="1709888425729" duration="1894000" />
     </task>
     <servers />
   </component>
