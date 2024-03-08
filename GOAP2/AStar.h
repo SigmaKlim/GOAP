@@ -13,9 +13,9 @@
 #include <unordered_map>
 #include <boost/functional/hash.hpp>
 
-#define CHECK_DISTANCE_NORMALIZED(value) if (value > 1.0f) std::cout << "WARNING: Normalized distance value (" << std::to_string(value) << ") is greater than 1.0f.\n"; \
+#define CHECK_DISTANCE_NORMALIZED(value) if ((value) > 1.0f) std::cout << "WARNING: Normalized distance value (" << std::to_string(value) << ") is greater than 1.0f.\n" \
 	
-#define CHECK_HEURISTICS_NORMALIZED(value) if (value > 1.0f) std::cout << "WARNING: Normalized heuristics value (" << std::to_string(value) << ") is greater than 1.0f.\n"; \
+#define CHECK_HEURISTICS_NORMALIZED(value) if ((value) > 1.0f) std::cout << "WARNING: Normalized heuristics value (" << std::to_string(value) << ") is greater than 1.0f.\n" \
 
 typedef unsigned long long ull;
 
@@ -28,29 +28,26 @@ struct Path
 
 //An internal class for constructing path in graph. The algorithm only uses ids to distinguish between nodes.
 //Each id is associated with a concrete user-class vertex. User must override protected methods. User himself is responsible for dealing with vertex-object internals. 
-template <typename t_id>
+//template <typename t_vertex>
 struct Node
 {
-	Node(t_id		 id,
-		 t_id		prevNodeId,
+	Node(unsigned	vertexId,
 		 float		distFromStart,
 		 float		heuristic)
-		 : _id(id), _prevNodeId(prevNodeId), _distFromStart(distFromStart), _heuristic(heuristic) {};
+		 : VertexId(vertexId), DistFromStart(distFromStart), Heuristic(heuristic) {};
 	bool operator<(const Node& right) const
 	{
-		return _distFromStart + _heuristic < right._distFromStart + right._heuristic;
+		return DistFromStart + Heuristic < right.DistFromStart + right.Heuristic;
 	}
 	bool operator>(const Node& right) const
 	{
-		return _distFromStart + _heuristic > right._distFromStart + right._heuristic;
+		return DistFromStart + Heuristic > right.DistFromStart + right.Heuristic;
 	}
-	t_id	  _id = t_id();
-	t_id _prevNodeId = 0;
-	float _distFromStart = 0.0f;
-	float _heuristic = 0.0f;
-
-
+	unsigned	  VertexId;
+	float DistFromStart = 0.0f;
+	float Heuristic = 0.0f;
 };
+
 struct TelemetryData
 {
 	ull totalBytesUsed = 0;		//total amount of memory used
@@ -58,131 +55,165 @@ struct TelemetryData
 	unsigned discoveredNum = 0;	//number of discovered vertices
 };
 
+template <typename t_vertex>
+struct VertexKey
+{
+	std::size_t operator()(const t_vertex& k) const
+	{
+		return boost::hash<t_vertex>()(k);
+	}
+};
+
+template <typename t_vertex>
+struct VertexEqual
+{
+	bool operator()(const t_vertex& lhs, const t_vertex& rhs) const
+	{
+		return false; //we assume that two vertices, returned by GetNeighbors are always different
+	}
+};
+
 
 //Utilizes A* pathfinding algorithm. All protected methods must be overriden in class template specialization.
-//t_id type must support >,<, == operations. Also std::size_t hash_value(const t_id& id) function must be implemented.
-template <typename t_vertex, typename t_id>
+//Also std::size_t hash_value(const t_vertex& vertex) function must be implemented.
+template <typename t_vertex>
 class AStarSolver
 {
 protected:
-	virtual float GetHeuristic(const t_vertex& vertex, const t_vertex& finish = t_vertex(),
-	                           void* userData = nullptr) const
+	virtual float GetHeuristic(const t_vertex& vertex, const t_vertex& finish = t_vertex()) const
 	{
 		return 0;
 	}
-	//Fills the array with newly created node's neighbors
-	virtual		void		GetNeighbors	(std::vector<t_vertex>&	neighbors, const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
+	//Returns accessible from 'vertex' neighbors as well as distances to them 
+	virtual		void		GetNeighbors	(	std::vector<t_vertex>&	neighbors, std::vector<float>& distances,
+												const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
 	//Checks whether this node satisfies conditions of the target node.
 	virtual		bool		Satisfies		(const t_vertex& vertex, const t_vertex& finish = t_vertex()) const = 0;
-	virtual		t_id		GetId			(const t_vertex& vertex) const = 0;
-	virtual		float		GetDistance		(const t_vertex& from, const t_vertex& to) const = 0;
+	//virtual		t_id		GetId			(const t_vertex& vertex) const = 0;
+	//virtual		float		GetDistance		(const t_vertex& from, const t_vertex& to) const = 0;
 
 	//Returns dDen, so that it is guaranteed that distFromStart / dDen <= 1. Used for normalizing distance.
 	virtual float GetDistanceDenominator() const = 0;
 	//Returns hDen, so that it is guaranteed that heuristics / hDen <= 1. Used for normalizing heuristics.
-	virtual float GetHeuristicsDenominator() const = 0;
+	virtual float GetHeuristicsDenominator() const
+	{
+		return 1;
+	}
 public:
 							AStarSolver	() {}
 	virtual					~AStarSolver	() {}
-				bool		Pathfind		(Path<t_vertex>& path, t_vertex start, t_vertex finish = t_vertex(),
-												TelemetryData* telemetryData = nullptr, void* userData = nullptr) const
+	bool		Pathfind		(Path<t_vertex>& path, t_vertex start, t_vertex finish = t_vertex(),
+				                             TelemetryData* telemetryData = nullptr) const
 	{
 
-		FibonacciHeap<Node<t_id>>											discovered; //A queue of discovered but not expanded nodes
-		std::unordered_map<t_id, Element<Node<t_id>>*, boost::hash<t_id>>	discMap;	//Used to access elements of heap and check if a node had been discovered (by id)
-		std::unordered_set<t_id, boost::hash<t_id>>							expanded;	//A set of expanded nodes, used to check if a node had been expanded
-		std::unordered_map<t_id, t_vertex, boost::hash<t_id>>				vertices;	//Used to map node id to vertex object
-		std::unordered_map <t_id, t_id, boost::hash<t_id>>					cameFrom;	//Used to map node to its preceding node
+		FibonacciHeap<Node>								discQueue; //A queue of discovered nodes, used to quickly get min-vertex
+		std::unordered_map<unsigned, Element<Node>*>	discovered;	//Used to access elements of queue and check if a node had been discovered (by id)
+								
+		std::unordered_set<unsigned>					expanded;	//A set of expanded nodes, used to check if a node had been expanded
+
+		std::unordered_map<t_vertex, unsigned,
+								VertexKey<t_vertex>, VertexEqual<t_vertex>>			vid;	//Used to map vertex object to id							
+		std::vector<const t_vertex*>					idv;	//Used to map node id to vertex object ptr
+								
+		std::unordered_map <unsigned, unsigned>			cameFrom;	//Used to map node to its preceding node
 
 		unsigned discoveredHeapSize = 0;
-		auto startId = GetId(start);
 		float normalizedDistance = 0.0f;
-		float normalizedHeuristics = GetHeuristic(start, finish, userData) / GetHeuristicsDenominator();
+		float normalizedHeuristics = GetHeuristic(start, finish) / GetHeuristicsDenominator();
 		CHECK_HEURISTICS_NORMALIZED(normalizedHeuristics);
-		Node<t_id> currentNode(startId, t_id(), normalizedDistance, normalizedHeuristics);
-		vertices.insert({ startId, start });
-		cameFrom.insert({ startId, t_id() });
-		Element<Node<t_id>>* currentElement = discovered.insert(currentNode);
+		Node currentNode(0, normalizedDistance, normalizedHeuristics);
+		idv.push_back(&start);
+		cameFrom.insert({ 0, UINT_MAX });
+		Element<Node>* currentElement = discQueue.insert(currentNode);
 		discoveredHeapSize++;
-		discMap.insert({ currentNode._id, currentElement });
+		discovered.insert({ 0, currentElement });
 		if (telemetryData != nullptr)
 			++telemetryData->discoveredNum;
 				
 		std::vector <t_vertex> neighborVertices;
+		std::vector<float> distances;
 		while (true)
 		{
 			int discoveredHeapSizeDelta = 0;
-			if (discovered.isEmpty() == true)
+			if (discQueue.isEmpty() == true)
 			{
 				path.Vertices.clear();
 				return false;
 			}
-			currentNode = discovered.extractMin();
+			currentNode = discQueue.extractMin();
 			discoveredHeapSizeDelta--;
-			discMap.erase(currentNode._id);
-			t_vertex currentVertex = vertices.at(currentNode._id);
+			unsigned currentVertexId = currentNode.VertexId;
+			discovered.erase(currentVertexId);
+			const t_vertex currentVertex = *idv[currentVertexId];
 			if (Satisfies(currentVertex, finish) == true)
 				break;
-			expanded.insert({ currentNode._id });
+			expanded.insert(currentVertexId);
 			if (telemetryData != nullptr)
 				++telemetryData->expandedNum;
-			GetNeighbors(neighborVertices, currentVertex, finish);
+			GetNeighbors(neighborVertices, distances, currentVertex, finish);
 			for (int i = 0; i < neighborVertices.size(); i++)
 			{
-				auto neighborId = GetId(neighborVertices[i]);
-				auto tempIt = discMap.find(neighborId);
-				bool wasDiscovered = (tempIt != discMap.end());
-				Element<Node<t_id>>* neighborElement = (wasDiscovered == true) ? tempIt->second : nullptr;
-				bool wasExpanded = expanded.find(neighborId) != expanded.end();
-				normalizedDistance = GetDistance(currentVertex, neighborVertices[i]) / GetDistanceDenominator();
+				normalizedDistance = distances[i] / GetDistanceDenominator();
 				CHECK_DISTANCE_NORMALIZED(normalizedDistance);
-				normalizedHeuristics = GetHeuristic(neighborVertices[i], finish, userData) / GetHeuristicsDenominator();
+				normalizedHeuristics = GetHeuristic(neighborVertices[i], finish) / GetHeuristicsDenominator();
 				CHECK_HEURISTICS_NORMALIZED(normalizedHeuristics);
-				Node<t_id> neighborNode(	neighborId, 
-											currentNode._id, 
-											currentNode._distFromStart + normalizedDistance, 
-											normalizedHeuristics);
-				if (wasDiscovered == false && wasExpanded == false)
+				auto discOrExpIt = vid.find(neighborVertices[i]);
+				if (discOrExpIt == vid.end())
 				{
-					neighborElement = discovered.insert({ neighborNode });
-					discMap.insert({ neighborId, neighborElement });
-					if (telemetryData != nullptr)
-						++telemetryData->discoveredNum;
+					unsigned neighborId = idv.size();
+					idv.push_back(&vid.insert({neighborVertices[i], neighborId}).first->first);
+
+					Node neighborNode(	neighborId, 
+										currentNode.DistFromStart + normalizedDistance, 
+										normalizedHeuristics);
+					auto* neighborElement = discQueue.insert({ neighborNode });
+					discovered.insert({ neighborId, neighborElement });
 					discoveredHeapSizeDelta++;
-					vertices.insert({neighborId, neighborVertices[i]});
-					assert(cameFrom.insert({neighborId, currentNode._id}).second == true);
+					assert(cameFrom.insert({neighborId, currentNode.VertexId}).second == true);
 				}
-				else if (	wasDiscovered == true && 
-							neighborElement->getKey()._distFromStart > neighborNode._distFromStart)
+				else
 				{
-					discovered.decreaseKey(neighborElement, neighborNode);
-					cameFrom.insert_or_assign(neighborId, currentNode._id).second;
+					unsigned neighborId = discOrExpIt->second;
+					Node neighborNode(	neighborId, 
+										currentNode.DistFromStart + normalizedDistance, 
+										normalizedHeuristics);
+					auto discIt = discovered.find(neighborId);
+					if (discIt != discovered.end())
+					{
+						auto* neighborElement = discIt->second;
+						if (neighborElement->getKey().DistFromStart > neighborNode.DistFromStart)
+						{
+							discQueue.decreaseKey(neighborElement, neighborNode);
+							cameFrom.insert_or_assign(neighborId, currentNode.VertexId).second;
+						}
+					}
 				}
 			}
 			neighborVertices.clear();
+			distances.clear();
 			if (discoveredHeapSizeDelta > 0)
 				discoveredHeapSize += discoveredHeapSizeDelta;
 		}
-		path.Cost = currentNode._distFromStart;
-		t_id anotherId = currentNode._id;
-		while (anotherId != t_id())
+		path.Cost = currentNode.DistFromStart * GetDistanceDenominator();
+		unsigned anotherId = currentNode.VertexId;
+		while (anotherId != UINT_MAX)
 		{
-			t_vertex anotherVertex = vertices.at(anotherId);
+			const t_vertex anotherVertex = *idv[anotherId];
 			path.Vertices.push_back(anotherVertex);
 			anotherId = cameFrom.at(anotherId);
 		}
 		for (u_int i = 0; i < path.Vertices.size() / 2; i++)
 			std::swap(path.Vertices[i], path.Vertices[path.Vertices.size() - 1 - i]);
-		const unsigned DISCOVERED_HEAP_ELEMENT_SIZE = sizeof(decltype(discovered.getMin()));
-		const unsigned DISCOVERED_MAP_ELEMENT_SIZE	= sizeof(decltype(*discMap.begin()));
+		const unsigned DISCOVERED_HEAP_ELEMENT_SIZE = sizeof(decltype(discQueue.getMin()));
+		const unsigned DISCOVERED_MAP_ELEMENT_SIZE	= sizeof(decltype(*discovered.begin()));
 		const unsigned EXPANDED_ELEMENT_SIZE		= sizeof(decltype(*expanded.begin()));
-		const unsigned VERTICES_ELEMENT_SIZE		= sizeof(decltype(*vertices.begin()));
+		const unsigned VERTICES_ELEMENT_SIZE		= sizeof(decltype(*idv.begin()));
 		const unsigned CAME_FROM_ELEMENT_SIZE		= sizeof(decltype(*cameFrom.begin()));
 		if (telemetryData != nullptr)
 			telemetryData->totalBytesUsed	+= discoveredHeapSize * DISCOVERED_HEAP_ELEMENT_SIZE
-											+ discMap.size() * DISCOVERED_MAP_ELEMENT_SIZE
+											+ discovered.size() * DISCOVERED_MAP_ELEMENT_SIZE
 											+ expanded.size() * EXPANDED_ELEMENT_SIZE
-											+ vertices.size() * VERTICES_ELEMENT_SIZE
+											+ idv.size() * VERTICES_ELEMENT_SIZE
 											+ cameFrom.size() * CAME_FROM_ELEMENT_SIZE;
 		return true;
 	}
