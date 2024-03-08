@@ -4,96 +4,214 @@
 #include <string>
 #include <iostream> 
 #include <fstream>
+
+#include "Planner.h"
+#include "Helper.h"
+#include "Actions/Basic/ACSimple.h"
+#include "Actions/Specific/ACGoTo.h"
+#include "Actions/Specific/ACPickupDepletable.h"
+#include "Actions/Specific/ACSearchEnemy.h"
+#include "Actions/Specific/ACUseDepletable.h"
+
+#include "Attributes/Basic/AEnum.h"
+#include "Attributes/Special/AHealth.h"
+#include "Attributes/Special/AHKitsLeft.h"
+#include "Attributes/Special/AAmmoInMag.h"
+#include "Attributes/Special/AAtNode.h"
+#include "Attributes/Special/AGrenadesLeft.h"
+#include "Attributes/Special/AMagsLeft.h"
+#include "Attributes/Special/Enums/EAVCoverStatus.h"
+#include "Attributes/Special/Enums/EAVEnemyStatus.h"
+
+#include "Condition/Special/CEqual.h"
+#include "Condition/Special/CLarger.h"
+#include "Condition/Special/CInSet.h"
+#include "Navigation/Navigator.h"
+
 #include "Tools/MathHelper.h"
 
-#include "GPlanner.h"
-#include "BitMask.h"
-#include "Actions/GoToAction.h"
-#include "Actions/SimpleAction.h"
 #include "Navigation/NavPathfinder.h"
-#include "Attributes/LocationAttribute.h"
-#include "Attributes/SimpleAttribute.h"
-#include "Navigation/Navigator.h"
 #pragma optimize( "", off )
 
-typedef std::vector<AttributeData> VectorAD;
 
 inline int TestNumeric()
 {
 	srand(time(0));
-	const std::vector<size_t> DIMS = { /*5, 15, 30, 100,*/ 500 };
+	const std::vector<unsigned> DIMS = { /*5, 15, 30, 100,*/ 500 };
 	const int K = 5;
-	const float DISC_CHANCE = 0.67f;
-#pragma region fill_txt
-	//for (const auto& dim : DIMS)
-	//{
-	//	for (auto k = 0; k < K; k++)
-	//	{
-	//		std::ofstream fout("test_data/test_matrix_set_" + std::to_string(dim) + "_" + std::to_string(k) + ".txt");
-	//		if (fout.is_open() == false)
-	//			return -1;
-	//		std::ofstream fout_("test_data/test_adjacency_list_" + std::to_string(dim) + "_" + std::to_string(k) + ".txt");
-	//		if (fout.is_open() == false)
-	//			return -1;
-	//		mtrx m;
-	//		mtrx aList;
-	//		MathHelper::MakeRndIncidenceMatrx(m, dim, DISC_CHANCE);
-	//		MathHelper::ToAdjacencyList(m, aList);
-	//		MathHelper::PrintMtrxToFile(m, fout, ',');
-	//		MathHelper::PrintMtrxToFile(aList, fout_, ' ');
-	//		fout.close();
-	//		fout_.close();
-	//	}
-	//}
-#pragma endregion
-#pragma region numerical_tests
-	//std::ofstream fout("test_data/results.txt");
-	//for (const auto& dim : DIMS)
-	//{
-	//	if (fout.is_open() == false)
-	//		return -1;
-	//	for (auto k = 0; k < K; k++)
-	//	{
-	//		std::ifstream fin("test_data/test_matrix_set_" + std::to_string(dim) + "_" + std::to_string(k) + ".txt");
-	//		if (fin.is_open() == false)
-	//			return -1;
-	//		NumPathfinder tpf(fin, dim);
-	//		int start = 0;
-	//		int finish = dim - 1;
-	//		fin.close();
-	//		Path<u_int> path;
-	//		tpf.Pathfind(path, start, finish);
-	//		std::cout << "dim = " + std::to_string(dim) + "\t k = " + std::to_string(k) + "\n";
-	//		std::cout << "start = " + std::to_string(start) + "\t finish = " + std::to_string(finish) + "\n";
-	//		std::cout << "path: ";
-	//		if (path.vertices.empty())
-	//			std::cout << "NONE\ncost = INFTY\n\n";
-	//		else
-	//		{
-	//			for (auto& vertex : path.vertices)
-	//				std::cout << vertex << " ";
-	//			std::cout << "\n";
-	//			std::cout << "cost = " << path.cost << "\n\n";
-	//		}
-
-	//		fout << "dim = " + std::to_string(dim) + "\t k = " + std::to_string(k) + "\n";
-	//		fout << "start = " + std::to_string(start) + "\t finish = " + std::to_string(finish) + "\n";
-	//		fout << "path: ";
-	//		if (path.vertices.empty())
-	//			fout << "NONE\ncost = INFTY\n\n";
-	//		else
-	//		{
-	//			for (auto& vertex : path.vertices)
-	//				fout << vertex << " ";
-	//			fout << "\n";
-	//			fout << "cost = " << path.cost << "\n\n";
-	//		}
-	//	}
-	//}
-#pragma endregion
+	for (auto& dim : DIMS)
+		for (unsigned k = 0; k < K; k++)
+		{
+			std::string fileName = "test_data/test_matrix_set_" + std::to_string(dim) + "_" + std::to_string(k) + ".txt";
+			std::ifstream fin(fileName);
+			assert(fin);
+			Matrix m;
+			MathHelper::MakeEmptyMatrix(m, dim);
+			MathHelper::ReadMtrxFromFile(m, fin);
+			unsigned start = rand() % dim;
+			unsigned finish = rand() % dim;
+			while (finish == start)
+				finish = rand() % dim;
+			NavPathfinder np(m);
+			Path<unsigned> p;
+			TelemetryData td;
+			np.Pathfind(p, start, finish, &td);
+			std::cout << "dim = " << dim << "\tk = " << k << "\n";
+			std::cout << "start = " << start << "\tfinish = " << finish << "\n";
+			std::cout << "path: ";
+			for (auto& v : p.Vertices)
+				std::cout << v << " ";
+			std::cout << "\ncost = " << p.Cost << "\n\n";
+		}
+	
 	return 0;
 }
+
+//test function to assign ids and distances to navigator
+inline Navigator SetUpNavigator()
+{
+	Navigator navigator;
+	navigator.AddNode("AmmoBox",	1, {8.0f, 1.0f, 0.0f});
+	navigator.AddNode("MedStation", 2, {2.0f, 2.0f, 0.0f});
+	navigator.AddNode("MedStation", 3, {8.0f, 4.0f, 0.0f});
+	navigator.AddNode("AmmoBox",	4, {5.0f, 5.0f, 0.0f});
+	navigator.AddNode("MedStation", 5, {2.0f, 7.0f, 0.0f});
+	navigator.AddNode("AmmoBox",	6, {6.0f, 8.0f, 0.0f});
+	navigator.AddNode("Cover",		7, {8.0f, 8.0f, 0.0f});
+	navigator.AddNode("Cover",		8, {3.0f, 5.0f, 0.0f});
+	navigator.AddNode("Cover",		9, {1.0f, 8.0f, 0.0f});
+
+	navigator.AddNode("Start", 0, {0.0f, 0.0f, 0.0f});
+	return navigator;
+}
+
 inline int TestGoap()
+{
+	Planner planner;
+	planner.RegisterAttribute<AEnum>("isCrouching");
+	planner.RegisterAttribute<AEnum>("enemyStatus");
+	planner.RegisterAttribute<AHealth>("hpLeft");
+	planner.RegisterAttribute<AHKitsLeft>("hKitsLeft");
+	planner.RegisterAttribute<AAmmoInMag>("ammoInMagLeft");
+	planner.RegisterAttribute<AMagsLeft>("magsLeft");
+	planner.RegisterAttribute<AAtNode>("atNode");
+	planner.RegisterAttribute<AGrenadesLeft>("grenadesLeft");
+	Navigator navigator = SetUpNavigator(); 
+	AAtNode::navigator = navigator;
+	
+	IActionConstructor::numAttributes = planner.GetNumAttributes(); //!!!
+	
+	Helper helper(&planner);
+	
+	ConditionSet	cCrouch = helper.MakeConditionSet	({});
+	ValueSet		eCrouch = helper.MakeValueSet		({{"isCrouching", true}});
+	planner.RegisterActionConstructor("Crouch", ACSimple(cCrouch, eCrouch, 3));
+
+	ConditionSet	cStand = helper.MakeConditionSet	({});
+	ValueSet		eStand = helper.MakeValueSet		({{"isCrouching", false}});
+	planner.RegisterActionConstructor("Stand", ACSimple(cStand, eStand, 4));
+	
+
+	ConditionSet	cEngage	= helper.MakeConditionSet	({{"enemyStatus", new CEqual(EAVEnemyStatus::eVisible)}});
+	ValueSet		eEngage	= helper.MakeValueSet		({{"enemyStatus", EAVEnemyStatus::eInRangedCombatRadius}});
+	planner.RegisterActionConstructor("Engage enemy", ACSimple(cEngage, eEngage, 4));
+
+	ConditionSet	cApproach = helper.MakeConditionSet	({{"enemyStatus", new CEqual(EAVEnemyStatus::eInRangedCombatRadius)}});
+	ValueSet		eApproach = helper.MakeValueSet		({{"enemyStatus", EAVEnemyStatus::eInCloseCombatRadius}});
+	planner.RegisterActionConstructor("Approach enemy", ACSimple(cApproach, eApproach, 3));
+
+	ConditionSet cShoot = helper.MakeConditionSet	({  {"enemyStatus", new CEqual(EAVEnemyStatus::eInRangedCombatRadius)},
+														{"ammoInMagLeft", new CLarger(5)}});
+	ValueSet	eShoot	= helper.MakeValueSet		({	{"enemyStatus", EAVEnemyStatus::eAttacking}});
+	planner.RegisterActionConstructor("Shoot enemy", ACSimple(cShoot, eShoot, 3));
+
+	ConditionSet cTGrenade = helper.MakeConditionSet({{"grenadesLeft", new CLarger(0)},
+							{"enemyStatus", new CEqual(EAVEnemyStatus::eInRangedCombatRadius)}});
+	ValueSet eTGreande = helper.MakeValueSet({	{"enemyStatus", EAVEnemyStatus::eAttacking}});
+	planner.RegisterActionConstructor("Throw grenade", ACSimple(cTGrenade, eTGreande, 7));
+
+	ConditionSet cCut = helper.MakeConditionSet({{"enemyStatus", new CEqual(EAVEnemyStatus::eInCloseCombatRadius)}});
+	ValueSet eCut = helper.MakeValueSet({{"enemyStatus", EAVEnemyStatus::eAttacking}});
+	planner.RegisterActionConstructor("Attack melee", ACSimple(cCut, eCut, 8));
+
+	
+	planner.RegisterActionConstructor("Go to", ACGoTo(	planner.GetAttributeId("atNode"),
+																planner.GetAttributeId("isCrouching"),
+																planner.GetAttributeId("enemyStatus")));
+	
+	planner.RegisterActionConstructor("Heal", ACUseDepletable(	planner.GetAttributeId("hKitsLeft"),
+																planner.GetAttributeId("hpLeft"), 20, 3));
+	
+	planner.RegisterActionConstructor("Reload", ACUseDepletable(planner.GetAttributeId("magsLeft"),
+																planner.GetAttributeId("ammoInMagLeft"), 30, 3,
+																"magazine", "ammo"));
+	
+	planner.RegisterActionConstructor("Pickup health kit",
+									ACPickupDepletable(	planner.GetAttributeId("hKitsLeft"),
+														planner.GetAttributeId("atNode"),
+														navigator.GetNodesByName("MedStation"), 4,
+														"health kit"));
+
+	planner.RegisterActionConstructor("Pickup magazine pack",
+								ACPickupDepletable(	planner.GetAttributeId("magsLeft"),
+													planner.GetAttributeId("atNode"),
+													navigator.GetNodesByName("AmmoBox"), 3,
+													"magazine pack"));
+
+	planner.RegisterActionConstructor("Pickup grenade",
+								ACPickupDepletable(	planner.GetAttributeId("grenadesLeft"),
+													planner.GetAttributeId("atNode"),
+													navigator.GetNodesByName("AmmoBox"), 4,
+													"grenade"));
+
+	
+	planner.RegisterActionConstructor("Search enemy", ACSearchEnemy(planner.GetAttributeId("enemyStatus"),
+		planner.GetAttributeId("atNode"),
+		planner.GetAttributeId("isCrouching"),
+		navigator.GetMaxDistance() * 5));
+	
+	ConditionSet gAttack = helper.MakeConditionSet({{"enemyStatus", new CEqual(EAVEnemyStatus::eAttacking)}});
+	planner.RegisterGoal("Attack enemy", gAttack);
+
+	ConditionSet gHeal = helper.MakeConditionSet({{"hpLeft", new CLarger(59)}});
+	planner.RegisterGoal("Heal", gHeal);
+	
+	ConditionSet gRefillHKits = helper.MakeConditionSet({{"hKitsLeft", new CLarger(3)}});
+	planner.RegisterGoal("Refill health kits", gRefillHKits);
+
+	ConditionSet gTakeCover = helper.MakeConditionSet({	{"isCrouching", new CEqual(true)},
+														{"atNode", new CInSet(navigator.GetNodesByName("Cover"))}});
+	planner.RegisterGoal("Take cover", gTakeCover);
+	
+	ValueSet init = helper.MakeValueSet({	{"isCrouching", true},
+											{"enemyStatus", EAVEnemyStatus::eNonVisible},
+											{"hpLeft", 20},
+											{"hKitsLeft", 1},
+											{"ammoInMagLeft", 0},
+											{"grenadesLeft", 0},
+											{"magsLeft", 0},
+											{"atNode", *navigator.GetNodesByName("AmmoBox").begin()}});
+	
+	SupplementalData initData;
+	initData.initNode = init.GetProperty(planner.GetAttributeId("atNode"));
+	initData.futureGoToDestinationNode = -1;
+	//initData.minimalNumHKits = (currentGoal.IsAffected(planner.GetAttributeId("hKitsLeft")) == true) ?
+	//	Helper::CastAssert<const CLarger>(currentGoal.GetProperty(planner.GetAttributeId("hKitsLeft")).get())->Value + 1 : 0;
+	
+	auto plan = planner.ConstructPlan(init, "Attack enemy", initData);
+	if (plan.success == true)
+	{
+		for (size_t i = 0; i < plan.ActionNames.size(); i++)
+			std::cout << i + 1 << ". " << plan.ActionNames[i] << " " << plan.ActionStrings[i] << "\n";
+	}
+	else
+	{
+		std::cout << "Failed to build plan\n";
+	}
+	return 0;
+}
+
+/*inline int TestGoap()
 {
 	//Create navigation pathfinder
 	// std::ifstream fin("ata/test_matrix_set_30_0.txt");
@@ -306,3 +424,4 @@ inline int TestGoap()
  		std::cout << "Could not construct a plan!";
  	return 0;
  }
+*/
