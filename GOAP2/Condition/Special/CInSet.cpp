@@ -7,7 +7,7 @@ CInSet::CInSet(const std::unordered_set<t_value>& valueSet): Values(valueSet)
 
 float CInSet::Evaluate(t_value value, const IAttribute* attributePtr, const SupplementalData& userData) const
 {
-    return (float)(!Values.contains(value)); //we assume that we deal with enum-like attribute
+    return (float)(!Values.contains(value)); //we assume that we deal with enum-like attribute ///set of level nodes?????
 }
 
 ICondition* CInSet::ResolveCEqual(const CEqual* cEqual) const

@@ -1,11 +1,18 @@
 ﻿#pragma once
+#include <vector>
 #include <boost/container_hash/hash.hpp>
 
 //Extra parameters passed to user overloads
 struct SupplementalData
 {
-    int initNode = -1;                      //The value mast be equal to 'atNode' value from init state. 
-    int futureGoToDestinationNode = -1;     //Default value is 'atNode' goal value if set, otherwise -1. Check ActionData.h for details.
+    //Extra parameters, that can be tuned according to design needs.
+    
+    //std::vector<float> position; //Agent's position on the map. By default must be set to its initial position.
+    
+    //Service value, that must be set to their default values (check comments) for planning to succeed. Thread carefully
+    
+    int initNode = -1;                      //The value must be equal to 'atNode' value from init state. 
+    int futureGoToDestinationNode = -1;     //Default value is 'atNode' goal value if set, otherwise -1. Check SupplementalData.h for details.
                                             //As we build our plan from future to the past, the GoTo action, chosen at a particular
                                             //plan constructing step, has no info on the id of the departure node (it is yet to be evaluated further in
                                             //the process). In order to provide at least some cost measure, at first we assume that we departure from initial node (O).
@@ -14,7 +21,7 @@ struct SupplementalData
                                             //For that purpose we need info on whether in future the agent will have to go at some node, which is stored in this variable.
 
     
-    int minimalNumHKits = 0;//Default value is 'hKitsLeft' goal value if set, otherwise 0. Check ActionData.h for details.
+    //int minimalNumHKits = 0;//Default value is 'hKitsLeft' goal value if set, otherwise 0. Check ActionData.h for details.
                             //Actions like 'Use health kit' require that agent possesses at least 1 health kit. However, if we stack these actions together
                             //in a single plan, minimal required number of health kits increases. Furthermore, we can only know the actual number of health
                             //kits at the moment when we achieve a state when all other conditions were satisfied -> we come to initial state. That means we
@@ -30,7 +37,7 @@ inline std::size_t hash_value(const SupplementalData& aData)
     size_t hash;
     boost::hash_combine(hash, aData.initNode);
     boost::hash_combine(hash, aData.futureGoToDestinationNode);
-    boost::hash_combine(hash, aData.minimalNumHKits);
+    //boost::hash_combine(hash, aData.minimalNumHKits);
     
     return hash;
 }

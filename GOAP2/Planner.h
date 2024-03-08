@@ -26,6 +26,7 @@ struct Vertex
 {
     ConditionSet ActiveConditionSet; //A set of conditions required for all previously taken actions
     std::size_t PrevActionId;
+    unsigned ActionCtr; //counter of previously included actions
     
     SupplementalData UserData;
     //debug
@@ -61,6 +62,8 @@ private:
     Catalogue<IAttribute*> _attributeCatalogue;
     Catalogue<IActionConstructor*> _actionConstructorCatalogue;
     Catalogue<ConditionSet> _goalCatalogue;
+
+    const unsigned MAX_NUM_ACTIONS_PER_PLAN = 10;
     friend Plan;
     friend class Helper;
 };

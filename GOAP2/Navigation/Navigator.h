@@ -10,17 +10,16 @@
 struct Navigator
 {
     //Adds nodes, but does not check for copies under other names
-    void AddNodes(const std::string& name, const std::unordered_set<int>& ids);
+    void AddNode(const std::string& name, int id, std::vector<float> position);
     const std::unordered_set<int>& GetNodesByName(const std::string& name) const;
-    //(Re)sets distance for given pair of end nodes
-    void SetDistance(int from , int to, float distance);
+    //If either from or to is -1 (only 1 of them), pos is used instead 
     float GetDistance(int from, int to) const;
     float GetMaxDistance() const;
     
     bool IsSymmetric = true;
 private:
     std::unordered_map<std::string, std::unordered_set<int>> nodeMap; //nodeName -> nodeIds
-    std::unordered_map<std::pair<int, int>, float, boost::hash<std::pair<int, int>>> distances;
+    std::unordered_map<int, std::vector<float>> positions;
     float maxDistance = 0;
 };
 

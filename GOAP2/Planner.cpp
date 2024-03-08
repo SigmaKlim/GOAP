@@ -40,6 +40,7 @@ Plan Planner::ConstructPlan(const ValueSet& startState, std::string goalName, Su
     
     Vertex departureVertex( plan.Goal,
                             std::numeric_limits<size_t>::max(),
+                            0,
                             initData,
                             "");
     Path<Vertex> path;
@@ -59,6 +60,8 @@ Plan Planner::ConstructPlan(const ValueSet& startState, std::string goalName, Su
 
 void Planner::GetNeighbors(std::vector<Vertex>& neighbors, std::vector<float>& distances, const Vertex& vertex, const Vertex& finish) const
 {
+    if (vertex.ActionCtr > MAX_NUM_ACTIONS_PER_PLAN)
+        return;
     for (unsigned i = 0; i < _actionConstructorCatalogue.Size(); i++)
     {
         std::vector<Action> actions;
@@ -71,7 +74,8 @@ void Planner::GetNeighbors(std::vector<Vertex>& neighbors, std::vector<float>& d
             bool isActionLegit = reducedConditionSet.Merge(action.Conditions, mergedConditionSet);
             if (isActionUseful == true && isActionLegit == true)
             {
-                neighbors.push_back(    {mergedConditionSet, i,
+                neighbors.push_back({   mergedConditionSet, i,
+                                        vertex.ActionCtr + 1,
                                         action.UserData,
                                         *_actionConstructorCatalogue.GetName(i),
                                         action.StringData});

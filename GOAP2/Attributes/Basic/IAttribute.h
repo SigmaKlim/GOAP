@@ -15,9 +15,4 @@ public:
     //Returns maximal possible difference between any two values of this attribute. Used to normalize difference.
     virtual float GetMaxDifference() const = 0;
 
-    // //Used to check if a condition can be applied to the attribute via dynamic_cast
-    // virtual bool CheckAllowedConditions(const ICondition* cPtr)
-    // {
-    //     return true;
-    // }
 };

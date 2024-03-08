@@ -7,13 +7,13 @@ class AAtNode : public IAttribute
 public:
     float GetDifference(t_value value1, t_value value2, const SupplementalData& userData) const override
     {
-        if (value1 == -1 || value2 == -1) // we reserve -1 value for cases when current node is unknown (like after action Patrol)
-            return GetMaxDifference() / 2; //in such case we return the same value for any argument
-        return (float) navigator.GetDistance(value1, value2);
+        if (value1 == -1 || value2 == -1) //we reserve node == -1 for the case when the real value is unknown 
+            return navigator.GetMaxDistance() / 2; 
+        return navigator.GetDistance(value1, value2);
     }
     float GetMaxDifference() const override
     {
-        return (float)navigator.GetMaxDistance();
+        return navigator.GetMaxDistance();
     }
 
     static Navigator navigator;

@@ -1,16 +1,18 @@
 ﻿#include "Navigator.h"
 #include "../Attributes/Special/AAtNode.h"
+#include <cmath>
 
 
 
-void Navigator::AddNodes(const std::string& name, const std::unordered_set<int>& ids)
+void Navigator::AddNode(const std::string& name, int id, std::vector<float> position)
 {
     auto fres = nodeMap.find(name);
     if (fres == nodeMap.end())
-        nodeMap.insert({name, ids});
+        nodeMap.insert({name, {id}});
     else
-        for (auto& id : ids)
-            assert(fres->second.insert(id).second);
+        assert(fres->second.insert(id).second);
+    assert(position.size() == 3);
+    assert(positions.insert({id, position}).second);
 }
 
 const std::unordered_set<int>& Navigator::GetNodesByName(const std::string& name) const
@@ -20,20 +22,18 @@ const std::unordered_set<int>& Navigator::GetNodesByName(const std::string& name
     return fres->second;
 }
 
-void Navigator::SetDistance(int from, int to, float distance)
-{
-    distances.insert_or_assign(std::make_pair(from, to), distance);
-    if (IsSymmetric == true)
-        distances.insert_or_assign(std::make_pair(to, from), distance);
-    if (distance > maxDistance)
-        maxDistance = distance;
-}
-
 float Navigator::GetDistance(int from, int to) const
 {
-    auto fres = distances.find(std::make_pair(from, to));
-    assert(fres != distances.end());
-    return fres->second;
+    assert(from != -1 && to != -1);
+    auto fresFrom = positions.find(from);
+    auto& fromPos = fresFrom->second;
+    assert(fresFrom != positions.end());
+    auto fresTo = positions.find(to);
+    assert(fresTo != positions.end());
+    auto& toPos = fresTo->second;
+    return sqrt(powf(toPos[0] - fromPos[0],2.0f) +
+                powf(toPos[1] - fromPos[1],2.0f) +
+                powf(toPos[2] - fromPos[2],2.0f));
 }
 
 float Navigator::GetMaxDistance() const
