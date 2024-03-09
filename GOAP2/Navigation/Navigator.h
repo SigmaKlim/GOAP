@@ -3,7 +3,6 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <boost/container_hash/hash.hpp>
 
 
 //A structure that holds ids of nodes, divided into groups by name, as well as distances between nodes (from, to -> dist)

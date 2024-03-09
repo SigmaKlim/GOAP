@@ -5,6 +5,8 @@
 #include "Tools/Catalogue.h"
 #include "Actions/Basic/IActionConstructor.h"
 
+
+
 struct Plan
 {
     Plan(const class Planner& planner, const ValueSet& startState, const std::string& goalName);
@@ -34,7 +36,8 @@ struct Vertex
     std::string PrevActionStringData;
 };
 
-std::size_t hash_value(const Vertex& vertex);
+template<>
+size_t VertexKey<Vertex>::operator()(const Vertex& k) const;
 
 
 class Planner : public AStarSolver<Vertex>

@@ -2,8 +2,6 @@
 
 #include <cassert>
 #include <vector>
-#include <boost/container_hash/hash.hpp>
-#include <boost/mp11/integral.hpp>
 
 template <typename T>
 class PropertyList
@@ -82,15 +80,4 @@ bool operator==(const PropertyList<T>& left, const PropertyList<T>& right)
         else
             return false;
     return true;
-}
-
-
-template <typename T>
-std::size_t hash_value(const PropertyList<T>& plist)
-{
-    size_t hash = 0;
-    for (size_t i = 0; i < plist.Size(); i++)
-        if (plist.IsAffected(i))
-            boost::hash_combine(hash, plist.GetProperty(i));
-    return hash;
 }

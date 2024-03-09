@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include <vector>
-#include <boost/container_hash/hash.hpp>
 
 //Extra parameters passed to user overloads
 struct SupplementalData
@@ -31,13 +29,3 @@ struct SupplementalData
                             //minimal required value for the number of health kits. As it is more of a auxiliary value, which does not reflect any real world
                             //parameter of the agent, it was moved from world state to action data.
 };
-
-inline std::size_t hash_value(const SupplementalData& aData)
-{
-    size_t hash;
-    boost::hash_combine(hash, aData.initNode);
-    boost::hash_combine(hash, aData.futureGoToDestinationNode);
-    //boost::hash_combine(hash, aData.minimalNumHKits);
-    
-    return hash;
-}

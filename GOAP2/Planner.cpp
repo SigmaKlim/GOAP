@@ -1,9 +1,7 @@
 ﻿#include "Planner.h"
-
+#include <boost/functional/hash.hpp>
 #include "Condition/Basic/ConditionSet.h"
 #include "Condition/Special/CEqual.h"
-
-
 
 
 Plan::Plan(const Planner& planner, const ValueSet& startState, const std::string& goalName) :
@@ -13,14 +11,18 @@ Plan::Plan(const Planner& planner, const ValueSet& startState, const std::string
     TotalCost = 0.0f;
 }
 
-std::size_t hash_value(const Vertex& vertex)
+
+template<>
+size_t VertexKey<Vertex>::operator()(const Vertex& k) const
 {
     size_t hash = 0;
-    boost::hash_combine(hash, vertex.ActiveConditionSet);
-    boost::hash_combine(hash, vertex.PrevActionId);
-    boost::hash_combine(hash, vertex.UserData);
+    for (size_t i = 0; i < k.ActiveConditionSet.Size(); i++)
+        if (k.ActiveConditionSet.IsAffected(i))
+            boost::hash_combine(hash, k.ActiveConditionSet.GetProperty(i));
+    boost::hash_combine(hash, k.PrevActionId);
     return hash;
 }
+
 
 Planner::Planner()
 {

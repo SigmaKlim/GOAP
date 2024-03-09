@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <memory>
-
 #include "../../Attributes/Basic/IAttribute.h"
 
 #pragma region Macro

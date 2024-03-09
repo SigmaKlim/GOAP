@@ -11,7 +11,6 @@
 #include "Tools/FibonacciHeap.hpp"
 #include <unordered_set>
 #include <unordered_map>
-#include <boost/functional/hash.hpp>
 
 #define CHECK_DISTANCE_NORMALIZED(value) if ((value) > 1.0f) std::cout << "WARNING: Normalized distance value (" << std::to_string(value) << ") is greater than 1.0f.\n" \
 	
@@ -27,8 +26,8 @@ struct Path
 };
 
 //An internal class for constructing path in graph. The algorithm only uses ids to distinguish between nodes.
-//Each id is associated with a concrete user-class vertex. User must override protected methods. User himself is responsible for dealing with vertex-object internals. 
-//template <typename t_vertex>
+//Each id is associated with a concrete user-class vertex. User must override protected methods. User himself
+//is responsible for dealing with vertex-object internals. 
 struct Node
 {
 	Node(unsigned	vertexId,
@@ -58,9 +57,11 @@ struct TelemetryData
 template <typename t_vertex>
 struct VertexKey
 {
+	//We can't include boost in .h file.
+	//YOU HAVE TO EXPLICITLY PROVIDE SPECIALIZATION FOR YOUR VERTEX TYPE
 	std::size_t operator()(const t_vertex& k) const
 	{
-		return boost::hash<t_vertex>()(k);
+		return 0;
 	}
 };
 
@@ -75,7 +76,7 @@ struct VertexEqual
 
 
 //Utilizes A* pathfinding algorithm. All protected methods must be overriden in class template specialization.
-//Also std::size_t hash_value(const t_vertex& vertex) function must be implemented.
+//Also size_t VertexKey::operator()(const t_vertex& k) must be specialized for your vertex class.
 template <typename t_vertex>
 class AStarSolver
 {
