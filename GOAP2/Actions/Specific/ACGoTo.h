@@ -5,6 +5,7 @@
 #include "../../Condition/Special/CInSet.h"
 #include "../../Attributes/Special/Enums/EAVEnemyStatus.h"
 
+//In order to use, AAtNode must anly be under InSet condition
 class ACGoTo : public IActionConstructor
 {
 public:
@@ -25,15 +26,9 @@ inline void ACGoTo::ConstructActions(std::vector<Action>& actions, const Conditi
     if (requiredConditions.IsAffected(_iAtNode) == true)
     {
         std::vector<int> destinations;
-        auto* eq = dynamic_cast<const CEqual*>(requiredConditions.GetProperty(_iAtNode).get());
-        auto inSet = dynamic_cast<const CInSet*>(requiredConditions.GetProperty(_iAtNode).get());
-        if (eq != nullptr)
-            destinations.push_back(eq->Value);
-        else if (inSet != nullptr)
-            for (auto& destination : inSet->Values)
-                destinations.push_back(destination);
-        else
-            assert(0);
+        auto* inSet = static_cast<const CInSet*>(requiredConditions.GetProperty(_iAtNode).get());
+        for (auto& destination : inSet->Values)
+            destinations.push_back(destination);
         for (auto& destinationNode : destinations)
         {
             ConditionSet cs(numAttributes);

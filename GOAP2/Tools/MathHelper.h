@@ -21,5 +21,11 @@ public:
 	static bool SatisfiesMask(const unsigned& mask_, const unsigned& value_);
 	static bool SatisfiesMask(const unsigned long& mask_, const unsigned long& value_);
 	static bool SatisfiesMask(const unsigned long long& mask_, const unsigned long long& value_);
+	template <typename T>
+	static void CombineHash(size_t& seed, const T& v)
+	{
+		std::hash<T> hasher;
+		seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+	}
 	};
 

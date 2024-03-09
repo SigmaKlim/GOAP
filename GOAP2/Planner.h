@@ -74,16 +74,14 @@ private:
 template <typename t_attribute>
 void Planner::RegisterAttribute(const std::string& name)
 {
-    IAttribute* iAttributePtr = dynamic_cast<IAttribute*>(new t_attribute);
-    assert(iAttributePtr);
+    IAttribute* iAttributePtr = static_cast<IAttribute*>(new t_attribute);
     assert(_attributeCatalogue.AddItem(name, iAttributePtr));
 }
 
 template <typename t_action>
 void Planner::RegisterActionConstructor(const std::string& name, const t_action& actionConstructor)
 {
-    auto* iActionConstructor = dynamic_cast<IActionConstructor*>(new t_action(actionConstructor));
-    assert (iActionConstructor);
+    auto* iActionConstructor = static_cast<IActionConstructor*>(new t_action(actionConstructor));
     assert(_actionConstructorCatalogue.AddItem(name, iActionConstructor));
 }
 

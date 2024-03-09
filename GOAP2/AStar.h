@@ -33,7 +33,7 @@ struct Node
 	Node(unsigned	vertexId,
 		 float		distFromStart,
 		 float		heuristic)
-		 : VertexId(vertexId), DistFromStart(distFromStart), Heuristic(heuristic) {};
+		 : VertexId(vertexId), DistFromStart(distFromStart), Heuristic(heuristic) {}
 	bool operator<(const Node& right) const
 	{
 		return DistFromStart + Heuristic < right.DistFromStart + right.Heuristic;
@@ -57,7 +57,6 @@ struct TelemetryData
 template <typename t_vertex>
 struct VertexKey
 {
-	//We can't include boost in .h file.
 	//YOU HAVE TO EXPLICITLY PROVIDE SPECIALIZATION FOR YOUR VERTEX TYPE
 	std::size_t operator()(const t_vertex& k) const
 	{
@@ -101,8 +100,8 @@ protected:
 		return 1;
 	}
 public:
-							AStarSolver	() {}
-	virtual					~AStarSolver	() {}
+							AStarSolver	()  = default;
+	virtual					~AStarSolver	()  = default;
 	bool		Pathfind		(Path<t_vertex>& path, t_vertex start, t_vertex finish = t_vertex(),
 				                             TelemetryData* telemetryData = nullptr) const
 	{
@@ -152,7 +151,7 @@ public:
 			if (telemetryData != nullptr)
 				++telemetryData->expandedNum;
 			GetNeighbors(neighborVertices, distances, currentVertex, finish);
-			for (int i = 0; i < neighborVertices.size(); i++)
+			for (size_t i = 0; i < neighborVertices.size(); i++)
 			{
 				normalizedDistance = distances[i] / GetDistanceDenominator();
 				CHECK_DISTANCE_NORMALIZED(normalizedDistance);

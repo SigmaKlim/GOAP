@@ -33,7 +33,7 @@ inline void ACPickupDepletable::ConstructActions(std::vector<Action>& actions, c
     {
         ConditionSet cs(numAttributes);
         cs.SetCondition(_iAtNode, new CInSet(_pickupLocationNodeIds));
-        auto* largerPtr = Helper::CastAssert<const CLarger>(requiredConditions.GetProperty(_iNumPickups).get());
+        auto* largerPtr = static_cast<const CLarger*>(requiredConditions.GetProperty(_iNumPickups).get());
         int requiredNumDepletables = largerPtr->Value;
         if (requiredNumDepletables > 0)
             cs.SetCondition(_iNumPickups, new CLarger(requiredNumDepletables - 1)); //reduce required number of depletables by 1

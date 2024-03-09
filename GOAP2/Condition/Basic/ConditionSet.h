@@ -27,6 +27,6 @@ private:
 template <typename T_Condition>
 void ConditionSet::SetCondition(size_t index, const T_Condition* condition)
 {
-    assert(dynamic_cast<const ICondition*>(condition));
+    //assert(dynamic_cast<const ICondition*>(condition));
     SetProperty(index, std::shared_ptr<const ICondition>(condition));
 }

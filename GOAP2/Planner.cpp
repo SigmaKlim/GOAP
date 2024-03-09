@@ -1,5 +1,5 @@
 ﻿#include "Planner.h"
-#include <boost/functional/hash.hpp>
+
 #include "Condition/Basic/ConditionSet.h"
 #include "Condition/Special/CEqual.h"
 
@@ -18,8 +18,8 @@ size_t VertexKey<Vertex>::operator()(const Vertex& k) const
     size_t hash = 0;
     for (size_t i = 0; i < k.ActiveConditionSet.Size(); i++)
         if (k.ActiveConditionSet.IsAffected(i))
-            boost::hash_combine(hash, k.ActiveConditionSet.GetProperty(i));
-    boost::hash_combine(hash, k.PrevActionId);
+            MathHelper::CombineHash(hash, k.ActiveConditionSet.GetProperty(i));
+    MathHelper::CombineHash(hash, k.PrevActionId);
     return hash;
 }
 

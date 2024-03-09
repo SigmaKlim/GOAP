@@ -10,12 +10,15 @@
     <list default="true" id="f2b96d9d-4464-4050-b1e3-f9237ac1656e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.GOAP2/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/AStar.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/AStar.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/Basic/ICondition.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Condition/Basic/ICondition.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACGoTo.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACGoTo.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACPickupDepletable.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACPickupDepletable.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACUseDepletable.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Actions/Specific/ACUseDepletable.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/Basic/ConditionSet.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Condition/Basic/ConditionSet.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Condition/Special/CInSet.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Condition/Special/CInSet.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Helper.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Helper.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Planner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Planner.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GOAP2/Planner.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Planner.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/SupplementalData.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/SupplementalData.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Tools/Catalogue.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Tools/Catalogue.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GOAP2/Tools/PropertyList.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Tools/PropertyList.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GOAP2/Tools/MathHelper.h" beforeDir="false" afterPath="$PROJECT_DIR$/GOAP2/Tools/MathHelper.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +49,9 @@
     <setting file="file://$PROJECT_DIR$/3rdparty/boost/container_hash/hash.hpp" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectId" id="2XODo90QGosfIwa8R3FHF0n7OSS" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -175,7 +181,8 @@
       <workItem from="1709713572071" duration="14945000" />
       <workItem from="1709800956004" duration="8246000" />
       <workItem from="1709888425729" duration="1894000" />
-      <workItem from="1709972954361" duration="1895000" />
+      <workItem from="1709972954361" duration="2633000" />
+      <workItem from="1709988487350" duration="2265000" />
     </task>
     <servers />
   </component>

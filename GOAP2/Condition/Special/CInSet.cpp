@@ -1,5 +1,5 @@
-﻿#include "CEqual.h"
-#include "CInSet.h"
+﻿#include "CInSet.h"
+#include "CEqual.h"
 #include "CLarger.h"
 
 CInSet::CInSet(const std::unordered_set<t_value>& valueSet): Values(valueSet)

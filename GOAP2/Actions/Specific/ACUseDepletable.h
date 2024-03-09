@@ -31,12 +31,12 @@ inline void ACUseDepletable::ConstructActions(std::vector<Action>& actions, cons
         int minNumDepletables = 0;
         if (requiredConditions.IsAffected(_iNumDepletables) == true)
         {
-            auto* cLargerNumDepletables = Helper::CastAssert<const CLarger>(requiredConditions.GetProperty(_iNumDepletables).get());
+            auto* cLargerNumDepletables = static_cast<const CLarger*>(requiredConditions.GetProperty(_iNumDepletables).get());
             minNumDepletables = cLargerNumDepletables->Value + 1; //Make minimal required number of health kits larger by 1, as this action depletes 1 kit
         }
         ConditionSet cs(numAttributes);
         cs.SetCondition(_iNumDepletables, new CLarger(minNumDepletables));
-        auto* cLargerAffected = Helper::CastAssert<const CLarger>(requiredConditions.GetProperty(_iAffectedAttribute).get());
+        auto* cLargerAffected = static_cast<const CLarger*>(requiredConditions.GetProperty(_iAffectedAttribute).get());
         t_value requiredValue = cLargerAffected->Value;
         cs.SetCondition(_iAffectedAttribute, new CLarger(requiredValue - _delta)); //Make minimal required value of the affected attribute less by delta, as this action increases it by delta
         ValueSet vs(numAttributes);
