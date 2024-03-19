@@ -1,17 +1,18 @@
 ﻿#pragma once
 
 #include "../../Attributes/Special/AAtNode.h"
-#include "../Basic/IActionConstructor.h"
-#include "../../Attributes/Special/Enums/EAVEnemyStatus.h"
-#include "../../Condition/Special/CEqual.h"
+#include "../Basic/IAction.h"
+#include "../../Attributes/Special/AEnemyStatus.h"
+#include "../../Conditions/Special/CEqual.h"
 
-class ACSearchEnemy : public IActionConstructor
+class AcSearchEnemy : public IAction
 {
 public:
-    ACSearchEnemy(size_t iEnemyStatus, size_t iAtNode, size_t iIsCrouching, float cost) :
+    AcSearchEnemy(size_t iEnemyStatus, size_t iAtNode, size_t iIsCrouching, float cost) :
     _iEnemyStatus(iEnemyStatus), _iAtNode(iAtNode), _iIsCrouching(iIsCrouching), _cost(cost) {}
 
-    void ConstructActions(std::vector<Action>& actions, const ConditionSet& requiredConditions, const SupplementalData& userData) override;
+    void ConstructActionInstancesPriori(std::vector<ActionInstanceData>& actions, const ConditionSet& requiredConditions, const SupplementalData& userData) override;
+    ActionInstanceData ConstructActionInstancePosteriori(const ValueSet& prevState, const ActionInstanceData& prioriActionInstance) override;
     float GetMaxCost() const override;
 private:
     size_t _iEnemyStatus;
@@ -20,7 +21,7 @@ private:
     float _cost;
 };
 
-inline void ACSearchEnemy::ConstructActions(std::vector<Action>& actions, const ConditionSet& requiredConditions,
+inline void AcSearchEnemy::ConstructActionInstancesPriori(std::vector<ActionInstanceData>& actions, const ConditionSet& requiredConditions,
     const SupplementalData& userData)
 {
     ConditionSet cs(numAttributes);
@@ -39,7 +40,18 @@ inline void ACSearchEnemy::ConstructActions(std::vector<Action>& actions, const 
     actions.push_back({cs, vs, projectedCost, newUserData});
 }
 
-inline float ACSearchEnemy::GetMaxCost() const
+inline ActionInstanceData AcSearchEnemy::ConstructActionInstancePosteriori(
+    const ValueSet& prevState, const ActionInstanceData& prioriActionInstance)
+{
+    auto posterioriActionInstance = IAction::ConstructActionInstancePosteriori(prevState, prioriActionInstance);
+    int trueDepartureNode = prevState.GetValue(_iAtNode); //now we know it
+    posterioriActionInstance.Effects.SetValue(_iAtNode, -1);
+    ///implement!!!
+    posterioriActionInstance.Cost = _cost;
+    return posterioriActionInstance;
+}
+
+inline float AcSearchEnemy::GetMaxCost() const
 {
     return _cost * 2;
 }

@@ -1,6 +1,6 @@
 ﻿#include "CEqual.h"
 #include "CInSet.h"
-#include "CLarger.h"
+#include "CGreater.h"
 CEqual::CEqual(t_value value) : Value(value) {}
 
 float CEqual::Evaluate(t_value value, const IAttribute* attributePtr, const SupplementalData& userData) const
@@ -13,9 +13,9 @@ ICondition* CEqual::ResolveCEqual(const CEqual* cEqual) const
     return Value == cEqual->Value ? new CEqual(Value) : nullptr;
 }
 
-ICondition* CEqual::ResolveCLarger(const CLarger* cLarger) const
+ICondition* CEqual::ResolveCGreater(const CGreater* cGreater) const
 {
-    return cLarger->ResolveCEqual(this);
+    return cGreater->ResolveCEqual(this);
 }
 
 ICondition* CEqual::ResolveCInSet(const CInSet* cInSet) const

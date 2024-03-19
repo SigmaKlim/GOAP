@@ -1,17 +1,17 @@
 ﻿#pragma once
-#include "../Basic/IActionConstructor.h"
+#include "../Basic/IAction.h"
 #include "../../Attributes/Special/AAtNode.h"
-#include "../../Condition/Special/CEqual.h"
-#include "../../Condition/Special/CInSet.h"
-#include "../../Attributes/Special/Enums/EAVEnemyStatus.h"
+#include "../../Conditions/Special/CEqual.h"
+#include "../../Conditions/Special/CInSet.h"
+#include "../../Attributes/Special/AEnemyStatus.h"
 
 //In order to use, AAtNode must anly be under InSet condition
-class ACGoTo : public IActionConstructor
+class AcGoTo : public IAction
 {
 public:
-    ACGoTo(size_t iAtNode, size_t isCrouchingIndex, size_t iEnemyStatus) : _iAtNode(iAtNode), _iIsCrouching(isCrouchingIndex), _iEnemyStatus(iEnemyStatus){}  
-    void ConstructActions(std::vector<Action>& actions, const ConditionSet& requiredConditions, const SupplementalData& userData) override;
-
+    AcGoTo(size_t iAtNode, size_t isCrouchingIndex, size_t iEnemyStatus) : _iAtNode(iAtNode), _iIsCrouching(isCrouchingIndex), _iEnemyStatus(iEnemyStatus){}  
+    void ConstructActionInstancesPriori(std::vector<ActionInstanceData>& actions, const ConditionSet& requiredConditions, const SupplementalData& userData) override;
+    ActionInstanceData ConstructActionInstancePosteriori(const ValueSet& prevState, const ActionInstanceData& prioriActionInstance) override;
     float GetMaxCost() const override;
 
 private:
@@ -20,7 +20,7 @@ private:
     size_t _iEnemyStatus;
 };
 
-inline void ACGoTo::ConstructActions(std::vector<Action>& actions, const ConditionSet& requiredConditions,
+inline void AcGoTo::ConstructActionInstancesPriori(std::vector<ActionInstanceData>& actions, const ConditionSet& requiredConditions,
     const SupplementalData& userData)
 {
     if (requiredConditions.IsAffected(_iAtNode) == true)
@@ -45,13 +45,24 @@ inline void ACGoTo::ConstructActions(std::vector<Action>& actions, const Conditi
             SupplementalData newData(userData);
             newData.futureGoToDestinationNode = destinationNode;
             std::string stringData = "-> " + std::to_string(destinationNode) + ";";
-            Action action(cs, vs, newCost, newData, stringData);//calculate cost of movement via navigator
+            ActionInstanceData action(cs, vs, newCost, newData, stringData);//calculate cost of movement via navigator
             actions.push_back(action);
         }
     }
 }
 
-inline float ACGoTo::GetMaxCost() const
+inline ActionInstanceData AcGoTo::ConstructActionInstancePosteriori(
+    const ValueSet& prevState, const ActionInstanceData& prioriActionInstance)
+{
+    auto posterioriActionInstance = IAction::ConstructActionInstancePosteriori(prevState, prioriActionInstance);
+    int destinationNode = prioriActionInstance.Effects.GetProperty(_iAtNode);
+    int trueDepartureNode = prevState.GetProperty(_iAtNode); //now we know it
+    posterioriActionInstance.Cost = AAtNode::navigator.GetDistance(trueDepartureNode, destinationNode); //true cost of goto action
+    return posterioriActionInstance;
+}
+
+
+inline float AcGoTo::GetMaxCost() const
 {
     return AAtNode::navigator.GetMaxDistance();
 }

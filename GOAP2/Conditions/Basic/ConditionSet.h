@@ -20,7 +20,8 @@ public:
     bool Merge(const ConditionSet& other, ConditionSet& mergedConditionSet) const;
 
 private:
-    static const Catalogue<IAttribute*>* _attributeCataloguePtr;
+    //static const Catalogue<IAttribute*>* _attributeCataloguePtr;
+    static const std::vector<std::shared_ptr<IAttribute>>* _attributes;
     friend class Planner;
 };
 

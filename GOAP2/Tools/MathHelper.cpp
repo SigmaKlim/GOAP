@@ -80,8 +80,8 @@ void MathHelper::ToAdjacencyList(Matrix& incidence, Matrix& result)
 
 unsigned MathHelper::NumDigits(int number)
 {
-	unsigned digits = 1;
-	unsigned bound = 10;
+	int digits = 1;
+	int bound = 10;
 	number = abs(number);
 	while (bound <= number)
 	{

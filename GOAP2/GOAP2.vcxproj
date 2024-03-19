@@ -134,9 +134,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Actions\Basic\IActionConstructor.cpp" />
+    <ClCompile Include="Actions\Basic\IAction.cpp" />
     <ClCompile Include="Attributes\Special\AAtNode.cpp" />
-    <ClCompile Include="Condition\Basic\ConditionSet.cpp">
+    <ClCompile Include="Conditions\Basic\ConditionSet.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <Optimization>Disabled</Optimization>
@@ -210,9 +210,11 @@
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
-    <ClCompile Include="Condition\Special\CEqual.cpp" />
-    <ClCompile Include="Condition\Special\CInSet.cpp" />
-    <ClCompile Include="Condition\Special\CLarger.cpp" />
+    <ClCompile Include="Conditions\Special\CEqual.cpp" />
+    <ClCompile Include="Conditions\Special\CInSet.cpp" />
+    <ClCompile Include="Conditions\Special\CGreater.cpp" />
+    <ClCompile Include="Debugger.cpp" />
+    <ClCompile Include="GController.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="Navigation\Navigator.cpp" />
     <ClCompile Include="Navigation\NavPathfinder.cpp">
@@ -367,30 +369,36 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actions\Basic\ACSimple.h" />
-    <ClInclude Include="Actions\Basic\IActionConstructor.h" />
-    <ClInclude Include="Actions\Specific\ACGoTo.h" />
-    <ClInclude Include="Actions\Specific\ACSearchEnemy.h" />
-    <ClInclude Include="Actions\Specific\ACPickupDepletable.h" />
+    <ClInclude Include="Actions\Basic\AcSimple.h" />
+    <ClInclude Include="Actions\Basic\IAction.h" />
+    <ClInclude Include="Actions\Performers\APTest.h" />
+    <ClInclude Include="Actions\Performers\IActionPerformer.h" />
+    <ClInclude Include="Actions\Specific\AcGoTo.h" />
+    <ClInclude Include="Actions\Specific\AcSearchEnemy.h" />
+    <ClInclude Include="Actions\Specific\AcPickupDepletable.h" />
+    <ClInclude Include="Actions\Specific\AcShoot.h" />
     <ClInclude Include="Actions\Specific\ACUseDepletable.h" />
     <ClInclude Include="AStar.h" />
-    <ClInclude Include="Attributes\Basic\AAccum.h" />
+    <ClInclude Include="Attributes\Basic\ABool.h" />
     <ClInclude Include="Attributes\Basic\AEnum.h" />
     <ClInclude Include="Attributes\Basic\AInt.h" />
     <ClInclude Include="Attributes\Basic\IAttribute.h" />
     <ClInclude Include="Attributes\Special\AAmmoInMag.h" />
+    <ClInclude Include="Attributes\Special\AEnemyStatus.h" />
     <ClInclude Include="Attributes\Special\AGrenadesLeft.h" />
     <ClInclude Include="Attributes\Special\AHealth.h" />
     <ClInclude Include="Attributes\Special\AHKitsLeft.h" />
     <ClInclude Include="Attributes\Special\AMagsLeft.h" />
     <ClInclude Include="Attributes\Special\AAtNode.h" />
-    <ClInclude Include="Attributes\Special\Enums\EAVCoverStatus.h" />
-    <ClInclude Include="Attributes\Special\Enums\EAVEnemyStatus.h" />
-    <ClInclude Include="Condition\Basic\ConditionSet.h" />
-    <ClInclude Include="Condition\Basic\ICondition.h" />
-    <ClInclude Include="Condition\Special\CEqual.h" />
-    <ClInclude Include="Condition\Special\CInSet.h" />
-    <ClInclude Include="Condition\Special\CLarger.h" />
+    <ClInclude Include="Conditions\Basic\ConditionSet.h" />
+    <ClInclude Include="Conditions\Basic\ICondition.h" />
+    <ClInclude Include="Conditions\Special\CEqual.h" />
+    <ClInclude Include="Conditions\Special\CInSet.h" />
+    <ClInclude Include="Conditions\Special\CGreater.h" />
+    <ClInclude Include="Debugger.h" />
+    <ClInclude Include="GController.h" />
+    <ClInclude Include="Goals\Basic\Goal.h" />
+    <ClInclude Include="Goals\Specific\GTest.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="Navigation\Navigator.h" />
     <ClInclude Include="Navigation\NavPathfinder.h" />

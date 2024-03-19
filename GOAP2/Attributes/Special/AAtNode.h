@@ -15,6 +15,9 @@ public:
     {
         return navigator.GetMaxDistance();
     }
-
+    std::string GetEnumeratorString(t_value value) const override
+    {
+        return navigator.GetNodeName(value) + " (" + std::to_string(value) + ")"; 
+    }
     static Navigator navigator;
 };
