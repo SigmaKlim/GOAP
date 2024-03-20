@@ -1,32 +1,29 @@
 ﻿#pragma once
 #include "../../Conditions/Basic/ConditionSet.h"
+#include "../../DataBase.h"
 class Goal
 {
 public:
-    Goal(const ConditionSet& goalConditions, float initPriority = 0.0f) :
-    _conditions(goalConditions), _priority(initPriority) {}
+    Goal(const ConditionSet& goalConditions) :
+    _conditions(goalConditions) {}
     virtual ~Goal() = default;
-    virtual float UpdatePriority()
-    {
-        return _priority;
-    }
+    //controller redirects user calls of UpdateGoalPriority to this method
+    virtual float UpdatePriority() = 0;
+    //called after the goal is completed to adjust intermediate state before the next plan is built
     virtual ValueSet OverrideAgentState(const ValueSet& resultState)
     {
         return resultState;
     }
     inline const ConditionSet& GetConditions() const;
-    inline float GetPriority() const;
+
+    static const DataBase* DataPtr; 
+    
 protected:
     ConditionSet _conditions;
-    float _priority;
+    
 };
 
 inline const ConditionSet& Goal::GetConditions() const
 {
     return _conditions;
-}
-
-inline float Goal::GetPriority() const
-{
-    return _priority;
 }

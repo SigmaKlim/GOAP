@@ -9,7 +9,12 @@
 class AcGoTo : public IAction
 {
 public:
-    AcGoTo(size_t iAtNode, size_t isCrouchingIndex, size_t iEnemyStatus) : _iAtNode(iAtNode), _iIsCrouching(isCrouchingIndex), _iEnemyStatus(iEnemyStatus){}  
+    AcGoTo()
+    {
+        _iAtNode        = DataPtr->GetAttributeId("atNode");
+        _iEnemyStatus   = DataPtr->GetAttributeId("enemyStatus");
+        _iIsCrouching   = DataPtr->GetAttributeId("isCrouching");
+    }
     void ConstructActionInstancesPriori(std::vector<ActionInstanceData>& actions, const ConditionSet& requiredConditions, const SupplementalData& userData) override;
     ActionInstanceData ConstructActionInstancePosteriori(const ValueSet& prevState, const ActionInstanceData& prioriActionInstance) override;
     float GetMaxCost() const override;
@@ -31,16 +36,16 @@ inline void AcGoTo::ConstructActionInstancesPriori(std::vector<ActionInstanceDat
             destinations.push_back(destination);
         for (auto& destinationNode : destinations)
         {
-            ConditionSet cs(numAttributes);
+            ConditionSet cs(DataPtr->GetNumAttributes());
             cs.SetCondition(_iIsCrouching, new CEqual(false)); //set isCrouching condition equal to false
-            ValueSet vs(numAttributes);                                      
+            ValueSet vs(DataPtr->GetNumAttributes());                                      
             vs.SetValue(_iAtNode, destinationNode);            //pick atNode attribute value from required conditions and set its effect accordingly
             vs.SetValue(_iEnemyStatus, EAVEnemyStatus::eNonVisible);
-            float newCost = AAtNode::navigator.GetDistance(userData.initNode, destinationNode);
+            float newCost = DataPtr->Navigator.GetDistance(userData.initNode, destinationNode);
             if (userData.futureGoToDestinationNode != -1)
             {
-                newCost +=  AAtNode::navigator.GetDistance(destinationNode, userData.futureGoToDestinationNode) -
-                            AAtNode::navigator.GetDistance(userData.futureGoToDestinationNode, userData.initNode); //compensate our previous lack of knowledge of future GoTo departure point
+                newCost +=  DataPtr->Navigator.GetDistance(destinationNode, userData.futureGoToDestinationNode) -
+                            DataPtr->Navigator.GetDistance(userData.futureGoToDestinationNode, userData.initNode); //compensate our previous lack of knowledge of future GoTo departure point
             }
             SupplementalData newData(userData);
             newData.futureGoToDestinationNode = destinationNode;
@@ -57,12 +62,12 @@ inline ActionInstanceData AcGoTo::ConstructActionInstancePosteriori(
     auto posterioriActionInstance = IAction::ConstructActionInstancePosteriori(prevState, prioriActionInstance);
     int destinationNode = prioriActionInstance.Effects.GetProperty(_iAtNode);
     int trueDepartureNode = prevState.GetProperty(_iAtNode); //now we know it
-    posterioriActionInstance.Cost = AAtNode::navigator.GetDistance(trueDepartureNode, destinationNode); //true cost of goto action
+    posterioriActionInstance.Cost = DataPtr->Navigator.GetDistance(trueDepartureNode, destinationNode); //true cost of goto action
     return posterioriActionInstance;
 }
 
 
 inline float AcGoTo::GetMaxCost() const
 {
-    return AAtNode::navigator.GetMaxDistance();
+    return DataPtr->Navigator.GetMaxDistance();
 }

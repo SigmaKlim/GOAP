@@ -32,13 +32,13 @@ inline void AcPickupDepletable::ConstructActionInstancesPriori(std::vector<Actio
 {
     if (requiredConditions.IsAffected(_iNumDepletables) == true)
     {
-        ConditionSet cs(numAttributes);
+        ConditionSet cs(DataPtr->GetNumAttributes());
         cs.SetCondition(_iAtNode, new CInSet(_pickupLocationNodeIds));
         auto* greaterPtr = static_cast<const CGreater*>(requiredConditions.GetProperty(_iNumDepletables).get());
         int requiredNumDepletables = greaterPtr->Value + 1; //minimal desired value
         if (requiredNumDepletables > 0)
             cs.SetCondition(_iNumDepletables, new CGreater(requiredNumDepletables - 2)); //reduce required number of depletables by 1
-        ValueSet vs(numAttributes);
+        ValueSet vs(DataPtr->GetNumAttributes());
         vs.SetValue(_iNumDepletables, requiredNumDepletables);
         actions.push_back({cs, vs, _cost, userData, ""});
     }

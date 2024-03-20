@@ -135,7 +135,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Actions\Basic\IAction.cpp" />
-    <ClCompile Include="Attributes\Special\AAtNode.cpp" />
+    <ClCompile Include="Attributes\Basic\IAttribute.cpp" />
     <ClCompile Include="Conditions\Basic\ConditionSet.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -213,8 +213,10 @@
     <ClCompile Include="Conditions\Special\CEqual.cpp" />
     <ClCompile Include="Conditions\Special\CInSet.cpp" />
     <ClCompile Include="Conditions\Special\CGreater.cpp" />
+    <ClCompile Include="DataBase.cpp" />
     <ClCompile Include="Debugger.cpp" />
     <ClCompile Include="GController.cpp" />
+    <ClCompile Include="Goals\Basic\Goal.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="Navigation\Navigator.cpp" />
     <ClCompile Include="Navigation\NavPathfinder.cpp">
@@ -293,6 +295,7 @@
     </ClCompile>
     <ClCompile Include="Planner.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Strategist.cpp" />
     <ClCompile Include="Tools\MathHelper.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -395,6 +398,7 @@
     <ClInclude Include="Conditions\Special\CEqual.h" />
     <ClInclude Include="Conditions\Special\CInSet.h" />
     <ClInclude Include="Conditions\Special\CGreater.h" />
+    <ClInclude Include="DataBase.h" />
     <ClInclude Include="Debugger.h" />
     <ClInclude Include="GController.h" />
     <ClInclude Include="Goals\Basic\Goal.h" />
@@ -403,6 +407,7 @@
     <ClInclude Include="Navigation\Navigator.h" />
     <ClInclude Include="Navigation\NavPathfinder.h" />
     <ClInclude Include="Planner.h" />
+    <ClInclude Include="Strategist.h" />
     <ClInclude Include="SupplementalData.h" />
     <ClInclude Include="Testing.h" />
     <ClInclude Include="Tools\Catalogue.h" />

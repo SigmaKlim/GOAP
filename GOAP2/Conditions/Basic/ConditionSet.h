@@ -6,6 +6,8 @@
 #include "../../ValueSet.h"
 
 
+class DataBase;
+
 class ConditionSet : public PropertyList<std::shared_ptr<const ICondition>>
 {
 public:
@@ -19,10 +21,9 @@ public:
     //Resolve all colliding conditions, if there is a pair of conflicting conditions, return false
     bool Merge(const ConditionSet& other, ConditionSet& mergedConditionSet) const;
 
+    static const DataBase* DataPtr;
 private:
-    //static const Catalogue<IAttribute*>* _attributeCataloguePtr;
-    static const std::vector<std::shared_ptr<IAttribute>>* _attributes;
-    friend class Planner;
+    //friend class Planner;
 };
 
 template <typename T_Condition>

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "../../DataBase.h"
 #include "../../Conditions/Basic/ConditionSet.h"
 #include "../../ValueSet.h"
 #include "../../SupplementalData.h"
@@ -39,7 +40,8 @@ public:
     }
     //Returns maximal possible cost for this action
     virtual float GetMaxCost() const = 0;
-    
-    static size_t numAttributes;
+
+    static const DataBase* DataPtr;
+
 };
 

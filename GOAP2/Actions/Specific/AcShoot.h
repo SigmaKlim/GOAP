@@ -7,13 +7,17 @@
 class AcShoot : public IAction
 {
 public:
-    AcShoot(size_t iAmmoLeftInMag, size_t iEnemyStatus, float cost) : _iAmmoLeftInMag(iAmmoLeftInMag), _iEnemyStatus(iEnemyStatus), _cost(cost){}
+    AcShoot(float cost) : _cost(cost)
+    {
+        _iEnemyStatus = DataPtr->GetAttributeId("enemyStatus");
+        _iAmmoLeftInMag = DataPtr->GetAttributeId("ammoInMagLeft");
+    }
     void ConstructActionInstancesPriori(std::vector<ActionInstanceData>& actionInstances, const ConditionSet& requiredConditions, const SupplementalData& userData) override
     {
-        ConditionSet conditions(numAttributes);
+        ConditionSet conditions(DataPtr->GetNumAttributes());
         conditions.SetCondition(_iAmmoLeftInMag, new CGreater(SHOTS_PER_ACTION - 1));
         conditions.SetCondition(_iEnemyStatus, new CEqual(EAVEnemyStatus::eInRangedCombatRadius));
-        ValueSet effects(numAttributes);
+        ValueSet effects(DataPtr->GetNumAttributes());
         effects.SetValue(_iEnemyStatus, EAVEnemyStatus::eAttacking);
         actionInstances.push_back({conditions, effects, _cost, userData});
     }

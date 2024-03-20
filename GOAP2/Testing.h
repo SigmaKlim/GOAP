@@ -74,29 +74,23 @@ inline int TestNumeric()
 }
 
 //test function to assign ids and distances to navigator
-inline Navigator SetUpNavigator()
+inline void InitNavigator(DataBase& data)
 {
-	Navigator navigator;
-	navigator.AddNode("AmmoBox",	1, {8.0f, 1.0f, 0.0f});
-	navigator.AddNode("MedStation", 2, {2.0f, 2.0f, 0.0f});
-	navigator.AddNode("MedStation", 3, {8.0f, 4.0f, 0.0f});
-	navigator.AddNode("AmmoBox",	4, {5.0f, 5.0f, 0.0f});
-	navigator.AddNode("MedStation", 5, {2.0f, 7.0f, 0.0f});
-	navigator.AddNode("AmmoBox",	6, {6.0f, 8.0f, 0.0f});
-	navigator.AddNode("Cover",		7, {8.0f, 8.0f, 0.0f});
-	navigator.AddNode("Cover",		8, {3.0f, 5.0f, 0.0f});
-	navigator.AddNode("Cover",		9, {1.0f, 8.0f, 0.0f});
+	data.Navigator.AddNode("AmmoBox",	1, {8.0f, 1.0f, 0.0f});
+	data.Navigator.AddNode("MedStation", 2, {2.0f, 2.0f, 0.0f});
+	data.Navigator.AddNode("MedStation", 3, {8.0f, 4.0f, 0.0f});
+	data.Navigator.AddNode("AmmoBox",	4, {5.0f, 5.0f, 0.0f});
+	data.Navigator.AddNode("MedStation", 5, {2.0f, 7.0f, 0.0f});
+	data.Navigator.AddNode("AmmoBox",	6, {6.0f, 8.0f, 0.0f});
+	data.Navigator.AddNode("Cover",		7, {8.0f, 8.0f, 0.0f});
+	data.Navigator.AddNode("Cover",		8, {3.0f, 5.0f, 0.0f});
+	data.Navigator.AddNode("Cover",		9, {1.0f, 8.0f, 0.0f});
 
-	navigator.AddNode("Arbitrary", 0, {0.0f, 0.0f, 0.0f});
-	return navigator;
+	data.Navigator.AddNode("Arbitrary", 0, {0.0f, 0.0f, 0.0f});
 }
 
-inline int TestGoap()
+inline void InitAttributes(const Helper& helper)
 {
-	srand(time(0));
-	GController ai;
-#pragma region Init
-	Helper helper(ai);
 	helper.RegisterAttribute("isCrouching",		new ABool);
 	helper.RegisterAttribute("enemyStatus",		new AEnemyStatus);
 	helper.RegisterAttribute("hpLeft",			new AHealth);
@@ -105,98 +99,103 @@ inline int TestGoap()
 	helper.RegisterAttribute("magsLeft",		new AMagsLeft);
 	helper.RegisterAttribute("atNode",			new AAtNode);
 	helper.RegisterAttribute("grenadesLeft",	new AGrenadesLeft);
-	
-	Navigator navigator = SetUpNavigator(); 
-	AAtNode::navigator = navigator;
-	IAction::numAttributes = ai.GetNumAttributes(); //!!!
+}
 
+inline void InitActions(const Helper& helper, const DataBase& data)
+{
 	ConditionSet	cCrouch = helper.MakeConditionSet	({});
 	ValueSet		eCrouch = helper.MakeValueSet		({{"isCrouching", true}});
-	helper.RegisterAction("Crouch", new AcSimple(cCrouch, eCrouch, 3), new APTest("Crouch"));
+	helper.RegisterAction("Crouch", new AcSimple(cCrouch, eCrouch, 3));
 	
 	ConditionSet	cStand = helper.MakeConditionSet	({});
 	ValueSet		eStand = helper.MakeValueSet		({{"isCrouching", false}});
-	helper.RegisterAction("Stand", new AcSimple(cStand, eStand, 4), new APTest("Stand"));
+	helper.RegisterAction("Stand", new AcSimple(cStand, eStand, 4));
 	
 	
 	ConditionSet	cEngage	= helper.MakeConditionSet	({{"enemyStatus", new CEqual(EAVEnemyStatus::eVisible)}});
 	ValueSet		eEngage	= helper.MakeValueSet		({{"enemyStatus", EAVEnemyStatus::eInRangedCombatRadius}});
-	helper.RegisterAction("Engage enemy", new AcSimple(cEngage, eEngage, 4), new APTest("Engage enemy"));
+	helper.RegisterAction("Engage enemy", new AcSimple(cEngage, eEngage, 4));
 	
 	ConditionSet	cApproach = helper.MakeConditionSet	({{"enemyStatus", new CEqual(EAVEnemyStatus::eInRangedCombatRadius)}});
 	ValueSet		eApproach = helper.MakeValueSet		({{"enemyStatus", EAVEnemyStatus::eInCloseCombatRadius}});
-	helper.RegisterAction("Approach enemy", new AcSimple(cApproach, eApproach, 3), new APTest("Approach enemy"));
+	helper.RegisterAction("Approach enemy", new AcSimple(cApproach, eApproach, 3));
 	
-	helper.RegisterAction("Shoot enemy", new AcShoot(ai.GetAttributeId("ammoInMagLeft"),
-		ai.GetAttributeId("enemyStatus"), 3), new APTest("Shoot enemy"));
+	helper.RegisterAction("Shoot enemy", new AcShoot(3));
 	
 	ConditionSet cTGrenade = helper.MakeConditionSet({{"grenadesLeft", new CGreater(0)},
 							{"enemyStatus", new CEqual(EAVEnemyStatus::eInRangedCombatRadius)}});
 	ValueSet eTGrenade = helper.MakeValueSet({	{"enemyStatus", EAVEnemyStatus::eAttacking}});
-	helper.RegisterAction("Throw grenade", new AcSimple(cTGrenade, eTGrenade, 7), new APTest("Throw grenade"));
+	helper.RegisterAction("Throw grenade", new AcSimple(cTGrenade, eTGrenade, 7));
 	
 	ConditionSet cCut = helper.MakeConditionSet({{"enemyStatus", new CEqual(EAVEnemyStatus::eInCloseCombatRadius)}});
 	ValueSet eCut = helper.MakeValueSet({{"enemyStatus", EAVEnemyStatus::eAttacking}});
-	helper.RegisterAction("Attack melee", new AcSimple(cCut, eCut, 80), new APTest("Attack melee"));
+	helper.RegisterAction("Attack melee", new AcSimple(cCut, eCut, 80));
 	
 	
-	helper.RegisterAction("Go to", new AcGoTo(	ai.GetAttributeId("atNode"),
-																ai.GetAttributeId("isCrouching"),
-																ai.GetAttributeId("enemyStatus")), new APTest("Go to"));
+	helper.RegisterAction("Go to", new AcGoTo);
 	
-	helper.RegisterAction("Heal", new ACUseDepletable(	ai.GetAttributeId("hKitsLeft"),
-																ai.GetAttributeId("hpLeft"), 20, 3), new APTest("Heal"));
+	helper.RegisterAction("Heal", new ACUseDepletable(	data.GetAttributeId("hKitsLeft"),
+	                                                    data.GetAttributeId("hpLeft"), 20, 3));
 	
-	helper.RegisterAction("Reload", new ACUseDepletable(ai.GetAttributeId("magsLeft"),
-																ai.GetAttributeId("ammoInMagLeft"), 30, 3,
-																"magazine", "ammo"), new APTest("Reload"));
+	helper.RegisterAction("Reload", new ACUseDepletable(data.GetAttributeId("magsLeft"),
+	                                                    data.GetAttributeId("ammoInMagLeft"), 30, 3,
+	                                                    "magazine", "ammo"));
 	
 	helper.RegisterAction("Pickup health kit",
-									new AcPickupDepletable(	ai.GetAttributeId("hKitsLeft"),
-														ai.GetAttributeId("atNode"),
-														navigator.GetNodesByName("MedStation"), 4,
-														"health kit"), new APTest("Pickup health kit"));
+	                      new AcPickupDepletable(	data.GetAttributeId("hKitsLeft"),
+	                                                data.GetAttributeId("atNode"),
+	                                                data.Navigator.GetNodesByName("MedStation"), 4,
+	                                                "health kit"));
 	
 	helper.RegisterAction("Pickup magazine pack",
-								new AcPickupDepletable(	ai.GetAttributeId("magsLeft"),
-													ai.GetAttributeId("atNode"),
-													navigator.GetNodesByName("AmmoBox"), 3,
-													"magazine pack"), new APTest("Pickup magazine pack"));
+	                      new AcPickupDepletable(	data.GetAttributeId("magsLeft"),
+	                                                data.GetAttributeId("atNode"),
+	                                                data.Navigator.GetNodesByName("AmmoBox"), 3,
+	                                                "magazine pack"));
 	
 	helper.RegisterAction("Pickup grenade",
-								new AcPickupDepletable(	ai.GetAttributeId("grenadesLeft"),
-													ai.GetAttributeId("atNode"),
-													navigator.GetNodesByName("AmmoBox"), 4,
-													"grenade"), new APTest("Pickup grenade"));
+	                      new AcPickupDepletable(	data.GetAttributeId("grenadesLeft"),
+	                                                data.GetAttributeId("atNode"),
+	                                                data.Navigator.GetNodesByName("AmmoBox"), 4,
+	                                                "grenade"));
 	
 	
-	helper.RegisterAction("Search enemy", new AcSearchEnemy(ai.GetAttributeId("enemyStatus"),
-		ai.GetAttributeId("atNode"),
-		ai.GetAttributeId("isCrouching"),
-		navigator.GetMaxDistance() * 5), new APTest("Search enemy"));
-	
+	helper.RegisterAction("Search enemy", new AcSearchEnemy(data.Navigator.GetMaxDistance() * 5));
+}
+inline void InitGoals(Helper& helper)
+{
 	ConditionSet gAttack = helper.MakeConditionSet({{"enemyStatus", new CEqual(EAVEnemyStatus::eAttacking)}});
-	helper.RegisterGoal("Attack enemy", new GTest(gAttack, ai.GetAttributeId("atNode"), 5.0f));
+	helper.RegisterGoal("Attack enemy", new GTest(gAttack, 5.0f));
 	
 	ConditionSet gHeal = helper.MakeConditionSet({{"hpLeft", new CGreater(59)}});
-	helper.RegisterGoal("Heal", new GTest(gHeal,ai.GetAttributeId("atNode"), 4.0f));
-
-	ValueSet init = helper.MakeValueSet({	{"isCrouching", true},
-											{"enemyStatus", EAVEnemyStatus::eNonVisible},
-											{"hpLeft", 20},
-											{"hKitsLeft", 1},
-											{"ammoInMagLeft", 0},
-											{"grenadesLeft", 0},
-											{"magsLeft", 0},
-											{"atNode", *navigator.GetNodesByName("AmmoBox").begin()}});
-	helper.InitState(init);
-#pragma endregion
-#pragma region Loop
-	while(true)
-	{
-		ai.Update();
-	}
-#pragma endregion
+	helper.RegisterGoal("Heal", new GTest(gHeal, 4.0f));
+}
+inline int TestGoap()
+{
+// 	srand(time(0));
+// 	GController ai;
+// 	//IAction::numAttributes = ai.GetNumAttributes(); //!!!
+//
+// 	
+// 	
+// 	
+//
+// 	ValueSet init = helper.MakeValueSet({	{"isCrouching", true},
+// 											{"enemyStatus", EAVEnemyStatus::eNonVisible},
+// 											{"hpLeft", 20},
+// 											{"hKitsLeft", 1},
+// 											{"ammoInMagLeft", 0},
+// 											{"grenadesLeft", 0},
+// 											{"magsLeft", 0},
+// 											{"atNode", *navigator.GetNodesByName("AmmoBox").begin()}});
+// 	helper.InitState(init);
+// #pragma endregion
+// #pragma region Loop
+// 	while(true)
+// 	{
+// 		ai.Update();
+// 	}
+// #pragma endregion
 
 #pragma region old
 	// Planner planner;

@@ -1,18 +1,22 @@
 ﻿#pragma once
 
-#include "GController.h"
+#include <map>
+
+#include "DataBase.h"
+#include "Actions/Performers/IActionPerformer.h"
+#include "Conditions/Basic/ConditionSet.h"
 
 class Helper
 {
 public:
-    Helper(GController& gController);
+    Helper(DataBase& data) : _data(data) {}
 
-    void RegisterAttribute(const std::string& name, IAttribute* attributePtr);
-    void RegisterGoal(const std::string& name, Goal* goalPtr);
-    void RegisterAction(const std::string& name, IAction* actionPtr, IActionPerformer* actionPerformerPtr);
+    void RegisterAttribute(const std::string& name, IAttribute* attributePtr) const;
+    void RegisterGoal(const std::string& name, Goal* goalPtr) const;
+    void RegisterAction(const std::string& name, IAction* actionPtr) const;
 
-    void InitState(const ValueSet& state);
-    void OverrideState(const std::string& attributeName, t_value value);
+    // void InitState(const ValueSet& state);
+    // void OverrideState(const std::string& attributeName, t_value value);
     
     //input: attributeName->ICondition*
     ConditionSet MakeConditionSet(const std::map<std::string, ICondition*>& input) const;
@@ -21,5 +25,5 @@ public:
     
 
 private:
-    GController& _gController;
+    DataBase& _data;
 };

@@ -1,3 +1,3 @@
 ﻿#include "IAction.h"
 
-size_t IAction::numAttributes;
+const DataBase* IAction::DataPtr;

@@ -10,6 +10,7 @@
 struct Plan
 {
     Plan(size_t numAttributes);
+    void Clear();
     ValueSet StartState;
     std::string GoalName;
     
@@ -22,7 +23,7 @@ struct Plan
     
     float TotalCost;
     ValueSet ResultState;
-    TelemetryData TelemetryData;
+    TelemetryData TData;
 };
 
 struct Vertex
@@ -43,7 +44,7 @@ size_t VertexKey<Vertex>::operator()(const Vertex& k) const;
 class Planner : public AStarSolver<Vertex>
 {
 public:
-    Planner(const std::vector<std::shared_ptr<IAttribute>>& attributes, const std::vector<std::shared_ptr<IAction>>& actions, const std::vector<const std::string*>& actionNames);
+    Planner(const DataBase& data);
     void GetNeighbors(std::vector<Vertex>& neighbors, std::vector<float>& distances, const Vertex& vertex, const Vertex& finish) const override;
     bool Satisfies(const Vertex& vertex, const Vertex& finish) const override;
     float GetDistanceDenominator() const override;
@@ -62,35 +63,10 @@ public:
     //size_t GetAttributeId(const std::string& name) const;
     //void PrintValueSet(const ValueSet& vs) const;
 private:
-    const std::vector<std::shared_ptr<IAttribute>>& _attributes;
-    const std::vector<std::shared_ptr<IAction>>& _actions;
-    //debug
-    const std::vector<const std::string*>& _actionNames;
     
-    // Catalogue<IAttribute*> _attributeCatalogue;
-    // Catalogue<IAction*> _actionCatalogue;
-    // Catalogue<ConditionSet> _goalCatalogue;
-
+    const DataBase& _data;
     const unsigned MAX_NUM_ACTIONS_PER_PLAN = 10;
     friend Plan;
 
 };
 
-// template <typename t_attribute>
-// void Planner::RegisterAttribute(const std::string& name)
-// {
-//     IAttribute* iAttributePtr = static_cast<IAttribute*>(new t_attribute);
-//     assert(_attributeCatalogue.AddItem(name, iAttributePtr));
-// }
-//
-// template <typename t_action>
-// void Planner::RegisterActionConstructor(const std::string& name, const t_action& actionConstructor)
-// {
-//     auto* iActionConstructor = static_cast<IAction*>(new t_action(actionConstructor));
-//     assert(_actionCatalogue.AddItem(name, iActionConstructor));
-// }
-//
-// inline void Planner::RegisterGoal(const std::string& name, const ConditionSet& goalState)
-// {
-//     assert(_goalCatalogue.AddItem(name, goalState));    
-// }

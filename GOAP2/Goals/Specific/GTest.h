@@ -4,7 +4,7 @@
 class GTest : public Goal
 {
 public:
-    GTest(const ConditionSet& goalConditions, size_t iAtNode, float initPriority = 0.0f) : Goal(goalConditions, initPriority),  _iAtNode(iAtNode){}
+    GTest(const ConditionSet& goalConditions, float initPriority = 0.0f) : Goal(goalConditions), _priority(initPriority){}
     
     float UpdatePriority() override
     {
@@ -14,10 +14,11 @@ public:
     ValueSet OverrideAgentState(const ValueSet& resultState) override
     {
         auto overridenState = resultState;
-        if (resultState.GetValue(_iAtNode) == -1)
-            overridenState.SetValue(_iAtNode, 0);
+        auto iAtNode = *DataPtr->AttributeCatalogue.GetId("atNode");
+        if (resultState.GetValue(iAtNode) == -1)
+            overridenState.SetValue(iAtNode, 0);
         return overridenState;
     }
 private:
-    size_t _iAtNode;
+    float _priority;
 };

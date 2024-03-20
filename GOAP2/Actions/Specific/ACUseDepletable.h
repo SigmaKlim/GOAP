@@ -35,12 +35,12 @@ inline void ACUseDepletable::ConstructActionInstancesPriori(std::vector<ActionIn
             auto* cGreaterNumDepletables = static_cast<const CGreater*>(requiredConditions.GetProperty(_iNumDepletables).get());
             minNumDepletables = cGreaterNumDepletables->Value + 1; //Make minimal required number of health kits Greater by 1, as this action depletes 1 kit
         }
-        ConditionSet cs(numAttributes);
+        ConditionSet cs(DataPtr->GetNumAttributes());
         cs.SetCondition(_iNumDepletables, new CGreater(minNumDepletables));
         auto* cGreaterAffected = static_cast<const CGreater*>(requiredConditions.GetProperty(_iAffectedAttribute).get());
         t_value requiredValue = cGreaterAffected->Value + 1;
         cs.SetCondition(_iAffectedAttribute, new CGreater(requiredValue - _delta - 1)); //Make minimal required value of the affected attribute less by delta, as this action increases it by delta
-        ValueSet vs(numAttributes);
+        ValueSet vs(DataPtr->GetNumAttributes());
         vs.SetValue(_iAffectedAttribute, requiredValue);
         ActionInstanceData action(cs, vs, _cost, userData, "");
         actions.push_back(action);

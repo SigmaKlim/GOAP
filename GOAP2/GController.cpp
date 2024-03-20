@@ -1,19 +1,22 @@
 ﻿#include "GController.h"
 #include <numeric>
 
-GController::GController() : _planner(  _attributeCatalogue.oRange.Objects,
-                                        _actionCatalogue.oRange.Objects,
-                                        _actionCatalogue.nRange.Names),
-                            _agentState(0), _currentPlan(0), _debugger(*this)
-{
-}
+const Strategist*    GController::StrategistPtr;
+const Planner*       GController::PlannerPtr;
+const DataBase*      GController::DataPtr;
 
+GController::GController(const ValueSet& initState, const std::vector<std::shared_ptr<IActionPerformer>>& performers) : _agentState(initState), _currentPlan(DataPtr->GetNumAttributes()), _actionPerformers(performers)
+{
+    _goalPriorities.resize(DataPtr->GoalCatalogue.Size());
+    for (size_t i = 0; i < _goalPriorities.size(); i++)
+        _goalPriorities[i] = (*DataPtr->GoalCatalogue.GetItem(i))->UpdatePriority();
+}
 
 void GController::Update()
 {
     if (_mustBuildStrategy == true)
     {
-        ConstructStrategy(_currentStrategy);
+        StrategistPtr->ConstructStrategy(_goalPriorities, _currentStrategy);
         _currentGoalIndex = 0;
         _mustBuildStrategy = false;
         _isGoalFinished = true;
@@ -30,12 +33,12 @@ void GController::Update()
         else
             skipNextDebugPrint = false;
         //
-        _currentPlan = Plan(GetNumAttributes());
-        _currentPlan.Goal = (*_goalCatalogue.GetItem(_currentStrategy.GoalIds[_currentGoalIndex]))->GetConditions();
-        _currentPlan.GoalName = (*_goalCatalogue.GetName(_currentStrategy.GoalIds[_currentGoalIndex]));
+        _currentPlan.Clear();
+        _currentPlan.Goal = (*DataPtr->GoalCatalogue.GetItem(_currentStrategy.GoalIds[_currentGoalIndex]))->GetConditions();
+        _currentPlan.GoalName = (*DataPtr->GoalCatalogue.GetName(_currentStrategy.GoalIds[_currentGoalIndex]));
         _currentPlan.StartState = _agentState;
         _isGoalFinished = false;
-        assert(_planner.ConstructPlan(_currentPlan, GenerateSupData()));
+        assert(PlannerPtr->ConstructPlan(_currentPlan, GenerateSupData()));
         _currentActionIndex = 0;
         //debug
         std::cout << "Plan for goal " << _currentPlan.GoalName << " constructed!\n";
@@ -47,9 +50,9 @@ void GController::Update()
         _currentActionIndex++; //move on to the next action in the plan
         if (_currentActionIndex >= _currentPlan.ActionIds.size()) //if we complete the plan
         {
-            (*_goalCatalogue.GetItem(_currentStrategy.GoalIds[_currentGoalIndex]))->UpdatePriority();
-            _currentGoalIndex = (_currentGoalIndex + 1) % _goalCatalogue.Size();
-            _agentState = (*_goalCatalogue.GetItem(_currentStrategy.GoalIds[_currentGoalIndex]))->OverrideAgentState(_currentPlan.ResultState);
+            (*DataPtr->GoalCatalogue.GetItem(_currentStrategy.GoalIds[_currentGoalIndex]))->UpdatePriority();
+            _currentGoalIndex = (_currentGoalIndex + 1) % DataPtr->GoalCatalogue.Size();
+            _agentState = (*DataPtr->GoalCatalogue.GetItem(_currentStrategy.GoalIds[_currentGoalIndex]))->OverrideAgentState(_currentPlan.ResultState);
             _isGoalFinished = true;
             //debug
             std::cout << "\nResult state:\n";
@@ -62,9 +65,10 @@ void GController::Update()
 
 void GController::UpdateGoalPriority(const std::string& name, bool mustRebuildStrategy)
 {
-    auto goalPtr = *_goalCatalogue.GetItem(name);
+    auto goalPtr = *DataPtr->GoalCatalogue.GetItem(name);
+    auto goalId = *DataPtr->GoalCatalogue.GetId(name);
     assert(goalPtr != nullptr);
-    goalPtr->UpdatePriority();
+    _goalPriorities[goalId] = goalPtr->UpdatePriority();
     _mustBuildStrategy = mustRebuildStrategy;
 }
 
@@ -73,33 +77,11 @@ void GController::RequestStrategyRebuild()
     _mustBuildStrategy = true;
 }
 
-void GController::ConstructStrategy(Strategy& strategy) const
-{
-    strategy.GoalIds = std::vector<size_t>(_goalCatalogue.Size());
-    std::iota(strategy.GoalIds.begin(), strategy.GoalIds.end(), 0);
-    auto& g = _goalCatalogue.oRange.Objects;
-    std::sort(strategy.GoalIds.begin(), strategy.GoalIds.end(), [&g](size_t i1, size_t i2)
-    {
-        return g[i1]->GetPriority() > g[i2]->GetPriority();
-    });
-}
-
-size_t GController::GetNumAttributes() const
-{
-    return _attributeCatalogue.Size();
-}
-
-size_t GController::GetAttributeId(const std::string& name) const
-{
-    auto* idPtr = _attributeCatalogue.GetId(name);
-    assert(idPtr);
-    return *idPtr;
-}
 
 SupplementalData GController::GenerateSupData() const
 {
     SupplementalData data;
-    data.initNode = _agentState.GetValue(GetAttributeId("atNode"));
+    data.initNode = _agentState.GetValue(DataPtr->GetAttributeId("atNode"));
     data.futureGoToDestinationNode = -1;
     return data;
 }

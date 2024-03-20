@@ -7,6 +7,7 @@
 #include "Planner.h"
 #include "Actions/Performers/IActionPerformer.h"
 #include "Debugger.h"
+#include "Strategist.h"
 
 struct RebuildStatus
 {
@@ -14,38 +15,30 @@ struct RebuildStatus
     bool mustDropCurrentGoal = false;
 };
 
-struct Strategy
-{
-    std::vector<size_t> GoalIds;
-};
 
 class GController
 {
 public:
-    GController();
+    GController(const ValueSet& initState, const std::vector<std::shared_ptr<IActionPerformer>>& performers);
     void Update();
     void UpdateGoalPriority(const std::string& name, bool mustRebuildStrategy);
     void RequestStrategyRebuild();
-    size_t GetNumAttributes() const;
-    size_t GetAttributeId(const std::string& name) const;
+
     SupplementalData GenerateSupData() const;
     //Set value in the agent state. Can be called in BeginPlay or on goal completion
     
+    static const Strategist*    StrategistPtr;
+    static const Planner*       PlannerPtr;
+    static const DataBase*      DataPtr;
 private:
-    void ConstructStrategy(Strategy& strategy) const;
-    Catalogue<std::shared_ptr<IAttribute>> _attributeCatalogue;
-    Catalogue<std::shared_ptr<Goal>> _goalCatalogue;
-    Catalogue<std::shared_ptr<IAction>> _actionCatalogue;
-    std::vector<std::shared_ptr<IActionPerformer>> _actionPerformers;
-    Planner _planner;
-
     ValueSet _agentState;
     int _currentActionIndex = -1;
     Plan _currentPlan;
+    std::vector<std::shared_ptr<IActionPerformer>> _actionPerformers;
     int _currentGoalIndex = -1;
     Strategy _currentStrategy;
-    friend class Helper;
-
+    std::vector<float> _goalPriorities;
+    
     bool _mustBuildStrategy = true;
     bool _isGoalFinished = false;
     bool _mustBuildPlan = true;
@@ -53,5 +46,5 @@ private:
     Debugger _debugger;
     
     friend Debugger;
-    
+    friend class Helper;
 };
