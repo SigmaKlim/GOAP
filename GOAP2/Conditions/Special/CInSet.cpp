@@ -1,6 +1,6 @@
-﻿#include "CEqual.h"
-#include "CInSet.h"
-#include "CLarger.h"
+﻿#include "CInSet.h"
+#include "CEqual.h"
+#include "CGreater.h"
 
 CInSet::CInSet(const std::unordered_set<t_value>& valueSet): Values(valueSet)
 {}
@@ -15,11 +15,11 @@ ICondition* CInSet::ResolveCEqual(const CEqual* cEqual) const
     return Values.contains(cEqual->Value) ? new CEqual(cEqual->Value) : nullptr;
 }
 
-ICondition* CInSet::ResolveCLarger(const CLarger* cLarger) const
+ICondition* CInSet::ResolveCGreater(const CGreater* cGreater) const
 {
     std::unordered_set<t_value> goodValues;
     for (auto& value : Values)
-        if (value < cLarger->Value)
+        if (value < cGreater->Value)
             goodValues.insert(value);
     return goodValues.empty() ? nullptr : new CInSet(goodValues);
 }

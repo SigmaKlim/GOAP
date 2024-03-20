@@ -53,8 +53,8 @@ private:
     FibonacciHeap<T_NodeDesc> &operator=(const FibonacciHeap<T_NodeDesc> &other);
 
 protected:
-    Element<T_NodeDesc> *min;
-    lli n;
+    Element<T_NodeDesc> *_min;
+    lli _n;
 
     lli _D(lli n) {
         return log(n)/log(GOLDEN_RATIO_ROUND_DOWN);
@@ -124,11 +124,11 @@ protected:
     }
 
     void _consolidate() {
-        lli D = this->_D(this->n);
+        lli D = this->_D(this->_n);
         std::vector<Element<T_NodeDesc>*> A(D + 1, nullptr);
 
         std::list<Element<T_NodeDesc>*> elements;
-        this->_fillListWithElements(this->min, elements);
+        this->_fillListWithElements(this->_min, elements);
 
         for (auto x : elements) {
             lli d = x->degree;
@@ -149,12 +149,12 @@ protected:
             A.at(d) = x;
         }
 
-        this->min = nullptr;
+        this->_min = nullptr;
         for (lli i = 0; i < (lli)A.size(); i++) {
             if (A.at(i) != nullptr) {
                 A.at(i)->right = A.at(i);
                 A.at(i)->left = A.at(i);
-                this->min = this->_unite(this->min, A.at(i));
+                this->_min = this->_unite(this->_min, A.at(i));
             }
         }
     }
@@ -178,7 +178,7 @@ protected:
         x->parent = nullptr;
         x->mark = false;
 
-        this->min = this->_unite(this->min, x);
+        this->_min = this->_unite(this->_min, x);
     }
 
     void _cascadingCut(Element<T_NodeDesc> *y) {
@@ -196,42 +196,42 @@ protected:
 
 public:
     FibonacciHeap() {
-        this->min = nullptr;
-        this->n = 0;
+        this->_min = nullptr;
+        this->_n = 0;
     };
 
     ~FibonacciHeap() {
-        if (this->min != nullptr) {
-            this->_deleteAll(this->min);
+        if (this->_min != nullptr) {
+            this->_deleteAll(this->_min);
         }
     }
 
     bool isEmpty() const {
-        return this->min == nullptr;
+        return this->_min == nullptr;
     }
 
     Element<T_NodeDesc> *insert(T_NodeDesc key) {
         Element<T_NodeDesc> *x = new Element<T_NodeDesc>(key);
         
-        this->min = this->_unite(this->min, x);
-        this->n++;
+        this->_min = this->_unite(this->_min, x);
+        this->_n++;
 
         return x;
     }
 
     void unite(FibonacciHeap<T_NodeDesc> *heap) {
-        this->min = this->_unite(this->min, heap->min);
-        this->n += heap->n;
-        heap->min = nullptr;
-        heap->n = 0;
+        this->_min = this->_unite(this->_min, heap->_min);
+        this->_n += heap->_n;
+        heap->_min = nullptr;
+        heap->_n = 0;
     }
 
     T_NodeDesc getMin() const {
-        return this->min->key;
+        return this->_min->key;
     }
 
     T_NodeDesc extractMin() {
-        Element<T_NodeDesc> *z = this->min;
+        Element<T_NodeDesc> *z = this->_min;
         if (z == nullptr) {
             throw std::invalid_argument("heap is empty");
         }
@@ -245,20 +245,20 @@ public:
                 x->parent = nullptr;
             } while (x != last);
 
-            this->min = this->_unite(this->min, x);
+            this->_min = this->_unite(this->_min, x);
         }
 
         z->left->right = z->right;
         z->right->left = z->left;
 
         if (z == z->right) {
-            this->min = nullptr;
+            this->_min = nullptr;
         } else {
-            this->min = z->right;
+            this->_min = z->right;
             this->_consolidate();
         }
         
-        this->n--;
+        this->_n--;
         T_NodeDesc min = z->key;
         delete z;
         return min;
@@ -277,13 +277,13 @@ public:
             this->_cascadingCut(y);
         }
 
-        if (x->key < this->min->key) {
-            this->min = x;
+        if (x->key < this->_min->key) {
+            this->_min = x;
         }
     }
 
     void deleteElement(Element<T_NodeDesc> *x) {
-        this->decreaseKey(x, std::numeric_limits<T_NodeDesc>::min());
+        this->decreaseKey(x, std::numeric_limits<T_NodeDesc>::_min());
         this->extractMin();
     }
 };

@@ -1,24 +1,29 @@
 ﻿#pragma once
 
-#include "Planner.h"
+#include <map>
+
+#include "DataBase.h"
+#include "Actions/Performers/IActionPerformer.h"
+#include "Conditions/Basic/ConditionSet.h"
 
 class Helper
 {
 public:
-    Helper(Planner* plannerPtr);
+    Helper(DataBase& data) : _data(data) {}
+
+    void RegisterAttribute(const std::string& name, IAttribute* attributePtr) const;
+    void RegisterGoal(const std::string& name, Goal* goalPtr) const;
+    void RegisterAction(const std::string& name, IAction* actionPtr) const;
+
+    // void InitState(const ValueSet& state);
+    // void OverrideState(const std::string& attributeName, t_value value);
+    
     //input: attributeName->ICondition*
     ConditionSet MakeConditionSet(const std::map<std::string, ICondition*>& input) const;
     //input: attributeName->attributeValue
     ValueSet MakeValueSet(const std::map<std::string, t_value>& input) const;
+    
 
-    //Cast from t_super* to t_sub* and assert that result is not nullptr
-    template <typename t_sub, typename t_super>
-    static t_sub* CastAssert(t_super* supPtr)
-    {
-        auto* subPtr = dynamic_cast<t_sub*>(supPtr);
-        assert(subPtr);
-        return subPtr;
-    }
 private:
-    Planner* _plannerPtr;
+    DataBase& _data;
 };

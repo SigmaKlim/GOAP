@@ -1,6 +1,8 @@
 ﻿#include "ConditionSet.h"
 
-const Catalogue<IAttribute*>* ConditionSet::_attributeCataloguePtr;
+#include "../../DataBase.h"
+
+const DataBase* ConditionSet::DataPtr;
 
 bool ConditionSet::HasConflicts(const ConditionSet& other) const
 {
@@ -23,7 +25,7 @@ bool ConditionSet::Reduce(const ValueSet& world, ConditionSet& reducedConditionS
     {
         if (IsAffected(i) == true && world.IsAffected(i) == true)
         {
-            if(_properties[i]->Evaluate(world.GetProperty(i), *_attributeCataloguePtr->GetItem(i), userData) != 0.0f)
+            if(_properties[i]->Evaluate(world.GetProperty(i), DataPtr->AttributeCatalogue.GetItem(i)->get(), userData) != 0.0f)
                     return false;
             reducedConditionSet.ClearValue(i);
             wasAtLeast1ConditionSatisfied = true;

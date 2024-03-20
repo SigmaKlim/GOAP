@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <memory>
+
 #include "../../Attributes/Basic/IAttribute.h"
 
 #pragma region Macro
@@ -18,8 +18,6 @@ ICondition* Resolve(const ICondition* c) const override \
 
 #pragma endregion 
 
-struct CEqual;
-
 struct ICondition
 {
     ICondition() = default;
@@ -35,7 +33,7 @@ struct ICondition
     virtual ICondition* Resolve(const ICondition* conditionPtr) const = 0;
     
     RESOLVE_I(CEqual)
-    RESOLVE_I(CLarger)
+    RESOLVE_I(CGreater)
     RESOLVE_I(CInSet)
 
 protected:

@@ -10,7 +10,7 @@ struct CEqual : public ICondition
     
     RESOLVE_D(CEqual)
     ICondition* ResolveCEqual(const CEqual* cEqual) const override;
-    ICondition* ResolveCLarger(const CLarger* cLarger) const override;
+    ICondition* ResolveCGreater(const CGreater* cGreater) const override;
     ICondition* ResolveCInSet(const CInSet* cInSet) const override;
 
     t_value Value;

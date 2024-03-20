@@ -12,7 +12,7 @@ struct CInSet : public ICondition
 
     RESOLVE_D(CInSet)
     ICondition* ResolveCEqual(const CEqual* cEqual) const override;
-    ICondition* ResolveCLarger(const CLarger* cLarger) const override;
+    ICondition* ResolveCGreater(const CGreater* cGreater) const override;
     ICondition* ResolveCInSet(const CInSet* cInSet) const override;
     
     std::unordered_set<t_value> Values;
